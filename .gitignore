@@ -1,0 +1,10 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives & temp downloads
+*.zip
+zi5VaVFL
+
+# Node
+node_modules/
