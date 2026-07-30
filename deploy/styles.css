@@ -13,20 +13,23 @@
    ========================================================================= */
 
 :root{
-  /* ---- Primitives de marque ---- */
-  --ink:#1e2e2d;
-  --ink-soft:#2f4443;
-  --teal-700:#46605f;
-  --teal-600:#5f7a79;
-  --teal-brand:#89a3a2;
+  /* ---- Primitives de marque ----
+     Palette neutre : le verre blanc porte les surfaces, l'encre porte le
+     texte. Aucune teinte verte — les anciens noms `teal-*` sont conservés
+     pour ne pas réécrire tout le fichier, mais leurs valeurs sont grises. */
+  --ink:#17191b;
+  --ink-soft:#3c4145;
+  --teal-700:#5a6165;
+  --teal-600:#767c80;
+  --teal-brand:#a2a8ac;
   --sand:#dec8a7;
   --surface:#ffffff;
-  --surface-teal:#eef3f3;
-  --surface-sand:#faf5ec;
-  --border:#d0dcdb;
-  --border-strong:#5f7a79;
-  --cta:#24312f;
-  --canvas:#e4e9e9;
+  --surface-teal:#f3f4f5;
+  --surface-sand:#faf6f0;
+  --border:#e2e4e6;
+  --border-strong:#767c80;
+  --cta:#17191b;
+  --canvas:#eaebec;
 
   /* ---- Typographie — VERROUILLÉE ---- */
   --font-display:'Outfit','Codec Pro',sans-serif;
@@ -40,8 +43,8 @@
   --radius-pill:999px;
 
   /* ---- Ombres ---- */
-  --shadow-soft:0 8px 30px rgba(30,46,45,.08);
-  --shadow-lift:0 22px 60px rgba(30,46,45,.16);
+  --shadow-soft:0 8px 30px rgba(23,25,27,.08);
+  --shadow-lift:0 22px 60px rgba(23,25,27,.16);
 
   /* ---- Échelle z-index ---- */
   --z-content:10;
@@ -52,10 +55,10 @@
   /* ---- Verre : les alphas plancher pour l'accessibilité ----
      Verre sombre >= .70 (texte blanc), verre clair >= .72 (texte encre).
      Composés sur blanc pur et sur noir pur, les deux passent AA. */
-  --glass-dark-a:rgba(20,30,28,.78);
-  --glass-dark-b:rgba(20,30,28,.7);
-  --glass-dark-hi-a:rgba(34,48,46,.86);
-  --glass-dark-hi-b:rgba(28,40,38,.78);
+  --glass-dark-a:rgba(20,21,23,.78);
+  --glass-dark-b:rgba(20,21,23,.7);
+  --glass-dark-hi-a:rgba(34,36,38,.86);
+  --glass-dark-hi-b:rgba(28,30,32,.78);
   --glass-light-a:rgba(255,255,255,.86);
   --glass-light-b:rgba(255,255,255,.72);
   --glass-light-hi-a:rgba(255,255,255,.95);
@@ -75,8 +78,8 @@
     inset 0 -1px 0 rgba(0,0,0,.12);
   /* Un liseré blanc est invisible sur fond clair : le verre clair a donc
      besoin d'un filet sombre pour garder une silhouette. */
-  --glass-hairline:inset 0 0 0 1px rgba(46,68,67,.12);
-  --glass-drop:0 4px 16px rgba(30,46,45,.07);
+  --glass-hairline:inset 0 0 0 1px rgba(30,32,34,.12);
+  --glass-drop:0 4px 16px rgba(23,25,27,.07);
 
   /* Grain argentique — la vidéo source fait 848x480 */
   --grain:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -162,7 +165,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,
    disparaîtrait silencieusement sur exactement les navigateurs concernés. */
 @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
   .blurred.glass-dark{
-    background:linear-gradient(180deg,rgba(20,30,28,.74),rgba(20,30,28,.68));
+    background:linear-gradient(180deg,rgba(20,21,23,.74),rgba(20,21,23,.68));
     -webkit-backdrop-filter:saturate(150%) blur(14px);
     backdrop-filter:saturate(150%) blur(14px);
   }
@@ -186,7 +189,7 @@ body:not(.past-hero) .dock-shell{
 
 @media (prefers-reduced-transparency:reduce){
   .blurred{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-  .glass-dark,.blurred.glass-dark{background:rgba(20,30,28,.97)}
+  .glass-dark,.blurred.glass-dark{background:rgba(20,21,23,.97)}
   .glass-light,.blurred.glass-light{background:rgba(255,255,255,.98)}
 }
 
@@ -205,18 +208,18 @@ body:not(.past-hero) .dock-shell{
 
 /* Encre — CTA principal sur fond clair */
 .btn-ink{
-  background:linear-gradient(180deg,rgba(38,52,50,.97),rgba(22,32,30,.99));
-  color:#fff;box-shadow:var(--glass-edge-bright),0 12px 30px rgba(30,46,45,.26);
+  background:linear-gradient(180deg,rgba(38,40,42,.97),rgba(22,24,26,.99));
+  color:#fff;box-shadow:var(--glass-edge-bright),0 12px 30px rgba(23,25,27,.26);
 }
 .btn-ink:hover{
-  background:linear-gradient(180deg,rgba(52,70,68,.98),rgba(34,46,44,1));
-  box-shadow:var(--glass-edge-bright),0 16px 38px rgba(30,46,45,.32);
+  background:linear-gradient(180deg,rgba(52,55,58,.98),rgba(34,37,40,1));
+  box-shadow:var(--glass-edge-bright),0 16px 38px rgba(23,25,27,.32);
 }
 
 /* Fumée — verre sombre sur média : contraste garanti sur n'importe quelle image */
 .btn-smoke{
   background:linear-gradient(180deg,var(--glass-dark-a),var(--glass-dark-b));
-  color:#fff;box-shadow:var(--glass-edge-bright),0 12px 30px rgba(12,20,19,.3);
+  color:#fff;box-shadow:var(--glass-edge-bright),0 12px 30px rgba(14,15,16,.3);
 }
 .btn-smoke:hover{background:linear-gradient(180deg,var(--glass-dark-hi-a),var(--glass-dark-hi-b))}
 
@@ -224,7 +227,7 @@ body:not(.past-hero) .dock-shell{
 .btn-quiet{
   background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
   color:var(--ink);
-  box-shadow:var(--glass-edge),inset 0 0 0 1px rgba(95,122,121,.34),0 4px 14px rgba(30,46,45,.08);
+  box-shadow:var(--glass-edge),inset 0 0 0 1px rgba(118,124,128,.34),0 4px 14px rgba(23,25,27,.08);
 }
 .btn-quiet:hover{background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
 
@@ -250,7 +253,7 @@ body:not(.past-hero) .dock-shell{
   background:var(--surface);
   border-radius:var(--radius-lg);
   overflow:hidden;
-  box-shadow:0 1px 2px rgba(30,46,45,.06),0 18px 50px rgba(30,46,45,.07);
+  box-shadow:0 1px 2px rgba(23,25,27,.06),0 18px 50px rgba(23,25,27,.07);
 }
 
 /* =========================================================================
@@ -270,15 +273,30 @@ body:not(.past-hero) .dock-shell{
   padding:8px 12px;
   border-radius:var(--radius-pill);
 }
-.nav-pill{box-shadow:var(--glass-edge),var(--glass-hairline),0 10px 34px rgba(12,20,19,.16)}
+.nav-pill{box-shadow:var(--glass-edge),var(--glass-hairline),0 10px 34px rgba(14,15,16,.16)}
 
-.nav-links{display:none;gap:6px}
+/* Les liens restent visibles à tous les formats : sous 1024px la rangée
+   défile horizontalement plutôt que de disparaître derrière un menu. */
+.nav-links{
+  display:flex;gap:2px;overflow-x:auto;
+  scrollbar-width:none;-ms-overflow-style:none;
+  -webkit-overflow-scrolling:touch;
+  /* Le masque signale qu'il reste des entrées à droite sans ajouter de
+     chrome : la pilule garde sa silhouette. */
+  mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 18px),transparent 100%);
+  -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 18px),transparent 100%);
+}
+.nav-links::-webkit-scrollbar{display:none}
 .nav-links a{
-  color:var(--teal-700);text-decoration:none;font-size:.9rem;
-  padding:12px 12px;border-radius:var(--radius-pill);
+  color:var(--teal-700);text-decoration:none;font-size:.86rem;white-space:nowrap;
+  padding:12px 11px;border-radius:var(--radius-pill);
   display:inline-flex;align-items:center;min-height:44px;transition:color .2s;
 }
-.nav-links a:hover{color:var(--ink)}
+.nav-links a:hover,.nav-links a[aria-current]{color:var(--ink)}
+@media(min-width:1024px){
+  .nav-links{gap:6px;overflow:visible;mask-image:none;-webkit-mask-image:none}
+  .nav-links a{font-size:.9rem;padding:12px 12px}
+}
 
 /* Le logo est dans la colonne centrale de la grille : il reste centré
    sur la pilule quel que soit le contenu de gauche et de droite. */
@@ -290,9 +308,21 @@ body:not(.past-hero) .dock-shell{
   display:inline-flex;align-items:center;justify-content:center;
   min-height:44px;padding:0 8px;white-space:nowrap;
 }
-.nav-start{grid-column:1;justify-self:start;display:flex;align-items:center}
+/* min-width:0 : sans elle, la colonne des liens refuse de rétrécir sous
+   la largeur intrinsèque de la rangée et déborde la pilule. */
+.nav-start{grid-column:1;justify-self:start;display:flex;align-items:center;min-width:0;max-width:100%}
 .nav-end{grid-column:3;justify-self:end;display:flex;align-items:center;gap:10px}
-@media(min-width:1024px){.nav-links{display:flex}}
+
+/* Sous 1024px le logo centré ne laisse plus de place aux liens : la pilule
+   passe sur deux rangs, logo et action en haut, navigation en dessous —
+   toutes les entrées restent lisibles au lieu d'être rognées. */
+@media(max-width:1023px){
+  .nav-pill{grid-template-columns:1fr auto;grid-template-areas:"logo action" "links links";gap:6px 10px;padding:8px 10px;border-radius:var(--radius-lg)}
+  .nav-start{grid-area:links;justify-self:stretch}
+  .logo{grid-area:logo;justify-self:start;font-size:1.2rem;padding:0}
+  .nav-end{grid-area:action}
+  .nav-links{width:100%}
+}
 
 /* =========================================================================
    Hero — vidéo automuette en boucle
@@ -304,7 +334,7 @@ body:not(.past-hero) .dock-shell{
   max-height:940px;
   /* Même image que l'affiche de la vidéo : chaque peinture de la séquence
      montre la même chose, il n'y a donc aucun flash perceptible. */
-  background:#0f1817 url("https://cdn.shopify.com/s/files/1/1026/1721/9449/files/video-poster.jpg?v=1785304471&width=1600") center/cover no-repeat;
+  background:#111214 url("https://cdn.shopify.com/s/files/1/1026/1721/9449/files/video-poster.jpg?v=1785304471&width=1600") center/cover no-repeat;
   border-radius:var(--radius-lg) var(--radius-lg) var(--radius-md) var(--radius-md);
 }
 /* Vidéo et affiche occupent exactement la même boîte : la bascule est un
@@ -314,7 +344,7 @@ body:not(.past-hero) .dock-shell{
   object-fit:cover;object-position:center 42%;display:block;
 }
 .hero-video{
-  z-index:1;pointer-events:none;background:#0f1817;
+  z-index:1;pointer-events:none;background:#111214;
   /* Léger recadrage : les 3% extérieurs sont la zone la plus molle de
      l'encodage. Étalonnage doux — jamais de blur, qui détruirait le peu
      de détail disponible. */
@@ -327,8 +357,8 @@ body:not(.past-hero) .dock-shell{
 .hero::before{
   content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
   background:
-    linear-gradient(180deg,rgba(10,16,15,.55) 0%,rgba(10,16,15,.14) 38%,rgba(10,16,15,.72) 100%),
-    radial-gradient(120% 82% at 50% 46%,rgba(10,16,15,0) 40%,rgba(10,16,15,.46) 100%);
+    linear-gradient(180deg,rgba(12,13,14,.55) 0%,rgba(12,13,14,.14) 38%,rgba(12,13,14,.72) 100%),
+    radial-gradient(120% 82% at 50% 46%,rgba(12,13,14,0) 40%,rgba(12,13,14,.46) 100%);
 }
 /* Grain : sous le contenu (sinon le texte serait grainé et perdrait du
    contraste), et jamais ancêtre d'une surface en verre. */
@@ -348,10 +378,10 @@ body:not(.past-hero) .dock-shell{
   padding:120px clamp(18px,4vw,40px) calc(clamp(40px,5vw,64px) + var(--dock-h));
 }
 .hero .eyebrow{color:rgba(255,255,255,.82)}
-.hero h1{color:#fff;max-width:15ch;text-shadow:0 2px 30px rgba(10,16,15,.45)}
+.hero h1{color:#fff;max-width:15ch;text-shadow:0 2px 30px rgba(12,13,14,.45)}
 .hero-sub{
   color:rgba(255,255,255,.9);max-width:52ch;font-size:clamp(1rem,1.5vw,1.14rem);
-  text-shadow:0 1px 16px rgba(10,16,15,.5);
+  text-shadow:0 1px 16px rgba(12,13,14,.5);
 }
 .hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 .hero-scroll{
@@ -427,7 +457,7 @@ section{padding:clamp(56px,8vw,104px) 0}
 .pcard>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 .pcard::after{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(180deg,rgba(10,16,15,.42) 0%,rgba(10,16,15,0) 34%,rgba(10,16,15,.24) 56%,rgba(10,16,15,.86) 100%);
+  background:linear-gradient(180deg,rgba(12,13,14,.42) 0%,rgba(12,13,14,0) 34%,rgba(12,13,14,.24) 56%,rgba(12,13,14,.86) 100%);
 }
 .pcard-chip{
   position:absolute;top:14px;left:14px;z-index:var(--z-content);
@@ -468,7 +498,7 @@ section{padding:clamp(56px,8vw,104px) 0}
   display:inline-block;vertical-align:-.18em;
   width:clamp(32px,4.4vw,54px);height:clamp(32px,4.4vw,54px);
   border-radius:50%;object-fit:cover;margin:0 .1em;
-  box-shadow:0 4px 14px rgba(30,46,45,.18);
+  box-shadow:0 4px 14px rgba(23,25,27,.18);
 }
 
 /* =========================================================================
@@ -484,11 +514,11 @@ section{padding:clamp(56px,8vw,104px) 0}
 .duo-card>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 .duo-card::after{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(180deg,rgba(10,16,15,.62) 0%,rgba(10,16,15,.14) 42%,rgba(10,16,15,.5) 100%);
+  background:linear-gradient(180deg,rgba(12,13,14,.62) 0%,rgba(12,13,14,.14) 42%,rgba(12,13,14,.5) 100%);
 }
 .duo-head{position:absolute;top:0;left:0;right:0;z-index:var(--z-content);padding:clamp(20px,2.6vw,30px);color:#fff}
-.duo-head h3{color:#fff;font-size:clamp(1.2rem,2.1vw,1.6rem);max-width:15ch;text-shadow:0 2px 18px rgba(10,16,15,.4)}
-.duo-head p{margin-top:8px;font-size:.9rem;color:rgba(255,255,255,.86);max-width:32ch;text-shadow:0 1px 12px rgba(10,16,15,.45)}
+.duo-head h3{color:#fff;font-size:clamp(1.2rem,2.1vw,1.6rem);max-width:15ch;text-shadow:0 2px 18px rgba(12,13,14,.4)}
+.duo-head p{margin-top:8px;font-size:.9rem;color:rgba(255,255,255,.86);max-width:32ch;text-shadow:0 1px 12px rgba(12,13,14,.45)}
 
 .widget{
   position:absolute;z-index:var(--z-content);
@@ -516,9 +546,7 @@ section{padding:clamp(56px,8vw,104px) 0}
 .select{
   position:relative;overflow:hidden;
   background:
-    radial-gradient(80% 60% at 12% 8%,rgba(222,200,167,.5) 0%,rgba(222,200,167,0) 62%),
-    radial-gradient(70% 60% at 88% 92%,rgba(137,163,162,.55) 0%,rgba(137,163,162,0) 66%),
-    linear-gradient(168deg,#eef3f3 0%,#dfe9e8 52%,#d3e0de 100%);
+    linear-gradient(168deg,#ffffff 0%,#f4f5f6 54%,#eceded 100%);
 }
 .select-grid{display:grid;gap:clamp(22px,3vw,34px);align-items:center}
 @media(min-width:980px){.select-grid{grid-template-columns:1.06fr .94fr;gap:clamp(28px,3.4vw,52px)}}
@@ -530,7 +558,7 @@ section{padding:clamp(56px,8vw,104px) 0}
 }
 .stage-media img{width:100%;height:100%;object-fit:cover;transition:opacity .18s ease-out}
 .stat-glass{
-  box-shadow:var(--glass-edge),var(--glass-hairline),0 8px 26px rgba(30,46,45,.14);
+  box-shadow:var(--glass-edge),var(--glass-hairline),0 8px 26px rgba(23,25,27,.14);
   position:absolute;z-index:var(--z-content);
   left:clamp(14px,2vw,24px);right:clamp(14px,2vw,24px);bottom:clamp(14px,2vw,24px);
   border-radius:var(--radius-md);padding:15px 17px;
@@ -547,7 +575,7 @@ section{padding:clamp(56px,8vw,104px) 0}
   border-radius:var(--radius-xl);padding:clamp(16px,2vw,22px);
   display:grid;gap:12px;
 }
-.rail{box-shadow:var(--glass-edge-bright),0 26px 70px rgba(30,46,45,.18)}
+.rail{box-shadow:var(--glass-edge-bright),0 26px 70px rgba(23,25,27,.18)}
 .rail-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .tag{
   display:inline-flex;align-items:center;gap:8px;padding:9px 15px;
@@ -571,7 +599,7 @@ section{padding:clamp(56px,8vw,104px) 0}
 .rail-item.active{box-shadow:var(--glass-edge),var(--glass-drop),inset 0 0 0 2px var(--ink)}
 .rail-thumb{
   width:52px;height:52px;border-radius:50%;flex:none;overflow:hidden;
-  background:var(--surface-teal);box-shadow:0 3px 10px rgba(30,46,45,.16);
+  background:var(--surface-teal);box-shadow:0 3px 10px rgba(23,25,27,.16);
 }
 .rail-thumb img{width:100%;height:100%;object-fit:cover}
 .rail-txt{display:grid;gap:2px;min-width:0}
@@ -579,7 +607,7 @@ section{padding:clamp(56px,8vw,104px) 0}
 .rail-txt span{font-size:.8rem;color:var(--teal-700);line-height:1.4}
 .rail-dot{
   width:16px;height:16px;border-radius:50%;flex:none;margin-left:auto;
-  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7),0 1px 4px rgba(30,46,45,.28);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7),0 1px 4px rgba(23,25,27,.28);
 }
 /* Coche : l'état actif ne repose pas uniquement sur la couleur. */
 .rail-check{width:18px;height:18px;flex:none;opacity:0;color:var(--ink)}
@@ -650,15 +678,15 @@ details .a{padding:18px 22px;color:var(--ink-soft);font-size:.94rem}
 .closing>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 72%;z-index:1}
 .closing::after{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(180deg,rgba(10,16,15,.34) 0%,rgba(10,16,15,.54) 55%,rgba(10,16,15,.8) 100%);
+  background:linear-gradient(180deg,rgba(12,13,14,.34) 0%,rgba(12,13,14,.54) 55%,rgba(12,13,14,.8) 100%);
 }
 .closing-inner{
   position:relative;z-index:var(--z-content);
   min-height:clamp(340px,52vh,520px);display:flex;flex-direction:column;
   justify-content:flex-end;gap:16px;padding:clamp(26px,4vw,52px);color:#fff;
 }
-.closing h2{color:#fff;max-width:16ch;text-shadow:0 2px 24px rgba(10,16,15,.4)}
-.closing p{max-width:42ch;color:rgba(255,255,255,.9);text-shadow:0 1px 14px rgba(10,16,15,.45)}
+.closing h2{color:#fff;max-width:16ch;text-shadow:0 2px 24px rgba(12,13,14,.4)}
+.closing p{max-width:42ch;color:rgba(255,255,255,.9);text-shadow:0 1px 14px rgba(12,13,14,.45)}
 .closing .btn{align-self:flex-start;margin-top:4px}
 
 /* =========================================================================
@@ -697,7 +725,7 @@ footer a{color:#fff}
   pointer-events:auto;display:flex;align-items:center;gap:clamp(10px,2vw,20px);
   width:min(680px,100%);padding:8px 8px 8px 20px;border-radius:var(--radius-pill);
 }
-.dock-shell{box-shadow:var(--glass-edge),var(--glass-hairline),0 14px 40px rgba(12,20,19,.2)}
+.dock-shell{box-shadow:var(--glass-edge),var(--glass-hairline),0 14px 40px rgba(14,15,16,.2)}
 .dock-info{display:grid;gap:1px;min-width:0;line-height:1.3}
 .dock-info b{font-family:var(--font-display);font-size:1.05rem;font-weight:600;color:var(--ink);letter-spacing:-.02em}
 .dock-info span{font-size:.8rem;color:var(--teal-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -733,11 +761,11 @@ footer a{color:#fff}
     radial-gradient(80% 70% at 50% 40%,#ffffff 0%,rgba(255,255,255,0) 70%),
     linear-gradient(168deg,#f6efe1 0%,#eadfc9 58%,#dfd0b4 100%);
 }
-.hero-pane-b{background:#0f1817}
+.hero-pane-b{background:#111214}
 /* Le voile ne descend que sur la moitié basse : le produit reste lisible. */
 .hero-split::before{
   content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
-  background:linear-gradient(180deg,rgba(10,16,15,.2) 0%,rgba(10,16,15,.04) 30%,rgba(10,16,15,.5) 100%);
+  background:linear-gradient(180deg,rgba(12,13,14,.2) 0%,rgba(12,13,14,.04) 30%,rgba(12,13,14,.5) 100%);
 }
 .hero-split-inner{
   position:absolute;inset:0;z-index:var(--z-content);
@@ -756,14 +784,196 @@ footer a{color:#fff}
 .wordmark{
   font-family:var(--font-display);font-weight:600;color:#fff;line-height:.92;
   letter-spacing:-.05em;font-size:clamp(2.7rem,8.5vw,6rem);
-  text-shadow:0 6px 60px rgba(10,16,15,.34);
+  text-shadow:0 6px 60px rgba(12,13,14,.34);
 }
 .wordmark-sub{
   color:rgba(255,255,255,.94);max-width:44ch;
   font-size:clamp(.96rem,1.4vw,1.12rem);line-height:1.55;
-  text-shadow:0 1px 18px rgba(10,16,15,.55);
+  text-shadow:0 1px 18px rgba(12,13,14,.55);
 }
 .hero-split .hero-actions{margin-top:8px}
+
+/* =========================================================================
+   Hero pleine largeur — une image, un wordmark, deux portes d'entrée
+   ========================================================================= */
+/* Le wordmark et la baseline sont incrustés dans le visuel : un recadrage
+   en « cover » les couperait sur les écrans étroits. L'image garde donc
+   son ratio natif et c'est le bloc qui s'y adapte. */
+.hero-full{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:#111214;
+  border-radius:var(--radius-lg) var(--radius-lg) var(--radius-md) var(--radius-md);
+}
+.hero-still{display:block;width:100%;height:auto;position:relative;z-index:1}
+/* Scrim : plancher de contraste sous les boutons, sans voiler le visuel. */
+.hero-full::before{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(12,13,14,0) 52%,rgba(12,13,14,.42) 100%);
+}
+.hero-full::after{
+  content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  opacity:.12;mix-blend-mode:overlay;
+  background-image:var(--grain);background-repeat:repeat;background-size:160px 160px;
+}
+@media (min-resolution:2dppx){.hero-full::after{background-size:96px 96px;opacity:.1}}
+/* L'image porte déjà le wordmark : l'overlay se contente des actions.
+   Sous 760px le visuel devient trop court pour porter des boutons —
+   ils repassent alors dans le flux, sur le fond sombre du bloc. */
+.hero-full-inner{
+  position:relative;z-index:var(--z-content);
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:16px;
+  padding:20px clamp(18px,4vw,40px) calc(16px + var(--dock-h));
+}
+/* Sous 760px les deux actions doivent tenir sur une ligne : empilées,
+   le bandeau sombre sous l'image doublerait de hauteur. */
+@media(max-width:759px){
+  .hero-full-inner .hero-actions{gap:10px;flex-wrap:nowrap;width:100%}
+  .hero-full-inner .btn{flex:1 1 0;min-width:0;padding:15px 14px;font-size:.94rem;min-height:50px}
+}
+@media(min-width:760px){
+  /* Aligné à gauche : la baseline incrustée occupe le coin bas droit. */
+  .hero-full-inner{
+    position:absolute;left:0;right:0;bottom:0;align-items:flex-start;
+    padding:0 clamp(18px,4vw,40px) calc(clamp(28px,4vw,56px) + var(--dock-h));
+  }
+}
+.hero-full .wordmark{
+  font-family:var(--font-display);font-weight:600;color:#fff;line-height:.92;
+  letter-spacing:-.05em;font-size:clamp(3rem,10vw,7rem);
+  text-shadow:0 6px 60px rgba(12,13,14,.4);
+}
+.hero-full .wordmark-sub{
+  color:rgba(255,255,255,.94);max-width:26ch;font-weight:400;
+  font-size:clamp(1.05rem,2.2vw,1.6rem);line-height:1.4;letter-spacing:-.01em;
+  text-shadow:0 1px 20px rgba(12,13,14,.6);
+}
+.hero-full .wordmark-sub b{font-weight:600}
+.hero-full .hero-actions{margin-top:12px}
+
+/* =========================================================================
+   Assistant : choisir un objectif avant un produit
+   ========================================================================= */
+.goals-sec{
+  position:relative;overflow:hidden;
+  background:
+    linear-gradient(168deg,#ffffff 0%,#f5f6f6 52%,#ebecec 100%);
+  padding:clamp(56px,8vw,104px) 0;
+}
+.goals{
+  display:grid;gap:clamp(12px,1.6vw,18px);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));
+  max-width:1080px;margin:0 auto;
+}
+.goal{
+  display:flex;flex-direction:column;text-align:left;overflow:hidden;
+  padding:0;border:none;cursor:pointer;
+  border-radius:var(--radius-lg);font-family:var(--font-body);
+  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
+  box-shadow:var(--glass-edge),var(--glass-hairline),var(--glass-drop);
+  color:var(--ink);
+  transition:transform .18s ease-out,background .2s ease-out,box-shadow .22s ease-out;
+}
+.goal:hover{transform:translateY(-3px);background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
+.goal.active{
+  background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b));
+  box-shadow:var(--glass-edge),var(--glass-drop),inset 0 0 0 2px var(--ink);
+}
+.goal-media{
+  position:relative;display:block;aspect-ratio:16/10;overflow:hidden;
+  background:var(--surface-teal);
+}
+.goal-media img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:transform .35s ease-out;
+}
+.goal:hover .goal-media img{transform:scale(1.05)}
+.goal-body{display:flex;align-items:center;gap:13px;padding:15px 17px 17px}
+.goal-icon{
+  width:38px;height:38px;flex:none;border-radius:50%;
+  display:grid;place-items:center;color:var(--ink-soft);
+  background:var(--surface);box-shadow:inset 0 0 0 1px rgba(30,32,34,.12);
+  transition:background .2s ease-out,color .2s ease-out;
+}
+.goal.active .goal-icon{background:var(--cta);color:#fff}
+.goal-txt{display:grid;gap:2px;min-width:0}
+.goal-txt b{font-family:var(--font-display);font-weight:600;font-size:1rem;letter-spacing:-.015em;line-height:1.25}
+.goal-txt span{font-size:.8rem;color:var(--teal-700);line-height:1.4}
+
+/* Recommandation — n'existe pas tant que rien n'est choisi. */
+.reco{
+  margin:clamp(22px,3vw,34px) auto 0;max-width:1000px;
+  border-radius:var(--radius-xl);padding:clamp(20px,2.6vw,32px);
+  background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b));
+  box-shadow:var(--glass-edge),var(--glass-hairline),0 22px 60px rgba(23,25,27,.16);
+}
+.reco:focus-visible{outline:3px solid var(--teal-600);outline-offset:3px}
+.reco-head{display:grid;gap:8px;margin-bottom:20px}
+.reco-head .eyebrow{display:block}
+.reco-head h3{font-size:clamp(1.2rem,2.2vw,1.6rem);max-width:26ch}
+.reco-head p{color:var(--ink-soft);font-size:.98rem;max-width:52ch;line-height:1.6}
+.reco-grid{display:grid;gap:clamp(14px,2vw,22px);align-items:center}
+@media(min-width:760px){.reco-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}}
+.reco-media{
+  position:relative;border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:1;
+  background:linear-gradient(168deg,#f6f7f7 0%,#edeeef 100%);
+}
+.reco-media img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  padding:clamp(14px,2.4vw,30px);mix-blend-mode:multiply;
+}
+.reco-body{display:grid;gap:10px}
+.reco-body .prod-cat{margin-bottom:-2px}
+.reco-body h4{font-family:var(--font-display);font-size:clamp(1.15rem,2vw,1.45rem);font-weight:600;letter-spacing:-.024em;line-height:1.24}
+.reco-body>p{color:var(--ink-soft);font-size:.95rem;line-height:1.6;max-width:44ch}
+.reco-price{display:flex;align-items:baseline;gap:9px;margin-top:2px}
+.reco-price b{font-family:var(--font-display);font-size:1.6rem;font-weight:600;letter-spacing:-.03em}
+.reco-price s{color:var(--teal-600);font-size:.9rem}
+.reco-price small{font-size:.75rem;color:var(--teal-700);letter-spacing:.04em}
+.reco-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.reco-also{
+  margin-top:clamp(18px,2.4vw,26px);padding-top:18px;
+  border-top:1px solid var(--border);display:grid;gap:12px;
+}
+.reco-also-t{
+  font-family:var(--font-display);font-size:.72rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--teal-700);line-height:1.4;
+}
+.reco-also-list{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+.reco-chip{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;
+  border-radius:var(--radius-md);text-decoration:none;color:var(--ink);
+  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
+  box-shadow:var(--glass-edge),var(--glass-hairline);
+  transition:transform .18s ease-out,background .2s ease-out;
+}
+.reco-chip:hover{transform:translateY(-2px);background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
+.reco-chip img{width:44px;height:44px;flex:none;object-fit:contain;mix-blend-mode:multiply}
+.reco-chip span{display:grid;gap:1px;min-width:0}
+.reco-chip b{font-family:var(--font-display);font-weight:600;font-size:.92rem;letter-spacing:-.015em;line-height:1.25}
+.reco-chip small{font-size:.78rem;color:var(--teal-700)}
+
+/* =========================================================================
+   Boutique — rayons par catégorie
+   ========================================================================= */
+.shop-jump{display:flex;gap:10px;flex-wrap:wrap}
+.shop-sec{padding:clamp(40px,5vw,72px) 0}
+.shop-sec:nth-child(even){background:var(--surface-teal)}
+.shop-count{
+  font-family:var(--font-display);font-size:.75rem;font-weight:500;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--teal-brand);line-height:1.4;
+}
+.trust-grid{
+  list-style:none;display:grid;gap:clamp(12px,2vw,20px);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));
+}
+.trust-grid li{
+  display:grid;gap:5px;padding:20px 22px;border-radius:var(--radius-md);
+  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
+  box-shadow:var(--glass-edge),var(--glass-hairline);
+}
+.trust-grid b{font-family:var(--font-display);font-size:1.12rem;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
+.trust-grid span{font-size:.86rem;color:var(--teal-700);line-height:1.5}
 
 /* =========================================================================
    Bandeau doré défilant (maquette Canva : claims produits)
@@ -806,10 +1016,12 @@ footer a{color:#fff}
   display:grid;gap:clamp(14px,2vw,22px);
   grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));
 }
-/* Les cinq produits tiennent sur une seule rangée : auto-fill s'arrêterait
-   à quatre et laisserait le cinquième orphelin. */
-@media(min-width:1120px){.cat-grid{grid-template-columns:repeat(5,1fr)}}
+/* Les quatre produits restants tiennent sur une rangée sous la fiche
+   produit : auto-fill s'arrêterait avant et laisserait un orphelin. */
 @media(min-width:1120px){.cat-grid[data-exclude]{grid-template-columns:repeat(4,1fr)}}
+/* En rayon, un plafond de largeur évite qu'un rayon d'un seul produit
+   étire sa carte sur toute la ligne. */
+.shop-sec .cat-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),290px))}
 .prod{
   display:flex;flex-direction:column;
   background:var(--surface);border-radius:var(--radius-lg);overflow:hidden;
@@ -819,7 +1031,7 @@ footer a{color:#fff}
 .prod:hover{transform:translateY(-4px);box-shadow:var(--glass-hairline),var(--shadow-lift)}
 .prod-media{
   position:relative;aspect-ratio:1;overflow:hidden;
-  background:linear-gradient(168deg,#f4f7f7 0%,#e8efee 100%);
+  background:linear-gradient(168deg,#f6f7f7 0%,#edeeef 100%);
 }
 .prod-media img{
   position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
@@ -857,7 +1069,7 @@ footer a{color:#fff}
 .band>video,.band>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 .band::after{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(180deg,rgba(10,16,15,.3) 0%,rgba(10,16,15,.12) 45%,rgba(10,16,15,.72) 100%);
+  background:linear-gradient(180deg,rgba(12,13,14,.3) 0%,rgba(12,13,14,.12) 45%,rgba(12,13,14,.72) 100%);
 }
 .band-inner{
   position:relative;z-index:var(--z-content);
@@ -865,13 +1077,13 @@ footer a{color:#fff}
   justify-content:flex-end;gap:14px;padding:clamp(24px,4vw,52px);color:#fff;
 }
 .band-inner .eyebrow{color:rgba(255,255,255,.82)}
-.band-inner h2{color:#fff;max-width:16ch;text-shadow:0 2px 24px rgba(10,16,15,.45)}
-.band-inner p{max-width:44ch;color:rgba(255,255,255,.9);text-shadow:0 1px 14px rgba(10,16,15,.45)}
+.band-inner h2{color:#fff;max-width:16ch;text-shadow:0 2px 24px rgba(12,13,14,.45)}
+.band-inner p{max-width:44ch;color:rgba(255,255,255,.9);text-shadow:0 1px 14px rgba(12,13,14,.45)}
 .band-inner .btn{align-self:flex-start;margin-top:4px}
-.band.light::after{background:linear-gradient(180deg,rgba(255,255,255,.1) 0%,rgba(20,30,28,.42) 100%)}
+.band.light::after{background:linear-gradient(180deg,rgba(255,255,255,.1) 0%,rgba(20,21,23,.42) 100%)}
 /* Certaines sources sont des visuels clairs (gélules dorées, tissu beige) :
    le voile sombre y suffit, mais le texte a besoin d'un plancher plus haut. */
-.band.deep::after{background:linear-gradient(180deg,rgba(10,16,15,.42) 0%,rgba(10,16,15,.3) 40%,rgba(10,16,15,.82) 100%)}
+.band.deep::after{background:linear-gradient(180deg,rgba(12,13,14,.42) 0%,rgba(12,13,14,.3) 40%,rgba(12,13,14,.82) 100%)}
 /* Variante centrée : le texte occupe le milieu, pas le bas. */
 .band.center .band-inner{justify-content:center;align-items:center;text-align:center}
 .band.center .band-inner h2,.band.center .band-inner p{max-width:22ch;margin-inline:auto}
@@ -895,6 +1107,11 @@ footer a{color:#fff}
   aspect-ratio:4/5;background:var(--surface-teal);box-shadow:var(--shadow-lift);
 }
 .chapter-media.wide{aspect-ratio:16/10}
+/* La boucle verticale garde son cadrage natif au lieu d'être recadrée.
+   width:100% est obligatoire : `margin-inline:auto` fait passer l'élément
+   de grille en dimensionnement au contenu, et le média étant en position
+   absolue le bloc s'effondrerait à zéro. */
+.chapter-media.portrait{aspect-ratio:9/16;width:100%;max-width:360px;margin-inline:auto}
 .chapter-media>img,.chapter-media>video{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
 }
@@ -936,7 +1153,7 @@ footer a{color:#fff}
 .pdp-media{
   position:relative;border-radius:var(--radius-xl);overflow:hidden;
   aspect-ratio:1;box-shadow:var(--shadow-lift);
-  background:linear-gradient(168deg,#f2f6f6 0%,#e3ecea 100%);
+  background:linear-gradient(168deg,#f6f7f7 0%,#e8eaeb 100%);
 }
 .pdp-media img{
   position:absolute;inset:0;width:100%;height:100%;object-fit:contain;

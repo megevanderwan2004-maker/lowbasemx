@@ -10,17 +10,16 @@
 <meta property="og:image" content="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-lineup.jpg?v=1785272697">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_MX">
-<meta name="theme-color" content="#24312f">
+<meta name="theme-color" content="#ffffff">
 <!-- Favicon en formes pures : une data-URI ne peut pas charger de webfont,
      un <text> y serait rendu dans une police système hors charte. -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2324312f'/%3E%3Crect x='21' y='15' width='7' height='34' rx='3.5' fill='%23dec8a7'/%3E%3Crect x='36' y='15' width='7' height='34' rx='3.5' fill='%23dec8a7'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffffff'/%3E%3Crect x='21' y='15' width='7' height='34' rx='3.5' fill='%2317191b'/%3E%3Crect x='36' y='15' width='7' height='34' rx='3.5' fill='%2317191b'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.shopify.com">
 <!-- Typographie verrouillée : Outfit (titres) + DM Sans (texte courant). Aucune autre famille sur le site. -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="/media/poster-hero-cirqa.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="/media/poster-loop-brand.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/media/hero-runners.jpg" fetchpriority="high">
 <script>
 document.documentElement.className += " js";
 try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.className += " rm"; }catch(e){}
@@ -47,7 +46,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   <div class="nav-pill glass-light blurred">
     <div class="nav-start">
       <div class="nav-links">
-        <a href="#catalogo">Tienda</a>
+        <a href="/tienda">Tienda</a>
+        <a href="#objetivo">Tu objetivo</a>
         <a href="#wearables">Wearables</a>
         <a href="#suplementos">Suplementos</a>
         <a href="#faq">FAQ</a>
@@ -55,48 +55,27 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
     </div>
     <a class="logo" href="/">lowlabs</a>
     <div class="nav-end">
-      <a class="btn btn-ink btn-sm" href="#catalogo">Comprar</a>
+      <a class="btn btn-ink btn-sm" href="/tienda">Comprar</a>
     </div>
   </div>
 </nav>
 
 <div class="shell">
 
-  <!-- ===== Hero éditorial en deux volets (maquette Canva, page 1) ===== -->
-  <header class="hero-split" id="hero">
-    <div class="hero-pane hero-pane-a">
-      <video autoplay muted loop playsinline webkit-playsinline preload="auto"
-             disablepictureinpicture disableremoteplayback
-             poster="/media/poster-loop-brand.jpg"
-             width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
-        <source src="/media/loop-brand.mp4" type="video/mp4">
-      </video>
-    </div>
-    <div class="hero-pane hero-pane-b">
-      <video class="hero-video" id="hero-video"
-             autoplay muted loop playsinline webkit-playsinline preload="auto"
-             disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"
-             poster="/media/poster-hero-cirqa.jpg"
-             width="1920" height="1080" aria-hidden="true" tabindex="-1">
-        <source src="/media/hero-cirqa.mp4" type="video/mp4">
-      </video>
-    </div>
-
-    <div class="hero-split-inner">
-      <!-- Faux verre volontairement : la plaque est posée sur la vidéo du
-           hero, un flou réel y serait rééchantillonné à chaque frame. -->
-      <div class="hero-plate glass-dark">
-        <p class="wordmark">lowlabs</p>
-        <p class="wordmark-sub">Una selección curada de tecnología, suplementos y esenciales de bienestar para optimizar tu día a día.</p>
-        <div class="hero-actions">
-          <a class="btn btn-smoke btn-lg" href="#catalogo">Explorar la tienda</a>
-        </div>
+  <!-- ===== Hero pleine largeur ===== -->
+  <header class="hero-full" id="hero">
+    <img class="hero-still" src="/media/hero-runners.jpg" alt="" aria-hidden="true"
+         width="2000" height="1180" fetchpriority="high">
+    <!-- Le wordmark et la baseline sont incrustés dans l'image : les
+         répéter en HTML les dédoublerait. Le titre reste accessible via
+         le h1 hors écran, et l'overlay ne porte que les deux actions. -->
+    <h1 class="sr-only">lowlabs — curated wellness and technology</h1>
+    <div class="hero-full-inner">
+      <div class="hero-actions rv">
+        <a class="btn btn-smoke btn-lg" href="#objetivo">Encuentra lo tuyo</a>
+        <a class="btn btn-smoke btn-lg" href="/tienda">Ver la tienda</a>
       </div>
     </div>
-
-    <button class="btn btn-smoke btn-round hero-toggle" id="hero-toggle" type="button" aria-pressed="false" aria-label="Pausar el video de fondo">
-      <svg id="hero-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/></svg>
-    </button>
   </header>
 
   <!-- ===== Bandeau de garanties (faits vérifiables, aucun témoignage) ===== -->
@@ -112,19 +91,43 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
   <main id="contenido">
 
-    <!-- ===== Catalogue : les 5 produits ===== -->
-    <section id="catalogo" aria-labelledby="catalogo-t">
+    <!-- ===== Manifeste : pourquoi cette sélection existe ===== -->
+    <section class="chapter" aria-labelledby="manifiesto-t">
       <div class="container">
-        <div class="section-head rv">
-          <div>
-            <span class="eyebrow">La selección</span>
-            <h2 id="catalogo-t">Cinco piezas, una sola idea del bienestar</h2>
+        <div class="chapter-grid">
+          <div class="chapter-media wide rv">
+            <img loading="lazy" src="/media/cirqa-tan-wide.jpg" alt="Garmin CIRQA Smart Band en color arena" width="1600" height="900">
           </div>
-          <div class="head-aside">
-            <p>Wearables Garmin y suplementos formulados por científicos. Nada de catálogo infinito: solo lo que usamos y recomendamos.</p>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">02 — Bienestar, curado</span>
+            <h2 id="manifiesto-t" class="rv">Buscamos los productos que valen la pena integrar a tu rutina.</h2>
+            <p class="rv">El mercado del bienestar es ruidoso. lowlabs es el filtro: estudiamos la ciencia, probamos el hardware y nos quedamos solo con lo que de verdad te ayuda a sentirte, recuperarte y rendir mejor.</p>
+            <div class="chapter-stats rv">
+              <div><b class="price-num">120+</b><span>Productos revisados</span></div>
+              <div><b class="price-num">5</b><span>Seleccionados</span></div>
+              <div><b class="price-num">0</b><span>Concesiones</span></div>
+            </div>
           </div>
         </div>
-        <div class="cat-grid rv" id="cat-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===== Assistant : commencer par l'objectif, pas par le produit ===== -->
+    <section class="goals-sec" id="objetivo" aria-labelledby="objetivo-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">03 — Compra por objetivo</span>
+            <h2 id="objetivo-t">Empieza por cómo quieres sentirte.</h2>
+            <p>Dinos qué buscas y te decimos con qué empezar. Sin cuestionarios largos, sin correo.</p>
+          </div>
+        </div>
+
+        <div class="goals rv" id="goals" role="radiogroup" aria-label="¿Qué buscas?"></div>
+
+        <!-- La recommandation est injectée ici : elle n'existe pas tant que
+             l'utilisateur n'a pas choisi, et le focus s'y déplace au clic. -->
+        <div class="reco" id="reco" hidden tabindex="-1" aria-live="polite"></div>
       </div>
     </section>
 
@@ -211,9 +214,13 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
     <section class="chapter" aria-labelledby="cap3-t">
       <div class="container">
         <div class="chapter-grid">
-          <div class="screens rv">
-            <figure><img loading="lazy" src="/media/app-body-battery.jpg" alt="Pantalla Body Battery en la app Garmin Connect" width="941" height="1672"></figure>
-            <figure><img loading="lazy" src="/media/app-actividades.jpg" alt="Pantalla de registro de actividades en la app Garmin Connect" width="941" height="1672"></figure>
+          <div class="chapter-media portrait rv">
+            <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+                   disablepictureinpicture disableremoteplayback
+                   poster="/media/poster-loop-vertical.jpg"
+                   width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
+              <source src="/media/loop-vertical.mp4" type="video/mp4">
+            </video>
           </div>
           <div class="chapter-copy">
             <span class="eyebrow rv">Garmin Connect™</span>
@@ -224,16 +231,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         </div>
       </div>
     </section>
-
-    <!-- ===== Bannière : la CIRQA en exterior ===== -->
-    <div class="band deep center tall rv">
-      <img loading="lazy" src="/media/cirqa-rock.jpg" alt="" width="1122" height="1402">
-      <div class="band-inner">
-        <span class="eyebrow">Hasta 10 días de batería</span>
-        <h2>Se pone una vez. Se olvida durante días.</h2>
-        <p>Una carga por semana y media. Sin cargador de viaje, sin ansiedad de batería, sin excusas para quitártela.</p>
-      </div>
-    </div>
 
     <!-- ===== Chapitres : les autres montres ===== -->
     <section class="chapter sand" aria-labelledby="cap4-t">
@@ -252,23 +249,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <section class="chapter flip" aria-labelledby="cap5-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media contain rv">
-            <img loading="lazy" src="/media/venu-3s.png" alt="Garmin Venu 3S" width="1200" height="1200">
-          </div>
-          <div class="chapter-copy">
-            <span class="eyebrow rv">Garmin Venu® 3S</span>
-            <h2 id="cap5-t" class="rv">El mismo sistema, en 41 mm.</h2>
-            <p class="rv">Coach de sueño, siestas detectadas automáticamente y llamadas desde la muñeca. Pensado para muñecas más delgadas.</p>
-            <a class="btn btn-ink rv" href="/productos/venu-3s">Ver Venu® 3S — $8,899 MXN</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="chapter tinted" aria-labelledby="cap6-t">
+    <section class="chapter flip tinted" aria-labelledby="cap6-t">
       <div class="container">
         <div class="chapter-grid">
           <div class="chapter-media contain rv">
@@ -326,75 +307,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <!-- ===== Déclaration éditoriale (maquette Canva, page 2) ===== -->
-    <section class="statement" aria-labelledby="statement-t">
-      <div class="container">
-        <div class="statement-grid">
-          <div class="statement-video rv">
-            <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
-                   disablepictureinpicture disableremoteplayback
-                   poster="/media/poster-loop-vertical.jpg"
-                   width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
-              <source src="/media/loop-vertical.mp4" type="video/mp4">
-            </video>
-          </div>
-          <div class="statement-copy">
-            <span class="eyebrow rv">Pensada para llevarse, no para mirarse</span>
-            <h2 id="statement-t" class="rv">Menos ruido.
-              <img class="inline-thumb" loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80">
-              Mejor
-              <img class="inline-thumb" loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-malva.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80">
-              bienestar
-              <img class="inline-thumb" loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-azul-capitan.jpg?v=1785272696&amp;width=160" alt="" width="80" height="80">
-              .</h2>
-            <p class="statement-lede rv">Cuatro colores, dos tallas y una sola promesa: registrar todo tu día sin pedirte ni una mirada.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== Comparatif ===== -->
-    <section class="compare" id="comparar" aria-labelledby="comp-t">
-      <div class="container">
-        <div class="section-head rv">
-          <div>
-            <span class="eyebrow">Comparación oficial Garmin</span>
-            <h2 id="comp-t">Métricas de reloj premium. Sin el reloj.</h2>
-          </div>
-          <div class="head-aside">
-            <p>Funciones clave de entrenamiento y sueño de los relojes Garmin de gama alta, en una banda discreta y más accesible.</p>
-          </div>
-        </div>
-        <div class="table-wrap rv" tabindex="0" role="region" aria-label="Tabla comparativa de funciones">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Función</th>
-                <th scope="col"><img loading="lazy" src="/media/venu-4.png" alt="" width="84" height="84">Venu® 4</th>
-                <th scope="col"><img loading="lazy" src="/media/vivoactive-6.png" alt="" width="84" height="84">Vívoactive® 6</th>
-                <th scope="col" class="col-hl"><img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra-detalle.jpg?v=1785272697&amp;width=168" alt="" width="84" height="84">CIRQA™</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><th scope="row">Detección automática de actividades</th><td class="no"><span aria-hidden="true">—</span><span class="sr-only">No incluida</span></td><td class="no"><span aria-hidden="true">—</span><span class="sr-only">No incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">VO2 max</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Relación de carga</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="no"><span aria-hidden="true">—</span><span class="sr-only">No incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Carga de entreno</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="no"><span aria-hidden="true">—</span><span class="sr-only">No incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Foco de carga de entreno</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="no"><span aria-hidden="true">—</span><span class="sr-only">No incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Efecto del entreno</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Tiempo de recuperación (mejorado)</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Predisposición para entrenar</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="no"><span aria-hidden="true">—</span><span class="sr-only">No incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Estado del entreno</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="no"><span aria-hidden="true">—</span><span class="sr-only">No incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Puntuación del sueño</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Entrenador de sueño</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Precio lowlabs</th><td class="price-num">$10,999</td><td class="price-num">$5,999</td><td class="col-hl price-num" style="font-weight:700">$3,999</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="compare-note rv">Tabla de funciones según la ficha oficial de producto Garmin (jul 2026). Precios lowlabs provisionales, sujetos a confirmación al finalizar la compra.</p>
-      </div>
-    </section>
-
     <!-- ===== FAQ ===== -->
     <section id="faq" aria-labelledby="faq-t">
       <div class="container">
@@ -447,7 +359,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       <div class="closing-inner">
         <h2 id="closing-t">Menos pantalla. Más vida.</h2>
         <p>Registra cada día completo — sueño, energía y entrenamiento — sin nada que te interrumpa.</p>
-        <a class="btn btn-smoke btn-lg" href="#catalogo">Explorar la tienda</a>
+        <a class="btn btn-smoke btn-lg" href="/tienda">Ver la tienda</a>
       </div>
     </section>
 
@@ -463,6 +375,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
       <div>
         <h3 class="foot-title">Tienda</h3>
+        <p><a href="/tienda">Ver todo</a></p>
         <p><a href="/productos/cirqa">Garmin CIRQA™</a></p>
         <p><a href="/productos/venu-4">Garmin Venu® 4</a></p>
         <p><a href="/productos/venu-3s">Garmin Venu® 3S</a></p>
@@ -473,7 +386,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         <h3 class="foot-title">Ayuda</h3>
         <p><a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a></p>
         <p><a href="/#faq">Garantía y devoluciones</a></p>
-        <p><a href="/#comparar">Comparativa</a></p>
       </div>
     </div>
     <div class="legal">
@@ -492,7 +404,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       <b class="price-num">Desde $1,349 MXN</b>
       <span>5 productos · Envío gratis a todo México</span>
     </div>
-    <a class="btn btn-ink" href="#catalogo">Explorar</a>
+    <a class="btn btn-ink" href="/tienda">Ver la tienda</a>
   </div>
 </div>
 

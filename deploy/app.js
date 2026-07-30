@@ -39,6 +39,29 @@
     }
   }
 
+  /* La carte produit est le seul gabarit : home, boutique et recommandation
+     la réutilisent, aucune variante n'est dupliquée ailleurs. */
+  function productCard(p){
+    var url = CATALOG.url(p.handle);
+    return '<article class="prod">' +
+        '<a class="prod-media" href="' + url + '" tabindex="-1" aria-hidden="true">' +
+          '<img loading="lazy" src="' + esc(p.image) + '" alt="" width="600" height="600">' +
+          (p.badge ? '<span class="prod-badge glass-dark">' + esc(p.badge) + '</span>' : "") +
+        '</a>' +
+        '<div class="prod-body">' +
+          '<span class="prod-cat">' + esc(p.category) + '</span>' +
+          '<h3 class="prod-name">' + esc(p.name) + '</h3>' +
+          '<p class="prod-tag">' + esc(p.tagline) + '</p>' +
+          '<div class="prod-price price-num">' +
+            '<b>' + CATALOG.money(p.price) + '</b>' +
+            (p.compareAt ? '<s>' + CATALOG.money(p.compareAt) + '</s>' : "") +
+            '<small>MXN</small>' +
+          '</div>' +
+          '<a class="btn btn-ink btn-block btn-sm" href="' + url + '">Ver producto</a>' +
+        '</div>' +
+      '</article>';
+  }
+
   /* =====================================================================
      Catalogue — rendu des cartes produit
 
@@ -52,27 +75,170 @@
     var html = "";
     each(CATALOG.products, function(p){
       if (only && p.handle === only) return;
-      var url = CATALOG.url(p.handle);
-      html +=
-        '<article class="prod">' +
-          '<a class="prod-media" href="' + url + '" tabindex="-1" aria-hidden="true">' +
-            '<img loading="lazy" src="' + esc(p.image) + '" alt="" width="600" height="600">' +
-            (p.badge ? '<span class="prod-badge glass-dark">' + esc(p.badge) + '</span>' : "") +
-          '</a>' +
-          '<div class="prod-body">' +
-            '<span class="prod-cat">' + esc(p.category) + '</span>' +
-            '<h3 class="prod-name">' + esc(p.name) + '</h3>' +
-            '<p class="prod-tag">' + esc(p.tagline) + '</p>' +
-            '<div class="prod-price price-num">' +
-              '<b>' + CATALOG.money(p.price) + '</b>' +
-              (p.compareAt ? '<s>' + CATALOG.money(p.compareAt) + '</s>' : "") +
-              '<small>MXN</small>' +
-            '</div>' +
-            '<a class="btn btn-ink btn-block btn-sm" href="' + url + '">Ver producto</a>' +
-          '</div>' +
-        '</article>';
+      html += productCard(p);
     });
     grid.innerHTML = html;
+  });
+
+  /* =====================================================================
+     Boutique — un rayon par catégorie, dans l'ordre du catalogue
+     ===================================================================== */
+  module("shop", function(){
+    var host = $("shop-sections");
+    if (!host || !CATALOG.categories) return;
+
+    /* Les ancres du menu de la boutique doivent rester stables :
+       on les dérive du nom de catégorie, pas de son index. */
+    function slug(s){
+      return s.toLowerCase()
+        .replace(/[áàä]/g,"a").replace(/[éèë]/g,"e").replace(/[íìï]/g,"i")
+        .replace(/[óòö]/g,"o").replace(/[úùü]/g,"u")
+        .replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+    }
+
+    var html = "";
+    each(CATALOG.categories, function(cat){
+      var items = CATALOG.inCategory(cat);
+      if (!items.length) return;
+      var id = slug(cat);
+      html +=
+        '<section class="shop-sec" id="' + id + '" aria-labelledby="' + id + '-t">' +
+          '<div class="container">' +
+            '<div class="section-head rv">' +
+              '<div>' +
+                '<span class="eyebrow">' + esc(cat) + '</span>' +
+                '<h2 id="' + id + '-t">' + esc(cat) + '</h2>' +
+              '</div>' +
+              '<div class="head-aside">' +
+                '<p class="shop-count">' + items.length +
+                  (items.length > 1 ? " productos" : " producto") + '</p>' +
+              '</div>' +
+            '</div>' +
+            '<div class="cat-grid rv">' + items.map(productCard).join("") + '</div>' +
+          '</div>' +
+        '</section>';
+    });
+    host.innerHTML = html;
+  });
+
+  /* =====================================================================
+     Assistant — l'utilisateur part d'un objectif, pas d'un produit
+
+     Aucun état n'est persisté et rien n'est envoyé : la recommandation
+     est une simple correspondance objectif → handle, résolue dans
+     catalog.js. Le bloc reste absent du DOM tant que rien n'est choisi.
+     ===================================================================== */
+  var GOAL_ICONS = {
+    moon:     '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    bolt:     '<path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z"/>',
+    spark:    '<path d="M12 2v5M12 17v5M2 12h5M17 12h5M5.6 5.6l3.5 3.5M14.9 14.9l3.5 3.5M18.4 5.6l-3.5 3.5M9.1 14.9l-3.5 3.5"/>',
+    leaf:     '<path d="M4 20c0-8 6-14 16-14 0 10-6 15-13 15H4v-1zM8 17c2-4 5-7 9-9"/>',
+    heart:    '<path d="M12 20.5S3.5 15 3.5 9.2A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.5 2.8c0 5.8-8.5 11.3-8.5 11.3z"/>',
+    infinity: '<path d="M7.5 15.5a3.5 3.5 0 1 1 0-7c3 0 6 7 9 7a3.5 3.5 0 1 0 0-7c-3 0-6 7-9 7z"/>'
+  };
+
+  function icon(name){
+    return '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" ' +
+      'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      (GOAL_ICONS[name] || GOAL_ICONS.spark) + '</svg>';
+  }
+
+  module("goals", function(){
+    var host = $("goals"), out = $("reco");
+    if (!host || !out || !CATALOG.goals) return;
+
+    host.innerHTML = CATALOG.goals.map(function(g, i){
+      return '<button class="goal" type="button" role="radio" aria-checked="false" ' +
+          'tabindex="' + (i === 0 ? "0" : "-1") + '" data-goal="' + esc(g.id) + '">' +
+          (g.image
+            ? '<span class="goal-media"><img loading="lazy" src="' + esc(g.image) + '" alt="" width="600" height="600"></span>'
+            : "") +
+          '<span class="goal-body">' +
+            '<span class="goal-icon">' + icon(g.icon) + '</span>' +
+            '<span class="goal-txt"><b>' + esc(g.label) + '</b><span>' + esc(g.lede) + '</span></span>' +
+          '</span>' +
+        '</button>';
+    }).join("");
+
+    var buttons = Array.prototype.slice.call(host.querySelectorAll(".goal"));
+
+    function render(g){
+      var p = CATALOG.byHandle(g.pick);
+      if (!p) return;
+      var also = (g.also || []).map(CATALOG.byHandle).filter(Boolean);
+
+      out.innerHTML =
+        '<div class="reco-head">' +
+          '<span class="eyebrow">Tu recomendación</span>' +
+          '<h3>' + esc(g.label) + '</h3>' +
+          '<p>' + esc(g.why) + '</p>' +
+        '</div>' +
+        '<div class="reco-grid">' +
+          '<div class="reco-media"><img src="' + esc(p.image) + '" alt="" width="600" height="600"></div>' +
+          '<div class="reco-body">' +
+            '<span class="prod-cat">Empieza por aquí · ' + esc(p.category) + '</span>' +
+            '<h4>' + esc(p.name) + '</h4>' +
+            '<p>' + esc(p.tagline) + '</p>' +
+            '<div class="reco-price price-num">' +
+              '<b>' + CATALOG.money(p.price) + '</b>' +
+              (p.compareAt ? '<s>' + CATALOG.money(p.compareAt) + '</s>' : "") +
+              '<small>MXN · Envío gratis</small>' +
+            '</div>' +
+            '<div class="reco-cta">' +
+              '<a class="btn btn-ink" href="' + CATALOG.url(p.handle) + '">Ver ' + esc(p.short) + '</a>' +
+              '<a class="btn btn-quiet" href="/tienda">Ver toda la tienda</a>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        (also.length
+          ? '<div class="reco-also">' +
+              '<p class="reco-also-t">Se complementa bien con</p>' +
+              '<div class="reco-also-list">' +
+                also.map(function(a){
+                  return '<a class="reco-chip" href="' + CATALOG.url(a.handle) + '">' +
+                    '<img loading="lazy" src="' + esc(a.image) + '" alt="" width="44" height="44">' +
+                    '<span><b>' + esc(a.short) + '</b><small>' + CATALOG.money(a.price) + ' MXN</small></span>' +
+                  '</a>';
+                }).join("") +
+              '</div>' +
+            '</div>'
+          : "");
+
+      out.hidden = false;
+    }
+
+    function select(btn, moveFocus){
+      var g = CATALOG.byGoal(btn.getAttribute("data-goal"));
+      if (!g) return;
+      each(buttons, function(b){
+        var on = b === btn;
+        b.className = on
+          ? (b.className.replace(/\s*active/g, "") + " active")
+          : b.className.replace(/\s*active/g, "");
+        b.setAttribute("aria-checked", on ? "true" : "false");
+        b.tabIndex = on ? 0 : -1;
+      });
+      render(g);
+      /* Le focus ne part sur la recommandation qu'au clic : au clavier il
+         doit rester dans le groupe pour continuer à parcourir les choix. */
+      if (moveFocus) out.focus();
+    }
+
+    each(buttons, function(b){
+      b.addEventListener("click", function(){ select(b, true); }, false);
+    });
+
+    host.addEventListener("keydown", function(e){
+      var i = buttons.indexOf(document.activeElement);
+      if (i < 0) return;
+      var d = (e.key === "ArrowRight" || e.key === "ArrowDown") ? 1
+            : (e.key === "ArrowLeft"  || e.key === "ArrowUp")   ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      var next = buttons[(i + d + buttons.length) % buttons.length];
+      select(next, false);
+      next.focus();
+    }, false);
   });
 
   /* =====================================================================

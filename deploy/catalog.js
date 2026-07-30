@@ -163,8 +163,84 @@
     }
   ];
 
+  /* -----------------------------------------------------------------------
+     Objectifs — le point d'entrée de l'assistant.
+     `pick` est le handle recommandé en premier, `also` les compléments.
+     ----------------------------------------------------------------------- */
+  var GOALS = [
+    {
+      id: "dormir",
+      label: "Dormir mejor",
+      icon: "moon",
+      image: "/media/goal-dormir.jpg",
+      lede: "Sueño profundo, despertares medidos, rutina que se sostiene.",
+      pick: "cirqa",
+      also: ["creatina"],
+      why: "La CIRQA mide el sueño sin una pantalla que te despierte: puntuación, fases, VFC y temperatura de la piel, toda la noche."
+    },
+    {
+      id: "energia",
+      label: "Tener más energía",
+      icon: "bolt",
+      image: "/media/goal-energia.jpg",
+      lede: "Saber cuánta batería te queda antes de gastarla.",
+      pick: "cirqa",
+      also: ["creatina"],
+      why: "Body Battery™ convierte tu frecuencia cardiaca y tu estrés en una sola cifra: cuándo empujar y cuándo parar."
+    },
+    {
+      id: "rendimiento",
+      label: "Mejorar mi rendimiento",
+      icon: "spark",
+      image: "/media/goal-rendimiento.jpg",
+      lede: "Entrenar con datos, no con sensaciones.",
+      pick: "venu-4",
+      also: ["creatina"],
+      why: "Predisposición para entrenar, VO2 max y estado del entreno en una pantalla AMOLED que lees de un vistazo."
+    },
+    {
+      id: "recuperacion",
+      label: "Optimizar mi recuperación",
+      icon: "leaf",
+      image: "/media/goal-recuperacion.jpg",
+      lede: "El descanso también es entrenamiento.",
+      pick: "creatina",
+      also: ["cirqa"],
+      why: "Creatina liposomal para el tono muscular y la recuperación,* medida con el tiempo de recuperación de tu Garmin."
+    },
+    {
+      id: "salud",
+      label: "Cuidar mi salud diaria",
+      icon: "heart",
+      image: "/media/goal-salud.jpg",
+      lede: "Un registro continuo, sin volverlo una obsesión.",
+      pick: "cirqa",
+      also: ["creatina"],
+      why: "Salud 24/7 en 18 gramos de tela: estrés, pulsioximetría¹ y más de 80 actividades detectadas solas."
+    },
+    {
+      id: "longevidad",
+      label: "Pensar a largo plazo",
+      icon: "infinity",
+      image: "/media/goal-longevidad.jpg",
+      lede: "Constancia antes que intensidad.",
+      pick: "venu-3s",
+      also: ["creatina"],
+      why: "Los hábitos que se sostienen años se miden con lo que llevas siempre puesto — y con lo que tomas cada día."
+    }
+  ];
+
   var BY_HANDLE = {};
   for (var i = 0; i < PRODUCTS.length; i++) BY_HANDLE[PRODUCTS[i].handle] = PRODUCTS[i];
+
+  var BY_GOAL = {};
+  for (var g = 0; g < GOALS.length; g++) BY_GOAL[GOALS[g].id] = GOALS[g];
+
+  /* Catégories, dans l'ordre d'affichage de la page Tienda. */
+  var CATEGORIES = [];
+  for (var c = 0; c < PRODUCTS.length; c++){
+    if (CATEGORIES.indexOf(PRODUCTS[c].category) === -1) CATEGORIES.push(PRODUCTS[c].category);
+  }
 
   function money(n){
     return "$" + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -172,7 +248,13 @@
 
   global.LOWLABS = {
     products: PRODUCTS,
+    goals: GOALS,
+    categories: CATEGORIES,
     byHandle: function(h){ return BY_HANDLE[h]; },
+    byGoal: function(id){ return BY_GOAL[id]; },
+    inCategory: function(cat){
+      return PRODUCTS.filter(function(p){ return p.category === cat; });
+    },
     money: money,
     url: function(h){ return "/productos/" + h; }
   };

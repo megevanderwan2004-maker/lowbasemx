@@ -26,14 +26,15 @@ const { products, money } = sandbox.window.LOWLABS;
 const esc = (s) =>
   String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-const CHECK = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#46605f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>';
+const CHECK = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>';
 
 const nav = () => `
 <nav class="nav" aria-label="Principal">
   <div class="nav-pill glass-light blurred">
     <div class="nav-start">
       <div class="nav-links">
-        <a href="/#catalogo">Tienda</a>
+        <a href="/tienda">Tienda</a>
+        <a href="/#objetivo">Tu objetivo</a>
         <a href="/#wearables">Wearables</a>
         <a href="/#suplementos">Suplementos</a>
         <a href="/#faq">FAQ</a>
@@ -56,13 +57,13 @@ const footer = () => `
       </div>
       <div>
         <h3 class="foot-title">Tienda</h3>
+        <p><a href="/tienda">Ver todo</a></p>
 ${products.map((p) => `        <p><a href="/productos/${p.handle}">${esc(p.name)}</a></p>`).join("\n")}
       </div>
       <div>
         <h3 class="foot-title">Ayuda</h3>
         <p><a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a></p>
         <p><a href="/#faq">Garantía y devoluciones</a></p>
-        <p><a href="/#comparar">Comparativa</a></p>
       </div>
     </div>
     <div class="legal">
@@ -161,8 +162,8 @@ function page(p) {
 <meta property="og:image" content="${esc(p.image)}">
 <meta property="og:type" content="product">
 <meta property="og:locale" content="es_MX">
-<meta name="theme-color" content="#24312f">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2324312f'/%3E%3Crect x='21' y='15' width='7' height='34' rx='3.5' fill='%23dec8a7'/%3E%3Crect x='36' y='15' width='7' height='34' rx='3.5' fill='%23dec8a7'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffffff'/%3E%3Crect x='21' y='15' width='7' height='34' rx='3.5' fill='%2317191b'/%3E%3Crect x='36' y='15' width='7' height='34' rx='3.5' fill='%2317191b'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.shopify.com">
