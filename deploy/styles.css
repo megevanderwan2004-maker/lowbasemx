@@ -1,309 +1,726 @@
+/* =========================================================================
+   lowlabs — Garmin CIRQA™ Smart Band
+   Éditorial premium + surfaces "liquid glass".
+
+   Deux règles non négociables dans ce fichier :
+   1. TYPOGRAPHIE — seules --font-display et --font-body existent.
+      Aucune règle ne doit écrire un nom de police en dur.
+   2. VERRE — le flou réel (backdrop-filter) est réservé à 3 surfaces
+      (nav, dock, nacelle). Tout le reste utilise le "faux verre"
+      (dégradé + arêtes internes) : visuellement identique à cette
+      échelle, sans le coût de rééchantillonnage à chaque frame.
+      Et la teinte seule porte le contraste — jamais le flou.
+   ========================================================================= */
+
 :root{
-    --ink:#1e2e2d;
-    --ink-soft:#2f4443;
-    --teal-700:#46605f;
-    --teal-600:#5f7a79;
-    --teal-brand:#89a3a2;
-    --sand:#dec8a7;
-    --sand-deep:#8a6a3f;
-    --surface:#ffffff;
-    --surface-teal:#eef3f3;
-    --surface-sand:#faf5ec;
-    --border:#d0dcdb;
-    --border-strong:#5f7a79;
-    --cta:#24312f;
-    --cta-hover:#2f4443;
-    --radius-sm:12px;
-    --radius-md:16px;
-    --radius-lg:24px;
-    --shadow-soft:0 8px 30px rgba(30,46,45,.08);
-    --font-display:'Outfit','Codec Pro',sans-serif;
-    --font-body:'DM Sans','Canva Sans',sans-serif;
+  /* ---- Primitives de marque ---- */
+  --ink:#1e2e2d;
+  --ink-soft:#2f4443;
+  --teal-700:#46605f;
+  --teal-600:#5f7a79;
+  --teal-brand:#89a3a2;
+  --sand:#dec8a7;
+  --surface:#ffffff;
+  --surface-teal:#eef3f3;
+  --surface-sand:#faf5ec;
+  --border:#d0dcdb;
+  --border-strong:#5f7a79;
+  --cta:#24312f;
+  --canvas:#e4e9e9;
+
+  /* ---- Typographie — VERROUILLÉE ---- */
+  --font-display:'Outfit','Codec Pro',sans-serif;
+  --font-body:'DM Sans','Canva Sans',sans-serif;
+
+  /* ---- Rayons ---- */
+  --radius-sm:14px;
+  --radius-md:20px;
+  --radius-lg:28px;
+  --radius-xl:40px;
+  --radius-pill:999px;
+
+  /* ---- Ombres ---- */
+  --shadow-soft:0 8px 30px rgba(30,46,45,.08);
+  --shadow-lift:0 22px 60px rgba(30,46,45,.16);
+
+  /* ---- Échelle z-index ---- */
+  --z-content:10;
+  --z-nav:120;
+  --z-dock:130;
+  --z-skip:200;
+
+  /* ---- Verre : les alphas plancher pour l'accessibilité ----
+     Verre sombre >= .70 (texte blanc), verre clair >= .72 (texte encre).
+     Composés sur blanc pur et sur noir pur, les deux passent AA. */
+  --glass-dark-a:rgba(20,30,28,.78);
+  --glass-dark-b:rgba(20,30,28,.7);
+  --glass-dark-hi-a:rgba(34,48,46,.86);
+  --glass-dark-hi-b:rgba(28,40,38,.78);
+  --glass-light-a:rgba(255,255,255,.86);
+  --glass-light-b:rgba(255,255,255,.72);
+  --glass-light-hi-a:rgba(255,255,255,.95);
+  --glass-light-hi-b:rgba(255,255,255,.85);
+
+  /* Arêtes : c'est le liseré interne qui fait lire "verre"
+     plutôt que "rectangle translucide". */
+  --glass-edge:
+    inset 0 1px 0 rgba(255,255,255,.6),
+    inset 1px 0 0 rgba(255,255,255,.22),
+    inset -1px 0 0 rgba(255,255,255,.22),
+    inset 0 -1px 0 rgba(0,0,0,.07);
+  --glass-edge-bright:
+    inset 0 1.5px 0 rgba(255,255,255,.72),
+    inset 1px 0 0 rgba(255,255,255,.3),
+    inset -1px 0 0 rgba(255,255,255,.3),
+    inset 0 -1px 0 rgba(0,0,0,.12);
+  /* Un liseré blanc est invisible sur fond clair : le verre clair a donc
+     besoin d'un filet sombre pour garder une silhouette. */
+  --glass-hairline:inset 0 0 0 1px rgba(46,68,67,.12);
+  --glass-drop:0 4px 16px rgba(30,46,45,.07);
+
+  /* Grain argentique — la vidéo source fait 848x480 */
+  --grain:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* Hauteur du dock d'achat, mesurée en JS */
+  --dock-h:72px;
+
+  /* Gouttière de la toile : la bande grise autour de la carte blanche */
+  --gutter:clamp(8px,1.1vw,16px);
+}
+
+/* =========================================================================
+   Base
+   ========================================================================= */
+*{margin:0;padding:0;box-sizing:border-box}
+html{
+  scroll-behavior:smooth;
+  scroll-padding-top:104px;
+  /* --dock-h = hauteur de la pilule seule ; +12px pour l'écart bas du dock,
+     +16px de respiration. Mesurée en JS, jamais codée en dur. */
+  scroll-padding-bottom:calc(var(--dock-h) + 28px + env(safe-area-inset-bottom,0px));
+  background:var(--canvas);
+}
+[id]{scroll-margin-top:104px}
+body{
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:var(--canvas);
+  line-height:1.6;
+  font-size:1rem;
+  -webkit-font-smoothing:antialiased;
+  /* Réserve constante pour le dock : ne change jamais, sinon le scroll saute. */
+  padding-bottom:calc(var(--dock-h) + 28px + env(safe-area-inset-bottom,0px));
+}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--teal-700)}
+
+h1,h2,h3,h4,h5,h6{font-family:var(--font-display);line-height:1.16;letter-spacing:-.024em;font-weight:600}
+h1{font-size:clamp(2.5rem,6vw,4.6rem);line-height:1.08;letter-spacing:-.032em}
+h2{font-size:clamp(1.7rem,3.4vw,2.6rem)}
+h3{font-size:clamp(1.05rem,1.8vw,1.3rem);line-height:1.28}
+h4{font-size:1rem}
+
+.eyebrow{
+  font-family:var(--font-display);font-size:.75rem;text-transform:uppercase;
+  letter-spacing:.13em;font-weight:500;color:var(--teal-700);line-height:1.45;
+}
+.container{max-width:1240px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+.price-num{font-variant-numeric:tabular-nums}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:var(--z-skip);
+  background:var(--cta);color:#fff;padding:14px 22px;
+  border-radius:0 0 var(--radius-sm) 0;font-family:var(--font-display);font-weight:600;
+}
+.skip:focus{left:0}
+
+/* Anneau de focus : 3px + décalage, visible sur verre comme sur photo. */
+a:focus-visible,button:focus-visible,summary:focus-visible,
+[tabindex]:focus-visible{outline:3px solid var(--teal-600);outline-offset:2px}
+.on-media a:focus-visible,.on-media button:focus-visible,
+.nav a:focus-visible,.nav button:focus-visible,
+.dock a:focus-visible,.dock button:focus-visible{outline-color:#fff}
+
+/* =========================================================================
+   Verre — socle partagé
+
+   .glass-light / .glass-dark = FAUX verre (dégradé + arêtes). Aucun
+   backdrop-filter : utilisable en quantité illimitée.
+   .blurred = ajoute le flou réel. Réservé à .nav-pill, .dock-shell, .rail.
+   ========================================================================= */
+.glass-light{
+  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
+  box-shadow:var(--glass-edge),var(--glass-hairline),var(--glass-drop);
+  color:var(--ink);
+}
+.glass-dark{
+  background:linear-gradient(180deg,var(--glass-dark-a),var(--glass-dark-b));
+  box-shadow:var(--glass-edge-bright);
+  color:#fff;
+}
+
+/* Flou réel — valeurs littérales obligatoires.
+   Safari <= 17 n'évalue pas var() dans -webkit-backdrop-filter : le verre
+   disparaîtrait silencieusement sur exactement les navigateurs concernés. */
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  .blurred.glass-dark{
+    background:linear-gradient(180deg,rgba(20,30,28,.74),rgba(20,30,28,.68));
+    -webkit-backdrop-filter:saturate(150%) blur(14px);
+    backdrop-filter:saturate(150%) blur(14px);
   }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth;scroll-padding-top:80px}
-  [id]{scroll-margin-top:76px}
-  body{font-family:var(--font-body);color:var(--ink);background:var(--surface);line-height:1.6;font-size:1rem;-webkit-font-smoothing:antialiased}
-  img{max-width:100%;height:auto;display:block}
-  a{color:var(--teal-700)}
-  h1,h2,h3{font-family:var(--font-display);line-height:1.12;letter-spacing:-0.02em}
-  h1{font-size:clamp(2.6rem,6.5vw,4.8rem);font-weight:700}
-  h2{font-size:clamp(1.75rem,3.5vw,2.5rem);font-weight:600;line-height:1.2}
-  h3{font-size:clamp(1.15rem,2vw,1.4rem);font-weight:600;line-height:1.3}
-  .eyebrow{font-family:var(--font-display);font-size:.8125rem;text-transform:uppercase;letter-spacing:.08em;font-weight:500;color:var(--teal-700)}
-  .container{max-width:1180px;margin:0 auto;padding:0 24px}
-  .price-num{font-variant-numeric:tabular-nums}
-  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-  .skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--cta);color:#fff;padding:12px 20px;border-radius:0 0 var(--radius-sm) 0;font-family:var(--font-display)}
-  .skip:focus{left:0}
-
-  /* ---------- Boutons : un seul système, trois variantes de verre ---------- */
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
-    font-family:var(--font-display);font-weight:600;font-size:1rem;line-height:1.2;letter-spacing:-.005em;
-    text-decoration:none;border-radius:999px;padding:15px 32px;border:none;cursor:pointer;text-align:center;
-    position:relative;isolation:isolate;overflow:hidden;color:#fff;background:transparent;
-    transition:transform .15s ease-out,box-shadow .25s ease-out}
-  .btn:active{transform:scale(.975)}
-  /* Couche de verre commune (port CSS du composant LiquidButton) */
-  .btn::before{content:"";position:absolute;inset:0;z-index:-2;border-radius:inherit;
-    backdrop-filter:blur(10px) saturate(1.5);-webkit-backdrop-filter:blur(10px) saturate(1.5);
-    transition:background .25s ease-out}
-  .btn::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;
-    box-shadow:inset 1.5px 1.5px 1px 0 rgba(255,255,255,.34),
-               inset -1px -1px 1px .5px rgba(255,255,255,.16),
-               inset 0 0 12px rgba(255,255,255,.07)}
-  /* Verre encre — CTA principal sur fond clair */
-  .btn-ink::before{background:rgba(30,41,39,.95)}
-  .btn-ink{box-shadow:0 10px 26px rgba(30,46,45,.24)}
-  .btn-ink:hover::before{background:rgba(47,68,67,.97)}
-  .btn-ink:hover{box-shadow:0 14px 32px rgba(30,46,45,.3)}
-  /* Verre clair — sur photo ou fond sombre */
-  .btn-glass::before{background:rgba(255,255,255,.12)}
-  .btn-glass{box-shadow:0 10px 26px rgba(20,30,29,.28);text-shadow:0 1px 8px rgba(20,30,29,.3)}
-  .btn-glass::after{box-shadow:inset 2px 2px 1px 0 rgba(255,255,255,.5),
-               inset -1.5px -1.5px 1px .5px rgba(255,255,255,.32),
-               inset 0 0 14px rgba(255,255,255,.12)}
-  .btn-glass:hover::before{background:rgba(255,255,255,.2)}
-  /* Verre discret — action secondaire sur fond clair */
-  .btn-quiet{color:var(--ink);box-shadow:none}
-  .btn-quiet::before{background:rgba(137,163,162,.14)}
-  .btn-quiet::after{box-shadow:inset 0 0 0 1.5px var(--border-strong)}
-  .btn-quiet:hover::before{background:rgba(137,163,162,.24)}
-  /* Boutons ronds (flèches, lecture, pause) — même verre */
-  .btn-round{width:46px;height:46px;padding:0;border-radius:50%;flex:none}
-  .btn-sm{padding:11px 22px;font-size:.9rem}
-  /* Compat : anciennes classes mappées sur le nouveau système */
-
-  a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--teal-600);outline-offset:3px}
-  .cards:focus-visible,.table-wrap:focus-visible{outline:3px solid var(--teal-600);outline-offset:-3px}
-  .hero a:focus-visible,.final a:focus-visible{outline-color:#fff}
-
-  /* ---------- Announcement ---------- */
-  .announce{background:var(--cta);color:#fff;text-align:center;font-size:.875rem;padding:9px 16px;letter-spacing:.02em}
-  .announce strong{font-weight:600}
-
-  /* ---------- Nav ---------- */
-  .nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
-  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
-  .logo{font-family:var(--font-display);font-weight:700;font-size:1.45rem;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
-  .logo span{display:block;font-family:var(--font-body);font-weight:400;font-size:.6rem;letter-spacing:.06em;color:var(--teal-600);margin-top:-4px}
-  .nav-links{display:none;gap:26px;font-size:.92rem}
-  .nav-links a{color:var(--ink-soft);text-decoration:none}
-  .nav-links a:hover{color:var(--ink)}
-  .nav .btn{padding:10px 22px;font-size:.9rem}
-  @media(min-width:900px){.nav-links{display:flex}}
-
-  /* ---------- Hero : le produit d'abord ---------- */
-  .hero{position:relative;overflow:hidden;text-align:center;
-    background:radial-gradient(120% 82% at 50% 0%, #f8fbfb 0%, #eef3f3 44%, #e0eae9 74%, #d2e0de 100%)}
-  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;
-    background:radial-gradient(46% 34% at 13% 10%, rgba(222,200,167,.55) 0%, rgba(222,200,167,0) 70%),
-               radial-gradient(44% 32% at 88% 20%, rgba(79,113,116,.26) 0%, rgba(79,113,116,0) 72%)}
-  .hero-inner{position:relative;padding:clamp(52px,6.5vw,84px) 0 0;display:flex;flex-direction:column;align-items:center;gap:20px}
-  .hero .eyebrow{color:var(--teal-700);display:block}
-  .hero h1{max-width:16ch;color:var(--ink)}
-  .hero p.sub{max-width:50ch;font-size:clamp(1.05rem,1.6vw,1.2rem);color:var(--ink-soft)}
-  .hero-cta{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:4px}
-  .hero-price{font-size:.95rem;color:var(--ink-soft)}
-  .hero-price s{color:var(--teal-700)}
-  .hero-product{position:relative;width:min(1180px,96%);margin:clamp(16px,3vw,32px) auto 0;padding:0 12px}
-  .hero-product img{width:100%;filter:drop-shadow(0 26px 34px rgba(30,46,45,.22))}
-  .hero-band{position:relative;display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap;
-    font-size:.82rem;color:var(--ink-soft);padding:clamp(16px,2.4vw,26px) 24px clamp(38px,5vw,58px);margin:0}
-  .hero-band span{display:inline-flex;align-items:center;gap:7px}
-  .hero-band span::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--teal-brand)}
-
-  /* ---------- Outcomes band (stats + foto con tarjeta flotante) ---------- */
-  .outcomes{background:var(--surface-teal)}
-  .outcomes .grid{display:grid;gap:48px;align-items:center}
-  .outcomes h2{margin-bottom:18px}
-  .outcomes p.lead{color:var(--ink-soft);font-size:1.08rem}
-  .outcomes .stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:34px}
-  .stat b{display:block;font-family:var(--font-display);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700;color:var(--ink);letter-spacing:-.02em}
-  .stat span{font-size:.85rem;color:var(--ink-soft)}
-  .outcomes .photo{position:relative}
-  .outcomes .photo>img{border-radius:var(--radius-lg);width:100%;object-fit:cover;box-shadow:var(--shadow-soft)}
-  .float-card{position:absolute;right:16px;bottom:20px;width:clamp(100px,11vw,140px);border-radius:var(--radius-md);overflow:hidden;box-shadow:0 18px 44px rgba(30,46,45,.35);border:1px solid rgba(255,255,255,.55)}
-  .float-card img{width:100%;aspect-ratio:375/460;object-fit:cover;object-position:top}
-  @media(min-width:900px){.outcomes .grid{grid-template-columns:1.05fr 1fr;gap:72px}}
-
-
-  /* ---------- Film produit ---------- */
-  .filmsec{position:relative;background:#16211f;color:#fff;overflow:hidden}
-  .filmsec::before{content:"";position:absolute;inset:0;pointer-events:none;
-    background:radial-gradient(60% 50% at 50% 0%, rgba(79,113,116,.5) 0%, rgba(79,113,116,0) 70%)}
-  .filmsec .container{position:relative}
-  .filmsec .section-head{margin-left:auto;margin-right:auto;text-align:center}
-  .filmsec .eyebrow{color:var(--sand)}
-  .filmsec h2{color:#fff}
-  .filmsec .section-head p{color:rgba(255,255,255,.72)}
-  .film{position:relative;width:min(1000px,100%);margin:0 auto;border-radius:var(--radius-lg);overflow:hidden;
-    background:#0f1817;box-shadow:0 30px 80px rgba(0,0,0,.45);aspect-ratio:848/480}
-  .film video{width:100%;height:100%;display:block;object-fit:cover;background:#0f1817}
-  .film-cover{position:absolute;inset:0;border:0;padding:0;margin:0;width:100%;height:100%;
-    display:grid;place-items:center;cursor:pointer;background:none;
-    transition:opacity .35s ease-out,visibility 0s .35s}
-  .film-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .film-cover::after{content:"";position:absolute;inset:0;
-    background:linear-gradient(180deg,rgba(12,20,19,.15) 0%,rgba(12,20,19,.42) 100%)}
-  .film.playing .film-cover{opacity:0;visibility:hidden;pointer-events:none}
-  .film-play{position:relative;z-index:2;width:clamp(72px,7vw,88px);height:clamp(72px,7vw,88px);
-    display:grid;place-items:center;pointer-events:none}
-  .film-play svg{margin-left:4px}
-  .film-cover:hover .film-play{transform:scale(1.05)}
-  .film-play{transition:transform .25s ease-out}
-  .film-meta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
-    margin-top:20px;font-size:.8rem;color:rgba(255,255,255,.6)}
-  .film-meta span{display:inline-flex;align-items:center;gap:7px}
-  .film-meta span::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--sand)}
-  .filmsec .film-cta{display:flex;justify-content:center;margin-top:clamp(28px,4vw,40px)}
-
-  /* ---------- Section scaffolding ---------- */
-  section{padding:clamp(56px,9vw,96px) 0}
-  .section-flush{padding-top:0}
-  .section-head{max-width:640px;margin-bottom:clamp(32px,5vw,48px)}
-  .section-head.center{margin-left:auto;margin-right:auto;text-align:center}
-  .section-head .eyebrow{display:block;margin-bottom:12px}
-  .section-head p{margin-top:14px;color:var(--ink-soft);font-size:1.05rem}
-  .fineprint{font-size:.85rem;color:var(--teal-600)}
-
-  /* ---------- App cards carousel (H3 + screenshot, sin body copy — patrón WHOOP) ---------- */
-  .carousel-wrap{position:relative}
-  .carousel-head{max-width:1180px;margin:0 auto;padding:0 24px}
-  .cards{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 24px 24px;padding-left:max(24px,calc((100vw - 1132px)/2));scrollbar-width:none;-ms-overflow-style:none}
-  .cards::-webkit-scrollbar{display:none}
-  .card{flex:0 0 min(78vw,300px);scroll-snap-align:start;background:linear-gradient(160deg,var(--surface-teal),#fff 70%);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-soft)}
-  .card h3{padding:20px 20px 14px}
-  .card img{width:100%;aspect-ratio:375/700;object-fit:cover;object-position:top}
-  .carousel-wrap::after{content:"";position:absolute;top:0;right:0;bottom:24px;width:48px;background:linear-gradient(90deg,transparent,#fff);pointer-events:none}
-  .car-arrows{display:none;gap:10px;position:absolute;top:-72px;right:max(24px,calc((100vw - 1132px)/2))}
-    @media(min-width:900px){.car-arrows{display:flex}.carousel-wrap::after{display:none}}
-
-  /* ---------- Buy / pricing ---------- */
-  .buy-card{display:grid;gap:40px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow-soft)}
-  .buy-media{border-radius:var(--radius-md);overflow:hidden;background:var(--surface-teal)}
-  .buy-media img{width:100%;aspect-ratio:1;object-fit:cover;transition:opacity .15s ease-out}
-  .buy-form .eyebrow{display:block;margin-bottom:8px}
-  .buy-form h2{font-size:clamp(1.6rem,2.6vw,2.1rem);margin-bottom:10px}
-  .buy-badge{display:inline-block;background:var(--sand);color:var(--ink);font-size:.75rem;font-weight:600;border-radius:999px;padding:4px 12px;margin-bottom:12px;font-family:var(--font-display)}
-  .buy-price{display:flex;align-items:baseline;gap:12px;margin:12px 0 4px;flex-wrap:wrap}
-  .buy-price .now{font-family:var(--font-display);font-size:2rem;font-weight:700}
-  .buy-price s{color:var(--teal-700);font-size:1.1rem}
-  .opt-label{font-size:.85rem;font-weight:600;margin:20px 0 10px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-  .opt-label small{font-weight:400;color:var(--teal-600)}
-  .size-row{display:flex;gap:10px}
-  .size-btn{flex:1;padding:13px;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:#fff;font-family:var(--font-body);font-size:.92rem;cursor:pointer;transition:border-color .2s;color:var(--ink)}
-  .size-btn small{display:block;color:var(--teal-600);font-size:.75rem}
-  .size-btn.active{border-color:var(--ink);font-weight:600}
-  .buy-actions{display:grid;gap:12px;margin-top:26px}
-  .buy-actions .btn{width:100%;padding:17px;font-size:1rem}
-  .buy-actions .btn[disabled]{opacity:.75;cursor:wait}
-  .trust{list-style:none;margin-top:22px;display:grid;gap:10px}
-  .trust li{display:flex;gap:10px;align-items:flex-start;font-size:.875rem;color:var(--ink-soft)}
-  .trust svg{flex:none;margin-top:2px}
-  .swatches{display:flex;gap:14px}
-  .swatch{width:44px;height:44px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:3px;background:transparent;transition:border-color .2s}
-  .swatch i{display:block;width:100%;height:100%;border-radius:50%}
-  .swatch.active{border-color:var(--ink)}
-  .swatch:hover{border-color:var(--teal-600)}
-  @media(min-width:900px){.buy-card{grid-template-columns:1.05fr 1fr;padding:40px}}
-
-  /* ---------- Masonry (respaldo real, sin testimonios inventados) ---------- */
-  .masonry-sec{background:var(--surface-sand)}
-  .masonry{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;grid-auto-rows:150px;grid-auto-flow:dense}
-  .masonry .tile{border-radius:var(--radius-md);overflow:hidden;position:relative}
-  .masonry img{width:100%;height:100%;object-fit:cover}
-  .tile-fact{display:flex;flex-direction:column;justify-content:center;padding:20px;background:#fff;border:1px solid var(--border)}
-  .tile-fact b{font-family:var(--font-display);font-size:clamp(1.5rem,3.4vw,2.6rem);font-weight:700;letter-spacing:-.02em;color:var(--ink);line-height:1.05}
-  .tile-fact span{font-size:.82rem;color:var(--ink-soft);margin-top:8px}
-  .tile-fact.t-teal{background:var(--cta);border:none}
-  .tile-fact.t-teal b{color:#fff}
-  .tile-fact.t-teal span{color:rgba(255,255,255,.75)}
-  .tile-fact.t-sand{background:var(--sand);border:none}
-  .tile-tall{grid-row:span 2}
-  @media(min-width:900px){.masonry{grid-template-columns:repeat(4,1fr);grid-auto-rows:170px}}
-
-  /* ---------- Hardware story (50/50 con items rotativos — patrón WHOOP) ---------- */
-  .hw{background:#fff}
-  .hw-grid{display:grid;gap:40px;align-items:center}
-  .hw-media{border-radius:var(--radius-lg);overflow:hidden;background:var(--surface-teal)}
-  .hw-media img{width:100%;aspect-ratio:4/3.4;object-fit:cover;transition:opacity .2s ease-out}
-  .hw-items{list-style:none;display:grid;gap:6px}
-  .hw-item{border-radius:var(--radius-sm);padding:16px 18px;cursor:pointer;transition:background .2s}
-  .hw-item h3{display:flex;align-items:center;gap:12px;font-size:1.1rem}
-  .hw-item .txt{max-height:0;overflow:hidden;transition:max-height .3s ease-out;color:var(--ink-soft);font-size:.95rem}
-  .hw-item.active{background:var(--surface-teal)}
-  .hw-item.active .txt{max-height:120px;margin-top:8px}
-  .hw-track{height:3px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden;display:none}
-  .hw-item.active .hw-track{display:block}
-  .hw-track i{display:block;height:100%;width:0;background:var(--teal-700);transition:width .2s linear}
-  .hw-ctrl{margin-top:18px;display:flex;align-items:center;gap:10px}
-    .hw-ctrl span{font-size:.8rem;color:var(--teal-600)}
-  @media(min-width:900px){.hw-grid{grid-template-columns:1.1fr 1fr;gap:72px}}
-
-  /* ---------- Customization (chips + descripción por color — patrón WHOOP) ---------- */
-  .colors-stage{display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center}
-  .colors-stage .stage-img{width:min(420px,80vw);aspect-ratio:1;border-radius:var(--radius-lg);background:var(--surface-teal);overflow:hidden}
-  .colors-stage .stage-img img{width:100%;height:100%;object-fit:cover;transition:opacity .15s ease-out}
-  .color-chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-  .chip{font-family:var(--font-display);font-weight:500;font-size:.9rem;padding:10px 20px;border-radius:999px;border:1.5px solid var(--border-strong);background:#fff;color:var(--ink);cursor:pointer;transition:all .2s}
-  .chip.active{background:var(--cta);border-color:var(--cta);color:#fff}
-  .color-name{font-family:var(--font-display);font-weight:600;font-size:1.2rem}
-  .color-desc{max-width:46ch;color:var(--ink-soft);min-height:3.2em}
-
-  /* ---------- Comparison ---------- */
-  .compare{background:var(--surface-teal)}
-  .table-wrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--border);background:#fff;box-shadow:var(--shadow-soft)}
-  table{border-collapse:collapse;width:100%;min-width:640px;font-size:.9rem}
-  th,td{padding:14px 18px;text-align:center;border-bottom:1px solid var(--surface-teal)}
-  th:first-child,td:first-child{text-align:left;font-weight:500;color:var(--ink-soft);position:sticky;left:0;background:#fff;min-width:200px}
-  tbody th[scope=row]{font-family:var(--font-body);font-size:.9rem}
-  thead th{font-family:var(--font-display);font-weight:600;color:var(--ink);vertical-align:bottom;padding-top:22px}
-  thead img{width:84px;margin:0 auto 8px;border-radius:8px}
-  .col-hl{background:var(--surface-sand)}
-  td.yes{color:var(--teal-700);font-weight:700}
-  td.no{color:var(--teal-600)}
-  tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
-  .compare-note{font-size:.8rem;color:var(--teal-700);margin-top:14px}
-
-  /* ---------- FAQ ---------- */
-  .faq-list{max-width:760px;margin:0 auto}
-  details{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:12px;overflow:hidden}
-  summary{cursor:pointer;padding:20px 24px;font-family:var(--font-display);font-weight:600;font-size:1rem;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
-  summary::-webkit-details-marker{display:none}
-  summary::after{content:"+";font-family:var(--font-display);font-weight:500;font-size:1.4rem;color:var(--teal-600);transition:transform .2s ease-out;flex:none}
-  details[open] summary::after{transform:rotate(45deg)}
-  details .a{padding:0 24px 20px;color:var(--ink-soft);font-size:.95rem}
-
-  /* ---------- Final CTA ---------- */
-  .final{position:relative;overflow:hidden;padding:0}
-  .final img.bg{width:100%;height:min(70vh,560px);object-fit:cover}
-  .final .overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,46,45,.45) 0%,rgba(30,46,45,.6) 55%,rgba(30,46,45,.75) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:20px}
-  .final h2{color:#fff;max-width:18ch;text-shadow:0 2px 24px rgba(30,46,45,.35)}
-
-  /* ---------- Footer ---------- */
-  footer{background:var(--cta);color:rgba(255,255,255,.85);padding:56px 0 40px;font-size:.875rem}
-  footer .logo{color:#fff}
-  footer .logo span{color:rgba(255,255,255,.6)}
-  .foot-grid{display:grid;gap:32px;margin-bottom:36px}
-  footer a{color:#fff}
-  .foot-title{font-size:.95rem;margin-bottom:12px;color:#fff}
-  .legal{border-top:1px solid rgba(255,255,255,.15);padding-top:24px;font-size:.75rem;color:rgba(255,255,255,.55);line-height:1.7}
-  @media(min-width:768px){.foot-grid{grid-template-columns:2fr 1fr 1fr}}
-
-  /* ---------- Sticky mobile buy bar ---------- */
-  .sticky-buy{position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;gap:14px;transform:translateY(110%);visibility:hidden;transition:transform .3s ease-out,visibility 0s .3s}
-  .sticky-buy.on{transform:translateY(0);visibility:visible;transition:transform .3s ease-out,visibility 0s}
-  .sticky-buy .p b{font-family:var(--font-display);font-size:1.05rem}
-  .sticky-buy .p{line-height:1.25;font-size:.75rem;color:var(--teal-700)}
-  .sticky-buy .btn{padding:12px 26px;font-size:.95rem;flex:none}
-  @media(min-width:900px){.sticky-buy{display:none}}
-
-  /* ---------- Reveal animations (JS only) ---------- */
-  .js .rv{opacity:0;transform:translateY(12px);transition:opacity .35s ease-out,transform .35s ease-out}
-  .js .rv.in{opacity:1;transform:none}
-  @media(prefers-reduced-motion:reduce){
-    html{scroll-behavior:auto}
-    .js .rv{opacity:1;transform:none;transition:none}
-    *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+  .blurred.glass-light{
+    background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.72));
+    -webkit-backdrop-filter:saturate(150%) blur(16px);
+    backdrop-filter:saturate(150%) blur(16px);
   }
+}
+
+/* Tant que la vidéo du hero joue derrière, on retire le flou des surfaces
+   fixes : le fond serait rééchantillonné à la fréquence des images. */
+body:not(.past-hero) .nav-pill,
+body:not(.past-hero) .dock-shell{
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  background:linear-gradient(180deg,var(--glass-dark-a),var(--glass-dark-b));
+}
+
+@media (prefers-reduced-transparency:reduce){
+  .blurred{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .glass-dark,.blurred.glass-dark{background:rgba(20,30,28,.97)}
+  .glass-light,.blurred.glass-light{background:rgba(255,255,255,.98)}
+}
+
+/* =========================================================================
+   Boutons — quatre variantes, toutes en verre
+   ========================================================================= */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--font-display);font-weight:600;font-size:1rem;line-height:1.2;
+  letter-spacing:-.004em;text-decoration:none;border:none;cursor:pointer;
+  border-radius:var(--radius-pill);padding:15px 30px;min-height:48px;text-align:center;
+  transition:transform .18s ease-out,box-shadow .22s ease-out,background .22s ease-out;
+}
+.btn:active{transform:scale(.975)}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.5;pointer-events:none;cursor:not-allowed}
+
+/* Encre — CTA principal sur fond clair */
+.btn-ink{
+  background:linear-gradient(180deg,rgba(38,52,50,.97),rgba(22,32,30,.99));
+  color:#fff;box-shadow:var(--glass-edge-bright),0 12px 30px rgba(30,46,45,.26);
+}
+.btn-ink:hover{
+  background:linear-gradient(180deg,rgba(52,70,68,.98),rgba(34,46,44,1));
+  box-shadow:var(--glass-edge-bright),0 16px 38px rgba(30,46,45,.32);
+}
+
+/* Fumée — verre sombre sur média : contraste garanti sur n'importe quelle image */
+.btn-smoke{
+  background:linear-gradient(180deg,var(--glass-dark-a),var(--glass-dark-b));
+  color:#fff;box-shadow:var(--glass-edge-bright),0 12px 30px rgba(12,20,19,.3);
+}
+.btn-smoke:hover{background:linear-gradient(180deg,var(--glass-dark-hi-a),var(--glass-dark-hi-b))}
+
+/* Discret — verre clair sur fond clair */
+.btn-quiet{
+  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
+  color:var(--ink);
+  box-shadow:var(--glass-edge),inset 0 0 0 1px rgba(95,122,121,.34),0 4px 14px rgba(30,46,45,.08);
+}
+.btn-quiet:hover{background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
+
+.btn-round{width:48px;height:48px;padding:0;border-radius:50%;flex:none;min-height:48px}
+.btn-sm{padding:12px 22px;font-size:.9rem;min-height:44px}
+.btn-lg{padding:18px 34px;font-size:1.05rem;min-height:56px}
+.btn-block{width:100%}
+
+/* =========================================================================
+   Coquille : la page est une carte posée sur la toile grise.
+   z-index + isolation : c'est le correctif Safari pour un conteneur
+   arrondi qui rogne — sans masque (qui tuerait tout backdrop-filter
+   descendant) et sans will-change (qui casserait les éléments fixed).
+   ========================================================================= */
+.shell{
+  position:relative;z-index:0;isolation:isolate;
+  /* width plutôt qu'une simple marge auto : sans elle, la toile grise
+     n'apparaît sur aucun écran de moins de 1680px et l'effet « carte
+     posée sur un fond » disparaît complètement. */
+  max-width:1680px;
+  width:calc(100% - 2 * var(--gutter));
+  margin:var(--gutter) auto 0;
+  background:var(--surface);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  box-shadow:0 1px 2px rgba(30,46,45,.06),0 18px 50px rgba(30,46,45,.07);
+}
+
+/* =========================================================================
+   Nav flottante — LOGO CENTRÉ
+   ========================================================================= */
+.nav{
+  position:fixed;top:clamp(10px,1.6vw,18px);left:0;right:0;z-index:var(--z-nav);
+  display:flex;justify-content:center;padding:0 12px;pointer-events:none;
+}
+.nav-pill{
+  pointer-events:auto;
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;
+  width:min(1180px,100%);
+  /* Rembourrage strictement symétrique : la colonne centrale de la grille
+     ne tombe au milieu de la pilule que si les deux côtés sont égaux.
+     L'encoche visuelle des liens vient de leur propre padding. */
+  padding:8px 12px;
+  border-radius:var(--radius-pill);
+}
+.nav-pill{box-shadow:var(--glass-edge-bright),0 10px 34px rgba(12,20,19,.22)}
+
+.nav-links{display:none;gap:6px}
+.nav-links a{
+  color:rgba(255,255,255,.84);text-decoration:none;font-size:.9rem;
+  padding:12px 12px;border-radius:var(--radius-pill);
+  display:inline-flex;align-items:center;min-height:44px;transition:color .2s;
+}
+.nav-links a:hover{color:#fff}
+
+/* Le logo est dans la colonne centrale de la grille : il reste centré
+   sur la pilule quel que soit le contenu de gauche et de droite. */
+.logo{
+  grid-column:2;justify-self:center;
+  font-family:var(--font-display);font-weight:600;font-size:1.34rem;
+  color:#fff;text-decoration:none;letter-spacing:-.022em;line-height:1;
+  /* min-height : la cible tactile doit rester à 44px même si le mot est court. */
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;padding:0 8px;white-space:nowrap;
+}
+.nav-start{grid-column:1;justify-self:start;display:flex;align-items:center}
+.nav-end{grid-column:3;justify-self:end;display:flex;align-items:center;gap:10px}
+@media(min-width:1024px){.nav-links{display:flex}}
+
+/* =========================================================================
+   Hero — vidéo automuette en boucle
+   ========================================================================= */
+.hero{
+  position:relative;isolation:isolate;overflow:hidden;
+  min-height:600px;
+  height:100vh;height:100svh;height:100dvh;
+  max-height:940px;
+  /* Même image que l'affiche de la vidéo : chaque peinture de la séquence
+     montre la même chose, il n'y a donc aucun flash perceptible. */
+  background:#0f1817 url("https://cdn.shopify.com/s/files/1/1026/1721/9449/files/video-poster.jpg?v=1785304471&width=1600") center/cover no-repeat;
+  border-radius:var(--radius-lg) var(--radius-lg) var(--radius-md) var(--radius-md);
+}
+/* Vidéo et affiche occupent exactement la même boîte : la bascule est un
+   fondu, sans reflow ni décalage de mise en page. */
+.hero-video,.hero-poster{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center 42%;display:block;
+}
+.hero-video{
+  z-index:1;pointer-events:none;background:#0f1817;
+  /* Léger recadrage : les 3% extérieurs sont la zone la plus molle de
+     l'encodage. Étalonnage doux — jamais de blur, qui détruirait le peu
+     de détail disponible. */
+  transform:scale(1.03);
+  filter:contrast(1.06) saturate(1.06) brightness(.94);
+}
+.hero-poster{z-index:2;opacity:1;transition:opacity .45s ease-out}
+.hero.is-playing .hero-poster{opacity:0}
+/* Scrim : plancher de contraste déterministe pour le texte. */
+.hero::before{
+  content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(10,16,15,.55) 0%,rgba(10,16,15,.14) 38%,rgba(10,16,15,.72) 100%),
+    radial-gradient(120% 82% at 50% 46%,rgba(10,16,15,0) 40%,rgba(10,16,15,.46) 100%);
+}
+/* Grain : sous le contenu (sinon le texte serait grainé et perdrait du
+   contraste), et jamais ancêtre d'une surface en verre. */
+.hero::after{
+  content:"";position:absolute;inset:0;z-index:4;pointer-events:none;
+  opacity:.13;mix-blend-mode:overlay;
+  background-image:var(--grain);background-repeat:repeat;background-size:160px 160px;
+}
+@media (min-resolution:2dppx){.hero::after{background-size:96px 96px;opacity:.11}}
+
+.hero-inner{
+  position:relative;z-index:var(--z-content);height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  text-align:center;gap:16px;
+  /* Le dock est fixe au-dessus du hero : la réserve de body ne s'applique
+     qu'à la fin du document, il faut donc dégager le bas ici aussi. */
+  padding:120px clamp(18px,4vw,40px) calc(clamp(40px,5vw,64px) + var(--dock-h));
+}
+.hero .eyebrow{color:rgba(255,255,255,.82)}
+.hero h1{color:#fff;max-width:15ch;text-shadow:0 2px 30px rgba(10,16,15,.45)}
+.hero-sub{
+  color:rgba(255,255,255,.9);max-width:52ch;font-size:clamp(1rem,1.5vw,1.14rem);
+  text-shadow:0 1px 16px rgba(10,16,15,.5);
+}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.hero-scroll{
+  display:inline-flex;align-items:center;gap:9px;min-height:44px;
+  font-family:var(--font-display);font-size:.75rem;text-transform:uppercase;
+  letter-spacing:.16em;color:rgba(255,255,255,.85);text-decoration:none;
+}
+.hero-scroll::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--sand);flex:none}
+.hero-scroll:hover{color:#fff}
+
+/* Commande de lecture : discrète, mais obligatoire — toute animation
+   automatique de plus de 5 s doit pouvoir être arrêtée (WCAG 2.2.2). */
+.hero-toggle{
+  position:absolute;right:clamp(14px,2.2vw,24px);
+  bottom:calc(clamp(14px,2.2vw,24px) + var(--dock-h));
+  z-index:calc(var(--z-content) + 1);
+}
+.hero-toggle svg{display:block}
+
+/* =========================================================================
+   Bandeau de garanties
+   ========================================================================= */
+.ticker{border-bottom:1px solid var(--border);background:var(--surface)}
+.ticker-row{
+  display:flex;gap:clamp(16px,3vw,36px);align-items:center;justify-content:center;
+  flex-wrap:wrap;padding:16px 0;
+  font-family:var(--font-display);font-size:.75rem;font-weight:500;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--teal-700);line-height:1.5;
+}
+.ticker-row span{display:inline-flex;align-items:center;gap:8px}
+.ticker-row span::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--teal-brand);flex:none}
+
+/* =========================================================================
+   Ossature des sections
+   ========================================================================= */
+section{padding:clamp(56px,8vw,104px) 0}
+.section-head{display:grid;gap:18px;margin-bottom:clamp(28px,4vw,44px);align-items:end}
+.section-head h2{max-width:18ch}
+.section-head p{color:var(--ink-soft);font-size:1.02rem;max-width:46ch}
+.section-head .eyebrow{display:block;margin-bottom:10px}
+.section-head.center{text-align:center;justify-items:center}
+.section-head.center h2,.section-head.center p{max-width:34ch;margin-inline:auto}
+@media(min-width:900px){
+  .section-head{grid-template-columns:1.15fr 1fr;gap:48px}
+  .section-head.center{grid-template-columns:1fr}
+}
+.head-aside{display:flex;flex-direction:column;gap:18px;align-items:flex-start}
+@media(min-width:900px){.head-aside{align-items:flex-end;text-align:right}}
+
+/* =========================================================================
+   Cartes-images à chips
+   ========================================================================= */
+.cards{
+  /* L'encoche aligne la première carte sur la grille du conteneur.
+     Elle doit être déclarée en scroll-padding autant qu'en padding :
+     sans elle, « scroll-snap-align:start » cale la carte sur le bord du
+     scrollport et le navigateur défile de lui-même par-dessus la marge. */
+  --cards-inset:clamp(18px,4vw,40px);
+  display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:4px var(--cards-inset) 6px;
+  scroll-padding-left:var(--cards-inset);
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.cards::-webkit-scrollbar{display:none}
+@media(min-width:1240px){
+  .cards{--cards-inset:max(40px,calc((100vw - 1240px)/2 + 40px))}
+}
+.pcard{
+  position:relative;isolation:isolate;flex:0 0 min(74vw,300px);scroll-snap-align:start;
+  aspect-ratio:3/4.15;border-radius:var(--radius-md);overflow:hidden;
+  background:var(--surface-teal);
+}
+.pcard>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.pcard::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,16,15,.42) 0%,rgba(10,16,15,0) 34%,rgba(10,16,15,.24) 56%,rgba(10,16,15,.86) 100%);
+}
+.pcard-chip{
+  position:absolute;top:14px;left:14px;z-index:var(--z-content);
+  font-family:var(--font-display);font-size:.75rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:8px 14px;border-radius:var(--radius-pill);line-height:1.3;
+}
+.pcard-body{position:absolute;left:0;right:0;bottom:0;z-index:var(--z-content);padding:18px 18px 20px;color:#fff}
+.pcard-body h3{color:#fff;margin-bottom:6px;font-size:1.1rem}
+.pcard-body p{font-size:.875rem;color:rgba(255,255,255,.88);line-height:1.5}
+.card-arrows{display:none;gap:10px}
+@media(min-width:900px){.card-arrows{display:flex}}
+
+/* =========================================================================
+   Déclaration éditoriale
+   ========================================================================= */
+.statement{background:var(--surface);text-align:center}
+.statement .eyebrow{display:block;margin-bottom:22px}
+.statement h2{
+  font-weight:500;font-size:clamp(1.5rem,3.5vw,2.55rem);line-height:1.34;
+  letter-spacing:-.028em;max-width:24ch;margin:0 auto;color:var(--ink);
+}
+.inline-thumb{
+  display:inline-block;vertical-align:-.18em;
+  width:clamp(32px,4.4vw,54px);height:clamp(32px,4.4vw,54px);
+  border-radius:50%;object-fit:cover;margin:0 .1em;
+  box-shadow:0 4px 14px rgba(30,46,45,.18);
+}
+
+/* =========================================================================
+   Duo de grandes cartes + widgets de données
+   ========================================================================= */
+.duo{display:grid;gap:16px}
+@media(min-width:900px){.duo{grid-template-columns:1fr 1fr}}
+.duo-card{
+  position:relative;isolation:isolate;border-radius:var(--radius-lg);overflow:hidden;
+  aspect-ratio:4/4.3;background:var(--surface-teal);
+}
+@media(min-width:900px){.duo-card{aspect-ratio:4/3.6}}
+.duo-card>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.duo-card::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,16,15,.62) 0%,rgba(10,16,15,.14) 42%,rgba(10,16,15,.5) 100%);
+}
+.duo-head{position:absolute;top:0;left:0;right:0;z-index:var(--z-content);padding:clamp(20px,2.6vw,30px);color:#fff}
+.duo-head h3{color:#fff;font-size:clamp(1.2rem,2.1vw,1.6rem);max-width:15ch;text-shadow:0 2px 18px rgba(10,16,15,.4)}
+.duo-head p{margin-top:8px;font-size:.9rem;color:rgba(255,255,255,.86);max-width:32ch;text-shadow:0 1px 12px rgba(10,16,15,.45)}
+
+.widget{
+  position:absolute;z-index:var(--z-content);
+  left:clamp(20px,2.6vw,30px);right:clamp(20px,2.6vw,30px);bottom:clamp(20px,2.6vw,30px);
+  border-radius:var(--radius-md);padding:16px 18px;
+}
+.widget-label{
+  font-family:var(--font-display);font-size:.75rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:.12em;color:rgba(255,255,255,.82);line-height:1.4;
+}
+.widget-row{display:flex;align-items:flex-end;gap:14px;margin-top:8px}
+.widget-num{font-family:var(--font-display);font-size:2.3rem;font-weight:600;line-height:1;letter-spacing:-.03em}
+.widget-num small{font-size:.85rem;font-weight:500;opacity:.75;margin-left:3px}
+.widget-state{font-size:.875rem;color:rgba(255,255,255,.9);padding-bottom:4px}
+.widget-bars{display:flex;align-items:flex-end;gap:3px;height:34px;margin-left:auto}
+.widget-bars i{display:block;width:5px;border-radius:2px;background:rgba(255,255,255,.55)}
+.widget-bars i.hi{background:var(--sand)}
+.widget-note{margin-top:10px;font-size:.75rem;color:rgba(255,255,255,.74);line-height:1.4}
+.widget-meter{height:6px;border-radius:3px;background:rgba(255,255,255,.28);margin-top:12px;overflow:hidden}
+.widget-meter i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--teal-brand),var(--sand))}
+
+/* =========================================================================
+   Sélecteur "liquid glass"
+   ========================================================================= */
+.select{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(80% 60% at 12% 8%,rgba(222,200,167,.5) 0%,rgba(222,200,167,0) 62%),
+    radial-gradient(70% 60% at 88% 92%,rgba(137,163,162,.55) 0%,rgba(137,163,162,0) 66%),
+    linear-gradient(168deg,#eef3f3 0%,#dfe9e8 52%,#d3e0de 100%);
+}
+.select-grid{display:grid;gap:clamp(22px,3vw,34px);align-items:center}
+@media(min-width:980px){.select-grid{grid-template-columns:1.06fr .94fr;gap:clamp(28px,3.4vw,52px)}}
+
+.stage{position:relative}
+.stage-media{
+  border-radius:var(--radius-xl);overflow:hidden;background:var(--surface);
+  aspect-ratio:1;box-shadow:var(--shadow-lift);
+}
+.stage-media img{width:100%;height:100%;object-fit:cover;transition:opacity .18s ease-out}
+.stat-glass{
+  box-shadow:var(--glass-edge),var(--glass-hairline),0 8px 26px rgba(30,46,45,.14);
+  position:absolute;z-index:var(--z-content);
+  left:clamp(14px,2vw,24px);right:clamp(14px,2vw,24px);bottom:clamp(14px,2vw,24px);
+  border-radius:var(--radius-md);padding:15px 17px;
+}
+.stat-glass-row{display:flex;gap:20px;flex-wrap:wrap}
+.stat-glass b{
+  display:block;font-family:var(--font-display);font-size:1.05rem;font-weight:600;
+  color:var(--ink);letter-spacing:-.02em;line-height:1.2;
+}
+.stat-glass span{font-size:.75rem;color:var(--teal-700);text-transform:uppercase;letter-spacing:.09em;line-height:1.4}
+
+/* La nacelle — l'une des trois seules surfaces à flou réel. */
+.rail{
+  border-radius:var(--radius-xl);padding:clamp(16px,2vw,22px);
+  display:grid;gap:12px;
+}
+.rail{box-shadow:var(--glass-edge-bright),0 26px 70px rgba(30,46,45,.18)}
+.rail-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tag{
+  display:inline-flex;align-items:center;gap:8px;padding:9px 15px;
+  border-radius:var(--radius-pill);
+  font-family:var(--font-display);font-size:.75rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.11em;color:var(--ink-soft);line-height:1.35;
+}
+.rail-price{display:flex;align-items:baseline;gap:9px}
+.rail-price b{font-family:var(--font-display);font-size:1.55rem;font-weight:600;letter-spacing:-.028em}
+.rail-price s{color:var(--teal-700);font-size:.95rem}
+
+.rail-track{display:grid;gap:9px}
+.rail-item{
+  display:flex;align-items:center;gap:14px;width:100%;min-height:76px;
+  padding:11px 14px;border:none;border-radius:var(--radius-md);
+  cursor:pointer;text-align:left;font-family:var(--font-body);
+  transition:transform .18s ease-out,background .2s ease-out;
+}
+.rail-item:hover{transform:translateY(-1px)}
+.rail-item:hover,.rail-item.active{background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
+.rail-item.active{box-shadow:var(--glass-edge),var(--glass-drop),inset 0 0 0 2px var(--ink)}
+.rail-thumb{
+  width:52px;height:52px;border-radius:50%;flex:none;overflow:hidden;
+  background:var(--surface-teal);box-shadow:0 3px 10px rgba(30,46,45,.16);
+}
+.rail-thumb img{width:100%;height:100%;object-fit:cover}
+.rail-txt{display:grid;gap:2px;min-width:0}
+.rail-txt b{font-family:var(--font-display);font-weight:600;font-size:1rem;letter-spacing:-.015em}
+.rail-txt span{font-size:.8rem;color:var(--teal-700);line-height:1.4}
+.rail-dot{
+  width:16px;height:16px;border-radius:50%;flex:none;margin-left:auto;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7),0 1px 4px rgba(30,46,45,.28);
+}
+/* Coche : l'état actif ne repose pas uniquement sur la couleur. */
+.rail-check{width:18px;height:18px;flex:none;opacity:0;color:var(--ink)}
+.rail-item.active .rail-check{opacity:1}
+
+.rail-sizes{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:2px}
+.size-btn{
+  padding:13px 15px;border:none;border-radius:var(--radius-md);cursor:pointer;
+  text-align:left;font-family:var(--font-body);min-height:64px;
+  transition:background .2s ease-out;
+}
+.size-btn:hover,.size-btn.active{background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
+.size-btn.active{box-shadow:var(--glass-edge),var(--glass-drop),inset 0 0 0 2px var(--ink)}
+.size-btn b{display:block;font-family:var(--font-display);font-weight:600;font-size:1rem}
+.size-btn small{display:block;color:var(--teal-700);font-size:.78rem;margin-top:1px;line-height:1.4}
+
+.rail-go{display:grid;gap:9px;margin-top:4px}
+.rail-foot{display:flex;align-items:center;justify-content:center;gap:8px;font-size:.8rem;color:var(--teal-700);text-align:center;line-height:1.5}
+.trust{list-style:none;display:grid;gap:8px;margin-top:6px}
+.trust li{display:flex;gap:9px;align-items:flex-start;font-size:.875rem;color:var(--ink-soft);line-height:1.5}
+.trust svg{flex:none;margin-top:3px}
+
+/* =========================================================================
+   Comparatif
+   ========================================================================= */
+.compare{background:var(--surface-teal)}
+.table-wrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--border);background:#fff;box-shadow:var(--shadow-soft)}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+th,td{padding:14px 18px;text-align:center;border-bottom:1px solid var(--surface-teal)}
+th:first-child,td:first-child{text-align:left;font-weight:500;color:var(--ink-soft);position:sticky;left:0;background:#fff;min-width:210px}
+tbody th[scope=row]{font-family:var(--font-body);font-size:.9rem}
+thead th{font-family:var(--font-display);font-weight:600;color:var(--ink);vertical-align:bottom;padding-top:22px}
+thead img{width:78px;margin:0 auto 8px;border-radius:8px}
+.col-hl{background:var(--surface-sand)}
+td.yes{color:var(--teal-700);font-weight:700}
+td.no{color:var(--teal-600)}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
+.compare-note{font-size:.8rem;color:var(--teal-700);margin-top:14px;line-height:1.6}
+
+/* =========================================================================
+   FAQ — le résumé est lui aussi une surface de verre
+   ========================================================================= */
+.faq-list{max-width:780px;margin:0 auto}
+details{border-radius:var(--radius-sm);margin-bottom:10px;overflow:hidden;background:var(--surface-teal)}
+summary{
+  cursor:pointer;padding:19px 22px;min-height:56px;
+  font-family:var(--font-display);font-weight:600;font-size:1rem;
+  list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
+  box-shadow:var(--glass-edge),var(--glass-hairline);color:var(--ink);transition:background .2s ease-out;
+}
+summary:hover{background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
+summary::-webkit-details-marker{display:none}
+summary::after{
+  content:"+";font-family:var(--font-display);font-weight:500;font-size:1.4rem;
+  color:var(--teal-600);transition:transform .2s ease-out;flex:none;line-height:1;
+}
+details[open] summary::after{transform:rotate(45deg)}
+details .a{padding:18px 22px;color:var(--ink-soft);font-size:.94rem}
+
+/* =========================================================================
+   Bannière de clôture
+   ========================================================================= */
+.closing{
+  position:relative;isolation:isolate;overflow:hidden;padding:0;
+  border-radius:var(--radius-lg);margin:0 clamp(14px,2.4vw,26px) clamp(14px,2.4vw,26px);
+}
+.closing>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 72%;z-index:1}
+.closing::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,16,15,.34) 0%,rgba(10,16,15,.54) 55%,rgba(10,16,15,.8) 100%);
+}
+.closing-inner{
+  position:relative;z-index:var(--z-content);
+  min-height:clamp(340px,52vh,520px);display:flex;flex-direction:column;
+  justify-content:flex-end;gap:16px;padding:clamp(26px,4vw,52px);color:#fff;
+}
+.closing h2{color:#fff;max-width:16ch;text-shadow:0 2px 24px rgba(10,16,15,.4)}
+.closing p{max-width:42ch;color:rgba(255,255,255,.9);text-shadow:0 1px 14px rgba(10,16,15,.45)}
+.closing .btn{align-self:flex-start;margin-top:4px}
+
+/* =========================================================================
+   Footer
+   ========================================================================= */
+footer{
+  background:var(--cta);color:rgba(255,255,255,.86);padding:56px 0 40px;font-size:.9rem;
+  /* Même gouttière que la coquille : la bande grise reste continue. */
+  max-width:1680px;
+  width:calc(100% - 2 * var(--gutter));
+  margin:var(--gutter) auto 0;
+  border-radius:var(--radius-lg);
+}
+.foot-logo{
+  display:inline-block;font-family:var(--font-display);font-weight:600;font-size:1.45rem;
+  color:#fff;text-decoration:none;letter-spacing:-.022em;line-height:1.1;
+}
+.foot-logo span{display:block;font-family:var(--font-body);font-weight:400;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-top:5px}
+.foot-grid{display:grid;gap:32px;margin-bottom:36px}
+footer a{color:#fff}
+/* Les liens de navigation du footer sont de vraies cibles tactiles. */
+.foot-grid p a{display:inline-flex;align-items:center;min-height:44px}
+.foot-title{font-size:.95rem;margin-bottom:12px;color:#fff;font-family:var(--font-display)}
+.legal{border-top:1px solid rgba(255,255,255,.15);padding-top:24px;font-size:.78rem;color:rgba(255,255,255,.62);line-height:1.7}
+@media(min-width:768px){.foot-grid{grid-template-columns:2fr 1fr 1fr}}
+
+/* =========================================================================
+   Dock d'achat permanent
+   ========================================================================= */
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:var(--z-dock);
+  display:flex;justify-content:center;pointer-events:none;
+  padding:0 12px calc(12px + env(safe-area-inset-bottom,0px));
+}
+.dock-shell{
+  pointer-events:auto;display:flex;align-items:center;gap:clamp(10px,2vw,20px);
+  width:min(680px,100%);padding:8px 8px 8px 20px;border-radius:var(--radius-pill);
+}
+.dock-shell{box-shadow:var(--glass-edge-bright),0 14px 40px rgba(12,20,19,.28)}
+.dock-info{display:grid;gap:1px;min-width:0;line-height:1.3}
+.dock-info b{font-family:var(--font-display);font-size:1.05rem;font-weight:600;color:#fff;letter-spacing:-.02em}
+.dock-info span{font-size:.8rem;color:rgba(255,255,255,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock-shell .btn{margin-left:auto;flex:none}
+@media(max-width:430px){
+  .dock-shell{padding-left:16px;gap:10px}
+  .dock-shell .btn{padding:12px 18px;font-size:.88rem}
+  .dock-info b{font-size:.98rem}
+  .dock-info span{font-size:.75rem}
+}
+
+/* =========================================================================
+   Révélation au scroll
+   Ne jamais appliquer .rv à une surface à flou réel, ni à un de ses
+   ancêtres : animer l'opacité d'un ancêtre crée une racine de fond et
+   le flou meurt pendant toute l'animation.
+   ========================================================================= */
+.js .rv{opacity:0;transform:translateY(14px);transition:opacity .45s ease-out,transform .45s ease-out}
+.js .rv.in{opacity:1;transform:none}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .rv{opacity:1;transform:none;transition:none}
+  .hero::after{opacity:.09}
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+
+/* Mouvement réduit : la vidéo reste en place mais ne joue pas — l'affiche
+   devient l'image du hero. Jamais display:none (WebKit exige que
+   l'élément soit visible, et la section aurait un trou).
+   La règle sur .is-playing est nécessaire : le navigateur peut lancer la
+   lecture depuis l'attribut autoplay avant que le JS ne l'arrête. */
+.rm .hero-video{opacity:0}
+.rm .hero.is-playing .hero-poster{opacity:1}
+
+/* ...sauf si l'utilisateur appuie lui-même sur lecture : c'est un
+   consentement explicite, et la vidéo doit alors être visible — sinon il
+   déclenche une lecture invisible derrière l'affiche. */
+.rm .hero.motion-ok .hero-video{opacity:1}
+.rm .hero.motion-ok.is-playing .hero-poster{opacity:0}

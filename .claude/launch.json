@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "cirqa-landing",
+      "name": "cirqa-deploy",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4173", "--directory", "site"],
-      "port": 4173
+      "runtimeArgs": [".claude/serve.py", "4175"],
+      "port": 4175
     }
   ]
 }
