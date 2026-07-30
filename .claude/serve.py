@@ -22,6 +22,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         super().end_headers()
 
+    def translate_path(self, path):
+        # vercel.json déclare cleanUrls : /productos/cirqa doit servir
+        # cirqa.html. On reproduit la règle en local, sinon la prévisu
+        # renvoie 404 sur exactement les liens qui marchent en production.
+        full = super().translate_path(path)
+        if not os.path.exists(full) and not full.endswith(".html"):
+            candidate = full.rstrip(os.sep) + ".html"
+            if os.path.isfile(candidate):
+                return candidate
+        return full
+
 
 socketserver.TCPServer.allow_reuse_address = True
 with socketserver.TCPServer(("127.0.0.1", PORT), Handler) as httpd:

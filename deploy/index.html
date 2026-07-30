@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Garmin CIRQA™ Smart Band — $3,999 MXN | lowlabs</title>
-<meta name="description" content="La banda inteligente sin pantalla de Garmin. Salud 24/7, sueño avanzado y +80 actividades, sin suscripción. $3,999 MXN con envío gratis a todo México. Garantía oficial Garmin.">
-<meta property="og:title" content="Garmin CIRQA™ Smart Band | lowlabs">
-<meta property="og:description" content="Registra todo el día. Sin distracciones. Salud 24/7, sin pantalla y sin suscripciones — $3,999 MXN.">
+<title>lowlabs — Tecnología y bienestar seleccionados</title>
+<meta name="description" content="Una selección curada de tecnología, suplementos y esenciales de bienestar para optimizar tu día a día. Garmin CIRQA, Venu 4, Venu 3S, Vívoactive 6 y Cymbiotika, con envío gratis a todo México.">
+<meta property="og:title" content="lowlabs — curated wellness and technology">
+<meta property="og:description" content="Una selección curada de tecnología, suplementos y esenciales de bienestar para optimizar tu día a día.">
 <meta property="og:image" content="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-lineup.jpg?v=1785272697">
-<meta property="og:type" content="product">
+<meta property="og:type" content="website">
 <meta property="og:locale" content="es_MX">
 <meta name="theme-color" content="#24312f">
 <!-- Favicon en formes pures : une data-URI ne peut pas charger de webfont,
@@ -19,7 +19,8 @@
 <link rel="preconnect" href="https://cdn.shopify.com">
 <!-- Typographie verrouillée : Outfit (titres) + DM Sans (texte courant). Aucune autre famille sur le site. -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/video-poster.jpg?v=1785304471&amp;width=1600" fetchpriority="high">
+<link rel="preload" as="image" href="/media/poster-hero-cirqa.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/media/poster-loop-brand.jpg" fetchpriority="high">
 <script>
 document.documentElement.className += " js";
 try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.className += " rm"; }catch(e){}
@@ -27,27 +28,12 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Product",
-  "name": "Garmin CIRQA™ Smart Band",
-  "brand": { "@type": "Brand", "name": "Garmin" },
-  "description": "Banda inteligente sin pantalla con monitoreo de salud 24/7, seguimiento avanzado del sueño y detección de más de 80 actividades. Sin suscripción. App Garmin Connect gratuita.",
-  "image": "https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-lineup.jpg?v=1785272697",
-  "sku": "010-04675-10",
-  "gtin12": "753759375331",
-  "offers": {
-    "@type": "Offer",
-    "price": "3999",
-    "priceCurrency": "MXN",
-    "priceValidUntil": "2026-12-31",
-    "itemCondition": "https://schema.org/NewCondition",
-    "availability": "https://schema.org/InStock",
-    "seller": { "@type": "Organization", "name": "lowlabs" },
-    "shippingDetails": {
-      "@type": "OfferShippingDetails",
-      "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "MXN" },
-      "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "MX" }
-    }
-  }
+  "@type": "Store",
+  "name": "lowlabs",
+  "description": "Una selección curada de tecnología, suplementos y esenciales de bienestar.",
+  "email": "lowlabsmx@gmail.com",
+  "areaServed": "MX",
+  "currenciesAccepted": "MXN"
 }
 </script>
 <link rel="stylesheet" href="/styles.css">
@@ -58,46 +44,54 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
 <!-- ===== Nav flottante : logo centré, verre sombre, présente en permanence ===== -->
 <nav class="nav" aria-label="Principal">
-  <div class="nav-pill glass-dark blurred">
+  <div class="nav-pill glass-light blurred">
     <div class="nav-start">
       <div class="nav-links">
-        <a href="#sistema">El sistema</a>
-        <a href="#comprar">Colores</a>
-        <a href="#comparar">Comparativa</a>
+        <a href="#catalogo">Tienda</a>
+        <a href="#wearables">Wearables</a>
+        <a href="#suplementos">Suplementos</a>
         <a href="#faq">FAQ</a>
       </div>
     </div>
-    <a class="logo" href="#">lowlabs</a>
+    <a class="logo" href="/">lowlabs</a>
     <div class="nav-end">
-      <a class="btn btn-smoke btn-sm" href="#comprar">Comprar</a>
+      <a class="btn btn-ink btn-sm" href="#catalogo">Comprar</a>
     </div>
   </div>
 </nav>
 
 <div class="shell">
 
-  <!-- ===== Hero : la vidéo démarre seule, muette, en boucle ===== -->
-  <header class="hero on-media" id="hero">
-    <video class="hero-video" id="hero-video"
-           autoplay muted loop playsinline webkit-playsinline
-           preload="auto"
-           disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"
-           poster="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/video-poster.jpg?v=1785304471&amp;width=1600"
-           width="848" height="480" aria-hidden="true" tabindex="-1">
-      <source src="https://cdn.shopify.com/videos/c/vp/40a4d6e6a5fe4091972bcfee82337268/40a4d6e6a5fe4091972bcfee82337268.SD-480p-1.2Mbps-90183205.mp4" type="video/mp4">
-    </video>
-    <img class="hero-poster" id="hero-poster"
-         src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/video-poster.jpg?v=1785304471&amp;width=1600"
-         alt="" aria-hidden="true" width="848" height="480" fetchpriority="high">
+  <!-- ===== Hero éditorial en deux volets (maquette Canva, page 1) ===== -->
+  <header class="hero-split" id="hero">
+    <div class="hero-pane hero-pane-a">
+      <video autoplay muted loop playsinline webkit-playsinline preload="auto"
+             disablepictureinpicture disableremoteplayback
+             poster="/media/poster-loop-brand.jpg"
+             width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
+        <source src="/media/loop-brand.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero-pane hero-pane-b">
+      <video class="hero-video" id="hero-video"
+             autoplay muted loop playsinline webkit-playsinline preload="auto"
+             disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"
+             poster="/media/poster-hero-cirqa.jpg"
+             width="1920" height="1080" aria-hidden="true" tabindex="-1">
+        <source src="/media/hero-cirqa.mp4" type="video/mp4">
+      </video>
+    </div>
 
-    <div class="container hero-inner">
-      <span class="eyebrow rv">Garmin CIRQA™ Smart Band</span>
-      <h1 class="rv">Registra tu salud. Sin una sola pantalla.</h1>
-      <p class="hero-sub rv">Salud 24/7, sueño avanzado y más de 80 actividades — en 18 gramos de tela, sin suscripciones y con garantía oficial Garmin en México.</p>
-      <div class="hero-actions rv">
-        <a class="btn btn-smoke btn-lg" href="#comprar">Comprar ahora — $3,999 MXN</a>
+    <div class="hero-split-inner">
+      <!-- Faux verre volontairement : la plaque est posée sur la vidéo du
+           hero, un flou réel y serait rééchantillonné à chaque frame. -->
+      <div class="hero-plate glass-dark">
+        <p class="wordmark">lowlabs</p>
+        <p class="wordmark-sub">Una selección curada de tecnología, suplementos y esenciales de bienestar para optimizar tu día a día.</p>
+        <div class="hero-actions">
+          <a class="btn btn-smoke btn-lg" href="#catalogo">Explorar la tienda</a>
+        </div>
       </div>
-      <a class="hero-scroll rv" href="#sistema">Conoce el sistema</a>
     </div>
 
     <button class="btn btn-smoke btn-round hero-toggle" id="hero-toggle" type="button" aria-pressed="false" aria-label="Pausar el video de fondo">
@@ -108,213 +102,252 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   <!-- ===== Bandeau de garanties (faits vérifiables, aucun témoignage) ===== -->
   <div class="ticker">
     <div class="container ticker-row">
-      <span>Garantía oficial Garmin</span>
+      <span>Garantía oficial</span>
       <span>Envío gratis a todo México</span>
       <span>Sin suscripción, para siempre</span>
-      <span>Hasta 10 días de batería</span>
-      <span>4 colores · 2 tallas</span>
+      <span>Pago seguro vía Shopify</span>
+      <span>Marcas seleccionadas</span>
     </div>
   </div>
 
   <main id="contenido">
 
-    <!-- ===== Le système quotidien ===== -->
-    <section id="sistema" aria-labelledby="sistema-t">
+    <!-- ===== Catalogue : les 5 produits ===== -->
+    <section id="catalogo" aria-labelledby="catalogo-t">
       <div class="container">
         <div class="section-head rv">
           <div>
-            <span class="eyebrow">El sistema</span>
-            <h2 id="sistema-t">Un sistema diario, aplicado con precisión</h2>
+            <span class="eyebrow">La selección</span>
+            <h2 id="catalogo-t">Cinco piezas, una sola idea del bienestar</h2>
           </div>
           <div class="head-aside">
-            <p>La CIRQA mide en silencio los procesos biológicos que definen tu salud a largo plazo, y te los devuelve ordenados en Garmin Connect™.</p>
-            <div class="card-arrows">
-              <button class="btn btn-quiet btn-round" type="button" data-dir="-1" aria-label="Tarjeta anterior" aria-controls="cards"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-              <button class="btn btn-quiet btn-round" type="button" data-dir="1" aria-label="Tarjeta siguiente" aria-controls="cards"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-            </div>
+            <p>Wearables Garmin y suplementos formulados por científicos. Nada de catálogo infinito: solo lo que usamos y recomendamos.</p>
           </div>
         </div>
-      </div>
-      <div class="cards-wrap">
-        <div class="cards" id="cards" tabindex="0" role="region" aria-label="Los pilares del sistema CIRQA">
-          <article class="pcard rv">
-            <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/vida-diaria-caminar.jpg?v=1785272696" alt="Uso diario de la CIRQA Smart Band durante una caminata" width="800" height="1000">
-            <span class="pcard-chip glass-dark">Salud 24/7</span>
-            <div class="pcard-body">
-              <h3>Energía y estrés</h3>
-              <p>Body Battery™, nivel de estrés y pulsioximetría¹ medidos de forma continua, todo el día.</p>
-            </div>
-          </article>
-          <article class="pcard rv">
-            <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/vida-suenio-malva-hd.jpg?v=1785274102" alt="Mujer durmiendo con la CIRQA Smart Band color Malva" width="800" height="1000">
-            <span class="pcard-chip glass-dark">Sueño</span>
-            <div class="pcard-body">
-              <h3>Sueño avanzado</h3>
-              <p>Puntuación, fases, variabilidad de la frecuencia cardiaca y temperatura de la piel cada noche.</p>
-            </div>
-          </article>
-          <article class="pcard rv">
-            <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/vida-running.jpg?v=1785272697" alt="Corredora preparándose con la CIRQA Smart Band" width="800" height="1000">
-            <span class="pcard-chip glass-dark">Entrenamiento</span>
-            <div class="pcard-body">
-              <h3>Más de 80 actividades</h3>
-              <p>Detección automática, VO2 max, estado del entreno y tiempo de recuperación.</p>
-            </div>
-          </article>
-          <article class="pcard rv">
-            <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra-detalle.jpg?v=1785272697" alt="Detalle de la banda de tela de la CIRQA Smart Band Negra" width="800" height="1000">
-            <span class="pcard-chip glass-dark">Sin pantalla</span>
-            <div class="pcard-body">
-              <h3>Cero distracciones</h3>
-              <p>Ninguna notificación, ninguna luz de noche. Solo registro, en 18 gramos de tela.</p>
-            </div>
-          </article>
-          <article class="pcard rv">
-            <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/vida-basquetbol.jpg?v=1785272697" alt="Jugando básquetbol con la banda CIRQA en el brazo" width="800" height="1000">
-            <span class="pcard-chip glass-dark">Sin mensualidades</span>
-            <div class="pcard-body">
-              <h3>Todo incluido</h3>
-              <p>Cada métrica está en la app gratuita Garmin Connect™. Sin membresías, hoy y siempre.</p>
-            </div>
-          </article>
-        </div>
+        <div class="cat-grid rv" id="cat-grid"></div>
       </div>
     </section>
 
-    <!-- ===== Déclaration éditoriale ===== -->
-    <section class="statement" aria-labelledby="statement-t">
-      <div class="container">
-        <span class="eyebrow rv">Pensada para llevarse, no para mirarse</span>
-        <h2 id="statement-t" class="rv">Un enfoque
-          <img class="inline-thumb" loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80">
-          continuo de tu salud, diseñado para la
-          <img class="inline-thumb" loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-malva.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80">
-          constancia
-          <img class="inline-thumb" loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-azul-capitan.jpg?v=1785272696&amp;width=160" alt="" width="80" height="80">
-          , no para la intensidad.</h2>
+    <!-- ===== Bandeau doré de claims (maquette Canva) ===== -->
+    <div class="gold-strip" aria-label="Nuestros estándares">
+      <div class="gold-track">
+        <ul>
+          <li>Vegan &amp; Non-GMO</li>
+          <li>100% Ingredients Made Traceable</li>
+          <li>Clean Label Project Certified</li>
+          <li>Formulated by Dietitians &amp; Scientists</li>
+        </ul>
+        <ul aria-hidden="true">
+          <li>Vegan &amp; Non-GMO</li>
+          <li>100% Ingredients Made Traceable</li>
+          <li>Clean Label Project Certified</li>
+          <li>Formulated by Dietitians &amp; Scientists</li>
+        </ul>
       </div>
-    </section>
+    </div>
 
-    <!-- ===== Duo de cartes avec widgets de données ===== -->
-    <section aria-labelledby="duo-t">
-      <div class="container">
-        <h2 id="duo-t" class="sr-only">Lo que la CIRQA mide mientras vives</h2>
-        <div class="duo">
-          <article class="duo-card on-media rv">
-            <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/vida-suenio-azul.jpg?v=1785272697" alt="Seguimiento del sueño con la CIRQA Smart Band Azul Capitán" width="960" height="840">
-            <div class="duo-head">
-              <h3>Sueño medido de verdad</h3>
-              <p>Fases, VFC y temperatura cutánea toda la noche — sin una luz que te despierte.</p>
-            </div>
-            <div class="widget glass-dark">
-              <div class="widget-label">Puntuación de sueño</div>
-              <div class="widget-row">
-                <div class="widget-num price-num">89<small>/100</small></div>
-                <div class="widget-state">Muy buena</div>
-              </div>
-              <div class="widget-meter"><i style="width:89%"></i></div>
-              <p class="widget-note">Ejemplo de visualización en Garmin Connect™</p>
-            </div>
-          </article>
-          <article class="duo-card on-media rv">
-            <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/vida-kettlebell.jpg?v=1785272697" alt="Entrenamiento de fuerza con la CIRQA Smart Band" width="960" height="840">
-            <div class="duo-head">
-              <h3>Energía que puedes ver</h3>
-              <p>Body Battery™ convierte tu frecuencia cardiaca y tu estrés en una sola cifra accionable.</p>
-            </div>
-            <div class="widget glass-dark">
-              <div class="widget-label">Body Battery™</div>
-              <div class="widget-row">
-                <div class="widget-num price-num">82</div>
-                <div class="widget-state">Cargada</div>
-                <div class="widget-bars" aria-hidden="true">
-                  <i style="height:34%"></i><i style="height:52%"></i><i style="height:44%"></i><i class="hi" style="height:72%"></i><i class="hi" style="height:88%"></i><i class="hi" style="height:100%"></i><i style="height:76%"></i><i style="height:58%"></i>
-                </div>
-              </div>
-              <p class="widget-note">Ejemplo de visualización en Garmin Connect™</p>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== Sélecteur « liquid glass » ===== -->
-    <section id="comprar" class="select" aria-labelledby="comprar-t">
+    <!-- ===== Wearables — bannière vidéo ===== -->
+    <section id="wearables" style="padding-bottom:0" aria-labelledby="wearables-t">
       <div class="container">
         <div class="section-head center rv">
           <div>
-            <span class="eyebrow">Elige la tuya</span>
-            <h2 id="comprar-t">Una banda, cuatro personalidades</h2>
+            <span class="eyebrow">Wearables</span>
+            <h2 id="wearables-t">Garmin CIRQA™</h2>
           </div>
         </div>
-        <div class="select-grid">
-          <div class="stage rv">
-            <div class="stage-media">
-              <img id="stage-img" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra.jpg?v=1785272697" alt="Garmin CIRQA Smart Band color Negra" width="900" height="900" loading="lazy">
-            </div>
-            <div class="stat-glass glass-light">
-              <div class="stat-glass-row">
-                <div><b>Desde 18 g</b><span>Peso</span></div>
-                <div><b>10 días</b><span>Batería</span></div>
-                <div><b class="price-num">$0</b><span>Suscripción</span></div>
-              </div>
+      </div>
+      <div class="band rv">
+        <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+               disablepictureinpicture disableremoteplayback
+               poster="/media/poster-loop-wearables.jpg"
+               width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
+          <source src="/media/loop-wearables.mp4" type="video/mp4">
+        </video>
+        <div class="band-inner">
+          <span class="eyebrow">Garmin CIRQA™ Smart Band</span>
+          <h2>Monitor de salud y ejercicio. Sin suscripción requerida.</h2>
+          <p>Salud 24/7, sueño avanzado y más de 80 actividades — en 18 gramos de tela, sin una sola pantalla.</p>
+          <a class="btn btn-smoke btn-lg" href="/productos/cirqa">Ver la CIRQA — $3,999 MXN</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Chapitres éditoriaux : une idée, un visuel, un texte court ===== -->
+    <section class="chapter" aria-labelledby="cap1-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="chapter-media rv">
+            <img loading="lazy" src="/media/wrist-negra.jpg" alt="La CIRQA Smart Band Negra en la muñeca" width="1122" height="1402">
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Sin pantalla</span>
+            <h2 id="cap1-t" class="rv">Cero distracciones. Solo registro.</h2>
+            <p class="rv">Ninguna notificación, ninguna luz de noche. Dieciocho gramos de tela que no te piden nada y lo miden todo.</p>
+            <div class="chapter-stats rv">
+              <div><b>18 g</b><span>Peso</span></div>
+              <div><b>8.7 mm</b><span>Grosor</span></div>
+              <div><b class="price-num">$0</b><span>Suscripción</span></div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
 
-          <!-- La nacelle ne porte pas .rv : animer l'opacité d'une surface
-               à flou réel tue le flou pendant toute la transition. -->
-          <div class="rail glass-light blurred">
-            <div class="rail-top">
-              <span class="tag glass-light">Color · Talla</span>
-              <div class="rail-price price-num">
-                <b>$3,999</b>
-                <s aria-hidden="true">$4,199</s>
-                <span class="sr-only">Precio anterior: 4,199 pesos. Precio actual: 3,999 pesos mexicanos.</span>
-              </div>
-            </div>
+    <section class="chapter tinted flip" aria-labelledby="cap2-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="chapter-media rv">
+            <img loading="lazy" src="/media/cirqa-sensor-negra.jpg" alt="Sensor óptico de frecuencia cardiaca de la CIRQA Smart Band" width="1448" height="1086">
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Salud 24/7</span>
+            <h2 id="cap2-t" class="rv">Mide mientras vives, no cuando te acuerdas.</h2>
+            <p class="rv">Frecuencia cardiaca, estrés, Body Battery™ y pulsioximetría¹ de forma continua. El sensor trabaja de día y de noche, sin que tengas que abrir nada.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <div class="rail-track" role="radiogroup" aria-label="Color de la banda">
-              <button class="rail-item glass-light active" type="button" role="radio" aria-checked="true" data-color="Negra">
-                <span class="rail-thumb"><img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80"></span>
-                <span class="rail-txt"><b>Negra</b><span>Discreción total, del gimnasio a la oficina</span></span>
-                <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-                <span class="rail-dot" style="background:#2b2b2e" aria-hidden="true"></span>
-              </button>
-              <button class="rail-item glass-light" type="button" role="radio" aria-checked="false" data-color="Gris Francés">
-                <span class="rail-thumb"><img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-gris-frances.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80"></span>
-                <span class="rail-txt"><b>Gris Francés</b><span>Un neutro cálido que acompaña sin pedir atención</span></span>
-                <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-                <span class="rail-dot" style="background:#a99f88" aria-hidden="true"></span>
-              </button>
-              <button class="rail-item glass-light" type="button" role="radio" aria-checked="false" data-color="Malva">
-                <span class="rail-thumb"><img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-malva.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80"></span>
-                <span class="rail-txt"><b>Malva</b><span>Suave y personal, para medir tu bienestar en calma</span></span>
-                <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-                <span class="rail-dot" style="background:#a4787e" aria-hidden="true"></span>
-              </button>
-              <button class="rail-item glass-light" type="button" role="radio" aria-checked="false" data-color="Azul Capitán">
-                <span class="rail-thumb"><img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-azul-capitan.jpg?v=1785272696&amp;width=160" alt="" width="80" height="80"></span>
-                <span class="rail-txt"><b>Azul Capitán</b><span>Profundo y sereno, con carácter para todo el día</span></span>
-                <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-                <span class="rail-dot" style="background:#2e3f63" aria-hidden="true"></span>
-              </button>
-            </div>
+    <section class="chapter" aria-labelledby="cap3-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="screens rv">
+            <figure><img loading="lazy" src="/media/app-body-battery.jpg" alt="Pantalla Body Battery en la app Garmin Connect" width="941" height="1672"></figure>
+            <figure><img loading="lazy" src="/media/app-actividades.jpg" alt="Pantalla de registro de actividades en la app Garmin Connect" width="941" height="1672"></figure>
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Garmin Connect™</span>
+            <h2 id="cap3-t" class="rv">Todos tus datos, en una sola app gratuita.</h2>
+            <p class="rv">Energía, sueño, estrés y más de 80 actividades detectadas automáticamente. Sin membresías, hoy y siempre.</p>
+            <a class="btn btn-ink rv" href="/productos/cirqa">Ver la CIRQA</a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <div class="rail-sizes" role="radiogroup" aria-label="Talla">
-              <button class="size-btn glass-light active" type="button" role="radio" aria-checked="true" data-size="S–M"><b>S–M</b><small>muñeca 120–200 mm</small></button>
-              <button class="size-btn glass-light" type="button" role="radio" aria-checked="false" data-size="L–XL"><b>L–XL</b><small>muñeca 145–240 mm</small></button>
-            </div>
+    <!-- ===== Bannière : la CIRQA en exterior ===== -->
+    <div class="band deep center tall rv">
+      <img loading="lazy" src="/media/cirqa-rock.jpg" alt="" width="1122" height="1402">
+      <div class="band-inner">
+        <span class="eyebrow">Hasta 10 días de batería</span>
+        <h2>Se pone una vez. Se olvida durante días.</h2>
+        <p>Una carga por semana y media. Sin cargador de viaje, sin ansiedad de batería, sin excusas para quitártela.</p>
+      </div>
+    </div>
 
-            <div class="rail-go">
-              <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button">Comprar ahora — $3,999 MXN</button>
-              <p class="rail-foot">Pago seguro con tarjeta vía Shopify Checkout</p>
-            </div>
+    <!-- ===== Chapitres : les autres montres ===== -->
+    <section class="chapter sand" aria-labelledby="cap4-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="chapter-media contain rv">
+            <img loading="lazy" src="/media/venu-4.png" alt="Garmin Venu 4" width="1200" height="1200">
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Garmin Venu® 4</span>
+            <h2 id="cap4-t" class="rv">Cuando sí quieres una pantalla.</h2>
+            <p class="rv">AMOLED brillante, predisposición para entrenar y entrenador de sueño. Doce días de batería sin renunciar a nada.</p>
+            <a class="btn btn-ink rv" href="/productos/venu-4">Ver Venu® 4 — $10,999 MXN</a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <ul class="trust">
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#46605f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Producto 100% original con garantía oficial Garmin en México</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#46605f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Envío gratis a todo México · Incluye cable USB-C</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#46605f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Sin suscripción — todas las funciones incluidas para siempre</li>
-            </ul>
+    <section class="chapter flip" aria-labelledby="cap5-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="chapter-media contain rv">
+            <img loading="lazy" src="/media/venu-3s.png" alt="Garmin Venu 3S" width="1200" height="1200">
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Garmin Venu® 3S</span>
+            <h2 id="cap5-t" class="rv">El mismo sistema, en 41 mm.</h2>
+            <p class="rv">Coach de sueño, siestas detectadas automáticamente y llamadas desde la muñeca. Pensado para muñecas más delgadas.</p>
+            <a class="btn btn-ink rv" href="/productos/venu-3s">Ver Venu® 3S — $8,899 MXN</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter tinted" aria-labelledby="cap6-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="chapter-media contain rv">
+            <img loading="lazy" src="/media/vivoactive-6.png" alt="Garmin Vívoactive 6" width="1200" height="1200">
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Garmin Vívoactive® 6</span>
+            <h2 id="cap6-t" class="rv">Lo esencial, sin nada de más.</h2>
+            <p class="rv">Más de 80 aplicaciones deportivas, rutinas guiadas de fuerza, yoga y pilates, y once días de batería.</p>
+            <a class="btn btn-ink rv" href="/productos/vivoactive-6">Ver Vívoactive® 6 — $5,999 MXN</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Suppléments — bannière vidéo dorée ===== -->
+    <section id="suplementos" style="padding-bottom:0" aria-labelledby="sup-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">Suplementos</span>
+            <h2 id="sup-t">Explorar suplementos</h2>
+          </div>
+        </div>
+      </div>
+      <div class="band rv">
+        <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+               disablepictureinpicture disableremoteplayback
+               poster="/media/poster-loop-suplementos.jpg"
+               width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
+          <source src="/media/loop-suplementos.mp4" type="video/mp4">
+        </video>
+        <div class="band-inner">
+          <span class="eyebrow">Cymbiotika</span>
+          <h2>Formulados por dietistas y científicos</h2>
+          <p>Creatina liposomal de absorción mejorada, en sobres líquidos listos para tomar. Vegan, Non-GMO y con trazabilidad total de ingredientes.</p>
+          <a class="btn btn-smoke btn-lg" href="/productos/creatina">Ver Advanced Creatine — $1,349 MXN</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter flip" aria-labelledby="cap7-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="chapter-media contain rv">
+            <img loading="lazy" src="/media/creatina.png" alt="Cymbiotika Liposomal Advanced Creatine" width="1000" height="1000">
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Advanced Creatine</span>
+            <h2 id="cap7-t" class="rv">5 g de creatina. Sin mezclar, sin grumos.</h2>
+            <p class="rv">Veinticuatro sobres líquidos de sabor Tangerine Vanilla. Tecnología liposomal para absorción mejorada, tono muscular y recuperación.*</p>
+            <a class="btn btn-ink rv" href="/productos/creatina">Ver Advanced Creatine — $1,349 MXN</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Déclaration éditoriale (maquette Canva, page 2) ===== -->
+    <section class="statement" aria-labelledby="statement-t">
+      <div class="container">
+        <div class="statement-grid">
+          <div class="statement-video rv">
+            <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+                   disablepictureinpicture disableremoteplayback
+                   poster="/media/poster-loop-vertical.jpg"
+                   width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
+              <source src="/media/loop-vertical.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="statement-copy">
+            <span class="eyebrow rv">Pensada para llevarse, no para mirarse</span>
+            <h2 id="statement-t" class="rv">Menos ruido.
+              <img class="inline-thumb" loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80">
+              Mejor
+              <img class="inline-thumb" loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-malva.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80">
+              bienestar
+              <img class="inline-thumb" loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-azul-capitan.jpg?v=1785272696&amp;width=160" alt="" width="80" height="80">
+              .</h2>
+            <p class="statement-lede rv">Cuatro colores, dos tallas y una sola promesa: registrar todo tu día sin pedirte ni una mirada.</p>
           </div>
         </div>
       </div>
@@ -337,8 +370,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <thead>
               <tr>
                 <th scope="col">Función</th>
-                <th scope="col"><img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/comparacion-venu4.png?v=1785272696&amp;width=168" alt="" width="84" height="84">Venu® 4</th>
-                <th scope="col"><img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/comparacion-vivoactive6.png?v=1785272696&amp;width=168" alt="" width="84" height="84">Vívoactive® 6</th>
+                <th scope="col"><img loading="lazy" src="/media/venu-4.png" alt="" width="84" height="84">Venu® 4</th>
+                <th scope="col"><img loading="lazy" src="/media/vivoactive-6.png" alt="" width="84" height="84">Vívoactive® 6</th>
                 <th scope="col" class="col-hl"><img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra-detalle.jpg?v=1785272697&amp;width=168" alt="" width="84" height="84">CIRQA™</th>
               </tr>
             </thead>
@@ -354,11 +387,11 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               <tr><th scope="row">Estado del entreno</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="no"><span aria-hidden="true">—</span><span class="sr-only">No incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
               <tr><th scope="row">Puntuación del sueño</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
               <tr><th scope="row">Entrenador de sueño</th><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td><td class="yes col-hl"><span aria-hidden="true">✓</span><span class="sr-only">Incluida</span></td></tr>
-              <tr><th scope="row">Precio aproximado</th><td class="price-num">$12,999*</td><td class="price-num">$8,499*</td><td class="col-hl price-num" style="font-weight:700">$3,999</td></tr>
+              <tr><th scope="row">Precio lowlabs</th><td class="price-num">$10,999</td><td class="price-num">$5,999</td><td class="col-hl price-num" style="font-weight:700">$3,999</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="compare-note rv">Tabla de funciones según la ficha oficial de producto Garmin (jul 2026). *Precios de lista de referencia de otros modelos; pueden variar según el distribuidor.</p>
+        <p class="compare-note rv">Tabla de funciones según la ficha oficial de producto Garmin (jul 2026). Precios lowlabs provisionales, sujetos a confirmación al finalizar la compra.</p>
       </div>
     </section>
 
@@ -374,35 +407,31 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         <div class="faq-list rv">
           <details>
             <summary>¿Necesito pagar una suscripción?</summary>
-            <div class="a">No. A diferencia de otras bandas de este segmento, la CIRQA no requiere ninguna membresía: todas las métricas y funciones están incluidas en la app gratuita Garmin Connect™, para siempre.</div>
+            <div class="a">No. En los wearables Garmin todas las métricas y funciones están incluidas en la app gratuita Garmin Connect™, para siempre.</div>
           </details>
           <details>
             <summary>¿Es compatible con mi teléfono?</summary>
-            <div class="a">Sí. Funciona con iPhone y con teléfonos Android a través de la app Garmin Connect™ (Bluetooth®). Para registrar rutas al aire libre usa el GPS de tu teléfono (GPS conectado).</div>
+            <div class="a">Sí. Funciona con iPhone y con teléfonos Android a través de la app Garmin Connect™ (Bluetooth®). Para registrar rutas al aire libre con la CIRQA usa el GPS de tu teléfono (GPS conectado).</div>
           </details>
           <details>
-            <summary>¿Qué talla me queda?</summary>
+            <summary>¿Qué talla de CIRQA me queda?</summary>
             <div class="a">S–M es para muñecas de 120 a 200 mm; L–XL, de 145 a 240 mm. Mide el contorno de tu muñeca con una cinta métrica: si estás entre las dos, la mayoría prefiere S–M porque queda más justa para las lecturas nocturnas.</div>
           </details>
           <details>
             <summary>¿Puedo cambiarla o devolverla si no me queda?</summary>
-            <div class="a">Sí. Escríbenos a <a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a> con tu número de pedido y te ayudamos a coordinar el cambio de talla o la devolución, con la banda en su empaque original. Las condiciones completas se muestran al finalizar tu compra.</div>
+            <div class="a">Sí. Escríbenos a <a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a> con tu número de pedido y te ayudamos a coordinar el cambio de talla o la devolución, con el producto en su empaque original. Las condiciones completas se muestran al finalizar tu compra.</div>
           </details>
           <details>
             <summary>¿Qué métodos de pago aceptan?</summary>
             <div class="a">Tarjetas de crédito y débito a través de Shopify Checkout, con cifrado de extremo a extremo. Los métodos disponibles se muestran al finalizar tu compra.</div>
           </details>
           <details>
-            <summary>¿Cómo veo mis datos si no tiene pantalla?</summary>
-            <div class="a">Todo se sincroniza con Garmin Connect™ en tu teléfono: sueño, energía Body Battery™, estrés, entrenamientos y más. La banda tiene un botón para marcar actividades al instante, y la detección automática registra el resto.</div>
-          </details>
-          <details>
             <summary>¿Cuánto dura la batería y cómo se carga?</summary>
-            <div class="a">Hasta 10 días con una carga. Incluye cable de carga/datos USB-C en la caja.</div>
+            <div class="a">La CIRQA dura hasta 10 días con una carga e incluye cable USB-C. Venu® 4 llega hasta 12 días, Vívoactive® 6 hasta 11 y Venu® 3S hasta 10, en modo smartwatch.</div>
           </details>
           <details>
-            <summary>¿Tiene garantía en México?</summary>
-            <div class="a">Sí. Es producto 100% original Garmin con garantía oficial válida en México. Incluye: CIRQA Smart Band, cable USB-C y documentación.</div>
+            <summary>¿Tienen garantía en México?</summary>
+            <div class="a">Sí. Todos los wearables son producto 100% original Garmin con garantía oficial válida en México.</div>
           </details>
           <details>
             <summary>¿Cuándo llega mi pedido?</summary>
@@ -418,7 +447,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       <div class="closing-inner">
         <h2 id="closing-t">Menos pantalla. Más vida.</h2>
         <p>Registra cada día completo — sueño, energía y entrenamiento — sin nada que te interrumpa.</p>
-        <a class="btn btn-smoke btn-lg" href="#comprar">Comprar ahora — $3,999 MXN</a>
+        <a class="btn btn-smoke btn-lg" href="#catalogo">Explorar la tienda</a>
       </div>
     </section>
 
@@ -429,41 +458,45 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   <div class="container">
     <div class="foot-grid">
       <div>
-        <a class="foot-logo" href="#">lowlabs<span lang="en">curated wellness and technology</span></a>
+        <a class="foot-logo" href="/">lowlabs<span lang="en">curated wellness and technology</span></a>
         <p style="margin-top:14px;max-width:38ch">Seleccionamos la mejor tecnología de bienestar y la traemos a México con una experiencia de compra simple y honesta.</p>
       </div>
       <div>
-        <h3 class="foot-title">Producto</h3>
-        <p><a href="#sistema">El sistema</a></p>
-        <p><a href="#comprar">Colores y tallas</a></p>
-        <p><a href="#comparar">Comparativa</a></p>
-        <p><a href="#comprar">Comprar</a></p>
+        <h3 class="foot-title">Tienda</h3>
+        <p><a href="/productos/cirqa">Garmin CIRQA™</a></p>
+        <p><a href="/productos/venu-4">Garmin Venu® 4</a></p>
+        <p><a href="/productos/venu-3s">Garmin Venu® 3S</a></p>
+        <p><a href="/productos/vivoactive-6">Garmin Vívoactive® 6</a></p>
+        <p><a href="/productos/creatina">Cymbiotika Advanced Creatine</a></p>
       </div>
       <div>
         <h3 class="foot-title">Ayuda</h3>
         <p><a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a></p>
-        <p><a href="#faq">Garantía y devoluciones</a></p>
+        <p><a href="/#faq">Garantía y devoluciones</a></p>
+        <p><a href="/#comparar">Comparativa</a></p>
       </div>
     </div>
     <div class="legal">
       <p>¹ Esto no es un dispositivo médico y no está destinado a diagnosticar ni monitorear ninguna condición médica; consulta Garmin.com/ataccuracy. Pulse Ox no está disponible en todos los países.</p>
-      <p style="margin-top:8px">Garmin®, CIRQA™, Body Battery™, Garmin Connect™, Venu® y Vívoactive® son marcas comerciales de Garmin Ltd. o sus subsidiarias. lowlabs es un distribuidor independiente y no está afiliado a Garmin Ltd.</p>
+      <p style="margin-top:8px">* Estas afirmaciones no han sido evaluadas por la FDA. Este producto no pretende diagnosticar, tratar, curar ni prevenir ninguna enfermedad.</p>
+      <p style="margin-top:8px">Garmin®, CIRQA™, Body Battery™, Garmin Connect™, Venu® y Vívoactive® son marcas comerciales de Garmin Ltd. o sus subsidiarias. Cymbiotika® es marca de Cymbiotika LLC. lowlabs es un distribuidor independiente y no está afiliado a Garmin Ltd. ni a Cymbiotika LLC.</p>
       <p style="margin-top:8px">© 2026 lowlabs. Todos los derechos reservados.</p>
     </div>
   </div>
 </footer>
 
-<!-- ===== Dock d'achat : présent à tout moment, à tous les formats ===== -->
-<div class="dock" role="region" aria-label="Comprar la CIRQA Smart Band">
-  <div class="dock-shell glass-dark blurred" id="dock-shell">
+<!-- ===== Dock : présent à tout moment, à tous les formats ===== -->
+<div class="dock" role="region" aria-label="Ir a la tienda">
+  <div class="dock-shell glass-light blurred" id="dock-shell">
     <div class="dock-info">
-      <b class="price-num">$3,999 MXN</b>
-      <span id="dock-variant">Negra · Talla S–M · Envío gratis</span>
+      <b class="price-num">Desde $1,349 MXN</b>
+      <span>5 productos · Envío gratis a todo México</span>
     </div>
-    <button class="btn btn-smoke" id="dock-btn" type="button">Comprar ahora</button>
+    <a class="btn btn-ink" href="#catalogo">Explorar</a>
   </div>
 </div>
 
+<script src="/catalog.js" defer></script>
 <script src="/app.js" defer></script>
 </body>
 </html>

@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "cirqa-deploy",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": [".claude/serve.py", "4175"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["/Users/erwanmegevand/Documents/lowlabs-cirqa-context/build/serve.js", "4175"],
       "port": 4175
     }
   ]

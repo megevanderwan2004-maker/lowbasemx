@@ -2,30 +2,32 @@
   "use strict";
 
   /* =====================================================================
-     Boutique Shopify
+     Boutique Shopify — le checkout n'est branché que sur les produits
+     qui déclarent un handle et des variantes dans catalog.js.
+     Les autres pointent vers leur page produit locale.
      ===================================================================== */
   var STORE = "https://jx8irc-px.myshopify.com";
-  var PRODUCT_HANDLE = "garmin-cirqa-smart-band";
   var CHECKOUT_PARAMS = "&locale=es&country=MX";
-  var VARIANTS = {
-    "Negra":        { "S–M": "64093481107833", "L–XL": "64093481140601" },
-    "Gris Francés": { "S–M": "64093481173369", "L–XL": "64093481206137" },
-    "Malva":        { "S–M": "64093481238905", "L–XL": "64093481271673" },
-    "Azul Capitán": { "S–M": "64093481304441", "L–XL": "64093481337209" }
-  };
-  var IMGS = {
-    "Negra":        "https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra.jpg?v=1785272697",
-    "Gris Francés": "https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-gris-frances.jpg?v=1785272697",
-    "Malva":        "https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-malva.jpg?v=1785272697",
-    "Azul Capitán": "https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-azul-capitan.jpg?v=1785272696"
-  };
 
-  var state = { color: "Negra", size: "S–M" };
+  var CATALOG = window.LOWLABS || { products: [], byHandle: function(){ return null; },
+                                    money: function(n){ return "$" + n; }, url: function(h){ return "/productos/" + h; } };
+
+  /* La page produit se déclare via data-product sur <body>. Sur la home,
+     l'attribut est absent : tous les modules produit se retirent seuls. */
+  var PRODUCT = CATALOG.byHandle(document.body.getAttribute("data-product") || "");
+
+  var state = {
+    color: PRODUCT && PRODUCT.colors ? PRODUCT.colors[0].name : null,
+    size:  PRODUCT && PRODUCT.sizes  ? PRODUCT.sizes[0].name  : null
+  };
   var reduceMotion = document.documentElement.className.indexOf("rm") > -1;
   var hasIO = "IntersectionObserver" in window;
 
   function $(id){ return document.getElementById(id); }
   function each(list, fn){ Array.prototype.forEach.call(list, fn); }
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
 
   /* Chaque module est isolé : une panne dans l'un ne doit jamais empêcher
      les autres de s'initialiser — et surtout jamais laisser la page
@@ -33,12 +35,48 @@
   function module(name, fn){
     try { fn(); }
     catch(err){
-      if (window.console && console.error) console.error("[cirqa] " + name, err);
+      if (window.console && console.error) console.error("[lowlabs] " + name, err);
     }
   }
 
   /* =====================================================================
-     Révélation au scroll — initialisée en premier
+     Catalogue — rendu des cartes produit
+
+     Rendu AVANT le module de révélation : les cartes injectées doivent
+     être observables, sinon elles resteraient à opacité nulle.
+     ===================================================================== */
+  module("catalog", function(){
+    var grid = $("cat-grid");
+    if (!grid) return;
+    var only = grid.getAttribute("data-exclude");
+    var html = "";
+    each(CATALOG.products, function(p){
+      if (only && p.handle === only) return;
+      var url = CATALOG.url(p.handle);
+      html +=
+        '<article class="prod">' +
+          '<a class="prod-media" href="' + url + '" tabindex="-1" aria-hidden="true">' +
+            '<img loading="lazy" src="' + esc(p.image) + '" alt="" width="600" height="600">' +
+            (p.badge ? '<span class="prod-badge glass-dark">' + esc(p.badge) + '</span>' : "") +
+          '</a>' +
+          '<div class="prod-body">' +
+            '<span class="prod-cat">' + esc(p.category) + '</span>' +
+            '<h3 class="prod-name">' + esc(p.name) + '</h3>' +
+            '<p class="prod-tag">' + esc(p.tagline) + '</p>' +
+            '<div class="prod-price price-num">' +
+              '<b>' + CATALOG.money(p.price) + '</b>' +
+              (p.compareAt ? '<s>' + CATALOG.money(p.compareAt) + '</s>' : "") +
+              '<small>MXN</small>' +
+            '</div>' +
+            '<a class="btn btn-ink btn-block btn-sm" href="' + url + '">Ver producto</a>' +
+          '</div>' +
+        '</article>';
+    });
+    grid.innerHTML = html;
+  });
+
+  /* =====================================================================
+     Révélation au scroll
 
      Les éléments .rv démarrent invisibles : si cette étape échouait, la
      page entière resterait blanche. D'où le garde-fou : si l'observateur
@@ -176,16 +214,53 @@
   });
 
   /* =====================================================================
+     Boucles de section (bannières vidéo)
+
+     Décoratives : aucune commande de lecture n'est requise puisque le
+     mouvement réduit les fige sur leur affiche. Elles ne jouent que
+     lorsqu'elles sont à l'écran.
+     ===================================================================== */
+  module("section-loops", function(){
+    var vids = document.querySelectorAll("video[data-autoloop]");
+    if (!vids.length) return;
+
+    each(vids, function(v){
+      if (reduceMotion){
+        v.removeAttribute("autoplay");
+        v.pause();
+        return;
+      }
+      function attempt(){
+        v.muted = true; v.defaultMuted = true;
+        var p;
+        try { p = v.play(); } catch(e){ return; }
+        if (p && typeof p["catch"] === "function") p["catch"](function(){});
+      }
+      if (!hasIO){ attempt(); return; }
+      new IntersectionObserver(function(entries){
+        var e = entries[entries.length - 1];
+        if (e.isIntersecting){ if (v.paused) attempt(); }
+        else if (!v.paused){ v.pause(); }
+      }, { threshold: 0.2 }).observe(v);
+    });
+
+    document.addEventListener("visibilitychange", function(){
+      if (!document.hidden) return;
+      each(vids, function(v){ if (!v.paused) v.pause(); });
+    }, false);
+  });
+
+  /* =====================================================================
      Flou des surfaces fixes
 
      Tant que la vidéo joue derrière la nav et le dock, le fond serait
-     rééchantillonné à la fréquence des images, par-dessus le décodage.
-     Le flou n'est activé qu'une fois le hero dépassé — à cet endroit un
-     voile sur une vidéo sombre et un flou sont visuellement identiques.
+     rééchantillonné à la fréquence des images. Le flou n'est activé
+     qu'une fois le hero dépassé. Sur une page sans hero vidéo (page
+     produit), il est actif d'entrée.
      ===================================================================== */
   module("past-hero", function(){
     var hero = $("hero");
-    if (!hero) return;
+    if (!hero || !$("hero-video")){ document.body.className += " past-hero"; return; }
     if (!hasIO){ document.body.className += " past-hero"; return; }
     new IntersectionObserver(function(entries){
       var past = !entries[entries.length - 1].isIntersecting;
@@ -220,10 +295,27 @@
   });
 
   /* =====================================================================
-     Sélection couleur / taille
+     Page produit — sélection couleur / taille
      ===================================================================== */
   var swapTimer = null;
-  var pendingSrc = IMGS[state.color];
+  var pendingSrc = null;
+
+  function imageFor(color){
+    if (!PRODUCT) return null;
+    if (!PRODUCT.colors) return PRODUCT.image;
+    for (var i = 0; i < PRODUCT.colors.length; i++){
+      if (PRODUCT.colors[i].name === color) return PRODUCT.colors[i].image;
+    }
+    return PRODUCT.image;
+  }
+
+  function variantLabel(){
+    var bits = [];
+    if (state.color) bits.push(state.color);
+    if (state.size) bits.push("Talla " + state.size);
+    bits.push("Envío gratis");
+    return bits.join(" · ");
+  }
 
   function syncSelection(){
     each(document.querySelectorAll(".rail-item"), function(b){
@@ -249,11 +341,11 @@
        « B » alors que « A » est sélectionné — l'image reste sur la
        mauvaise photo, et parfois à opacité nulle. */
     var img = $("stage-img");
-    var src = IMGS[state.color];
-    if (img && pendingSrc !== src){
+    var src = imageFor(state.color);
+    if (img && src && pendingSrc !== src){
       pendingSrc = src;
       if (swapTimer) clearTimeout(swapTimer);
-      var alt = "Garmin CIRQA Smart Band color " + state.color;
+      var alt = PRODUCT.name + (state.color ? " color " + state.color : "");
       img.style.opacity = 0;
       swapTimer = setTimeout(function(){
         swapTimer = null;
@@ -264,58 +356,71 @@
     }
 
     var label = $("dock-variant");
-    if (label) label.textContent = state.color + " · Talla " + state.size + " · Envío gratis";
+    if (label) label.textContent = variantLabel();
   }
 
   module("selection", function(){
-  each(document.querySelectorAll(".rail-item"), function(b){
-    b.addEventListener("click", function(){ state.color = b.getAttribute("data-color"); syncSelection(); }, false);
-  });
-  each(document.querySelectorAll(".size-btn"), function(b){
-    b.addEventListener("click", function(){ state.size = b.getAttribute("data-size"); syncSelection(); }, false);
-  });
+    if (!PRODUCT) return;
+    pendingSrc = imageFor(state.color);
 
-  /* Groupes radio : navigation aux flèches, tabindex glissant */
-  each(document.querySelectorAll('[role="radiogroup"]'), function(group){
-    var radios = Array.prototype.slice.call(group.querySelectorAll('[role="radio"]'));
-    group.addEventListener("keydown", function(e){
-      var i = radios.indexOf(document.activeElement);
-      if (i < 0) return;
-      var d = (e.key === "ArrowRight" || e.key === "ArrowDown") ? 1
-            : (e.key === "ArrowLeft"  || e.key === "ArrowUp")   ? -1 : 0;
-      if (!d) return;
-      e.preventDefault();
-      var next = radios[(i + d + radios.length) % radios.length];
-      next.click(); next.focus();
-    }, false);
-  });
+    each(document.querySelectorAll(".rail-item"), function(b){
+      b.addEventListener("click", function(){ state.color = b.getAttribute("data-color"); syncSelection(); }, false);
+    });
+    each(document.querySelectorAll(".size-btn"), function(b){
+      b.addEventListener("click", function(){ state.size = b.getAttribute("data-size"); syncSelection(); }, false);
+    });
 
-  syncSelection();
+    /* Groupes radio : navigation aux flèches, tabindex glissant */
+    each(document.querySelectorAll('[role="radiogroup"]'), function(group){
+      var radios = Array.prototype.slice.call(group.querySelectorAll('[role="radio"]'));
+      group.addEventListener("keydown", function(e){
+        var i = radios.indexOf(document.activeElement);
+        if (i < 0) return;
+        var d = (e.key === "ArrowRight" || e.key === "ArrowDown") ? 1
+              : (e.key === "ArrowLeft"  || e.key === "ArrowUp")   ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        var next = radios[(i + d + radios.length) % radios.length];
+        next.click(); next.focus();
+      }, false);
+    });
 
-  /* Préchargement à l'inactivité : le changement de couleur se fait sans flash */
-  (window.requestIdleCallback || function(f){ setTimeout(f, 800); })(function(){
-    for (var k in IMGS){ if (IMGS.hasOwnProperty(k)) (new Image()).src = IMGS[k]; }
-  });
+    syncSelection();
+
+    /* Préchargement à l'inactivité : le changement de couleur se fait sans flash */
+    if (PRODUCT.colors){
+      (window.requestIdleCallback || function(f){ setTimeout(f, 800); })(function(){
+        each(PRODUCT.colors, function(c){ (new Image()).src = c.image; });
+      });
+    }
   });
 
   /* =====================================================================
-     Checkout — la sélection courante part vers Shopify
+     Checkout — la sélection courante part vers Shopify.
+     Produit sans configuration Shopify : le bouton reste informatif et
+     dirige vers le contact, jamais vers une URL de boutique inexistante.
      ===================================================================== */
   function goToCheckout(btn, restoreLabel){
-    if (btn.disabled) return;
+    if (btn.disabled || !PRODUCT) return;
+    var shop = PRODUCT.shopify;
+    if (!shop || !shop.handle){
+      window.location.href = "mailto:lowlabsmx@gmail.com?subject=" +
+        encodeURIComponent("Pedido: " + PRODUCT.name);
+      return;
+    }
     /* La référence est résolue AVANT de désactiver le bouton : une
        combinaison inconnue ne doit pas laisser un bouton mort. */
-    var byColor = VARIANTS[state.color];
-    var id = byColor && byColor[state.size];
+    var byColor = shop.variants && state.color ? shop.variants[state.color] : null;
+    var id = byColor && state.size ? byColor[state.size] : null;
     if (!id){
-      window.location.href = STORE + "/products/" + PRODUCT_HANDLE + "?locale=es&country=MX";
+      window.location.href = STORE + "/products/" + shop.handle + "?locale=es&country=MX";
       return;
     }
     btn.disabled = true;
     btn.setAttribute("aria-disabled", "true");
     var previous = btn.textContent;
     btn.textContent = "Abriendo tu selección…";
-    window.location.href = STORE + "/products/" + PRODUCT_HANDLE + "?variant=" + id + CHECKOUT_PARAMS;
+    window.location.href = STORE + "/products/" + shop.handle + "?variant=" + id + CHECKOUT_PARAMS;
     /* Si l'utilisateur revient en arrière, le bouton doit être réutilisable. */
     setTimeout(function(){
       btn.disabled = false;
@@ -325,18 +430,16 @@
   }
 
   module("checkout", function(){
-  var checkoutBtn = $("checkout-btn");
-  if (checkoutBtn){
-    checkoutBtn.addEventListener("click", function(){
-      goToCheckout(checkoutBtn, "Comprar ahora — $3,999 MXN");
-    }, false);
-  }
-  var dockBtn = $("dock-btn");
-  if (dockBtn){
-    dockBtn.addEventListener("click", function(){
-      goToCheckout(dockBtn, "Comprar ahora");
-    }, false);
-  }
+    var checkoutBtn = $("checkout-btn");
+    if (checkoutBtn){
+      var mainLabel = checkoutBtn.textContent;
+      checkoutBtn.addEventListener("click", function(){ goToCheckout(checkoutBtn, mainLabel); }, false);
+    }
+    var dockBtn = $("dock-btn");
+    if (dockBtn){
+      var dockLabel = dockBtn.textContent;
+      dockBtn.addEventListener("click", function(){ goToCheckout(dockBtn, dockLabel); }, false);
+    }
   });
 
   /* =====================================================================
