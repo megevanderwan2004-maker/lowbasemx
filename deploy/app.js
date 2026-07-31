@@ -425,8 +425,11 @@
      produit), il est actif d'entrée.
      ===================================================================== */
   module("past-hero", function(){
+    /* .has-hero est posée dans le HTML, pas ici : elle conditionne la
+       réserve haute de la carte, qui doit être bonne dès la première
+       peinture — sinon le contenu saute au chargement du script. */
     var hero = $("hero");
-    if (!hero || !$("hero-video")){ document.body.className += " past-hero"; return; }
+    if (!hero){ document.body.className += " past-hero"; return; }
     if (!hasIO){ document.body.className += " past-hero"; return; }
     new IntersectionObserver(function(entries){
       var past = !entries[entries.length - 1].isIntersecting;

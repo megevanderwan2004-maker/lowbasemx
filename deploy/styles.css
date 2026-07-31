@@ -181,11 +181,11 @@ a:focus-visible,button:focus-visible,summary:focus-visible,
   }
 }
 
-/* Tant que la vidéo du hero joue derrière, on retire le flou des surfaces
-   fixes : le fond serait rééchantillonné à la fréquence des images.
-   La teinte de repli est celle du verre clair — les deux barres restent
-   blanches quel que soit l'état. */
-body:not(.past-hero) .nav-pill,
+/* Le dock repose sur le hero, dont il ne doit pas rééchantillonner le
+   fond en permanence : au-dessus du hero il garde une teinte pleine, et
+   ne reprend le flou qu'une fois le hero dépassé.
+   La nav, elle, garde son flou — c'est ce qui la rend transparente sur
+   l'image (voir .nav-pill). */
 body:not(.past-hero) .dock-shell{
   -webkit-backdrop-filter:none;
   backdrop-filter:none;
@@ -266,8 +266,14 @@ body:not(.past-hero) .dock-shell{
   overflow:hidden;
   box-shadow:0 1px 2px rgba(23,25,27,.06),0 18px 50px rgba(23,25,27,.07);
 }
-@media(max-width:1023px){
-  .shell{margin-top:calc(var(--topbar-h) + var(--nav-h) + var(--gutter) + 10px)}
+/* La nav flotte au-dessus du hero, qui remplit désormais toute la hauteur
+   disponible : aucune réserve à prévoir sur la page d'accueil. Les pages
+   sans hero, elles, doivent démarrer sous la pilule. */
+body:not(.has-hero) .shell{
+  margin-top:calc(var(--topbar-h) + var(--nav-h) + var(--gutter) + 10px);
+}
+@media(min-width:1024px){
+  body:not(.has-hero) .shell{margin-top:calc(var(--topbar-h) + var(--gutter))}
 }
 
 /* =========================================================================
@@ -335,7 +341,32 @@ body:not(.past-hero) .dock-shell{
   padding:8px 12px;
   border-radius:var(--radius-pill);
 }
-.nav-pill{box-shadow:var(--glass-edge),var(--glass-hairline),0 10px 34px rgba(14,15,16,.16)}
+/* Verre transparent : la pilule laisse voir le hero au travers. Le flou
+   et le liseré portent la silhouette, la teinte reste très légère —
+   c'est le scrim haut du hero qui garantit la lisibilité de l'encre. */
+.nav-pill{
+  background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.3));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 0 0 1px rgba(255,255,255,.24),
+    0 10px 34px rgba(14,15,16,.14);
+}
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  .nav-pill.blurred{
+    background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,.26));
+    -webkit-backdrop-filter:saturate(165%) blur(22px);
+    backdrop-filter:saturate(165%) blur(22px);
+  }
+}
+/* Une fois le hero dépassé, la pilule repose sur du blanc : la même
+   teinte y deviendrait invisible, on la densifie. */
+body.past-hero .nav-pill,
+body.past-hero .nav-pill.blurred{
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.8));
+}
+@media (prefers-reduced-transparency:reduce){
+  .nav-pill,.nav-pill.blurred{background:rgba(255,255,255,.97)}
+}
 
 /* Les liens restent visibles à tous les formats : sous 1024px la rangée
    défile horizontalement plutôt que de disparaître derrière un menu. */
@@ -379,11 +410,19 @@ body:not(.past-hero) .dock-shell{
    passe sur deux rangs, logo et action en haut, navigation en dessous —
    toutes les entrées restent lisibles au lieu d'être rognées. */
 @media(max-width:1023px){
-  .nav-pill{grid-template-columns:1fr auto;grid-template-areas:"logo action" "links links";gap:6px 10px;padding:8px 10px;border-radius:var(--radius-lg)}
+  /* Trois colonnes dont la première reste vide : c'est ce qui garde le
+     logo au centre optique malgré le bouton posé à droite. */
+  .nav-pill{
+    grid-template-columns:1fr auto 1fr;
+    grid-template-areas:"spacer logo action" "links links links";
+    gap:4px 8px;padding:8px 10px;border-radius:var(--radius-lg);
+  }
   .nav-start{grid-area:links;justify-self:stretch}
-  .logo{grid-area:logo;justify-self:start;font-size:1.2rem;padding:0}
-  .nav-end{grid-area:action}
-  .nav-links{width:100%}
+  .logo{grid-area:logo;grid-column:auto;justify-self:center;font-size:1.2rem;padding:0}
+  .nav-end{grid-area:action;justify-self:end}
+  /* Alignée à gauche : centrée, la rangée démarrerait au milieu de la
+     liste et « Tienda » serait déjà sorti du cadre. */
+  .nav-links{width:100%;justify-content:flex-start}
 }
 
 /* =========================================================================
@@ -846,19 +885,33 @@ footer a{color:#fff}
 /* =========================================================================
    Hero pleine largeur — une image, un wordmark, deux portes d'entrée
    ========================================================================= */
-/* Le wordmark et la baseline sont incrustés dans le visuel : un recadrage
-   en « cover » les couperait sur les écrans étroits. L'image garde donc
-   son ratio natif et c'est le bloc qui s'y adapte. */
+/* Le hero occupe tout l'espace entre le bandeau défilant et le bas de la
+   fenêtre. La hauteur est calculée, pas devinée : viewport moins le
+   bandeau, moins la gouttière de la carte. */
 .hero-full{
   position:relative;isolation:isolate;overflow:hidden;
+  height:calc(100svh - var(--topbar-h) - var(--gutter));
+  min-height:420px;
   background:#111214;
   border-radius:var(--radius-lg) var(--radius-lg) var(--radius-md) var(--radius-md);
 }
-.hero-still{display:block;width:100%;height:auto;position:relative;z-index:1}
-/* Scrim : plancher de contraste sous les boutons, sans voiler le visuel. */
+@supports not (height:100svh){
+  .hero-full{height:calc(100vh - var(--topbar-h) - var(--gutter))}
+}
+/* Le wordmark incrusté est centré : en recadrage « cover » il survit à
+   tous les formats. La baseline, elle, occupe le coin bas droit et sort
+   du cadre sur mobile — elle y est reprise en HTML (voir .hero-tagline). */
+.hero-still{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center 46%;z-index:1;
+}
+/* Deux planchers de contraste : en haut pour la nav en verre transparent,
+   en bas pour les actions. Le milieu du visuel reste intact. */
 .hero-full::before{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(180deg,rgba(12,13,14,0) 52%,rgba(12,13,14,.42) 100%);
+  background:
+    linear-gradient(180deg,rgba(12,13,14,.3) 0%,rgba(12,13,14,.08) 22%,rgba(12,13,14,0) 38%),
+    linear-gradient(180deg,rgba(12,13,14,0) 56%,rgba(12,13,14,.46) 100%);
 }
 .hero-full::after{
   content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
@@ -875,11 +928,20 @@ footer a{color:#fff}
 .hero-full-inner{
   position:absolute;left:0;right:0;bottom:0;z-index:var(--z-content);
   display:flex;flex-direction:column;align-items:center;
-  text-align:center;gap:16px;
-  padding:0 clamp(14px,4vw,40px) clamp(14px,3vw,24px);
+  text-align:center;gap:14px;
+  padding:0 clamp(14px,4vw,40px) calc(clamp(18px,3vw,26px) + var(--dock-h));
 }
+/* La baseline reprend en HTML ce que le recadrage mobile fait sortir du
+   cadre. Au-delà de 760px la version incrustée est visible : on masque
+   celle-ci pour ne pas la dédoubler. */
+.hero-tagline{
+  color:#fff;font-family:var(--font-display);font-weight:500;
+  font-size:clamp(1rem,4.6vw,1.3rem);line-height:1.3;letter-spacing:-.01em;
+  max-width:18ch;text-shadow:0 1px 18px rgba(12,13,14,.65);
+}
+.hero-tagline b{font-weight:700}
 /* Sous 760px les deux actions doivent tenir sur une ligne : empilées,
-   elles dépasseraient la hauteur disponible du visuel. */
+   elles mangeraient le visuel. */
 @media(max-width:759px){
   .hero-full-inner .hero-actions{gap:8px;flex-wrap:nowrap;width:100%}
   .hero-full-inner .btn{flex:1 1 0;min-width:0;padding:12px 10px;font-size:.85rem;min-height:46px}
@@ -890,6 +952,7 @@ footer a{color:#fff}
     align-items:flex-start;
     padding:0 clamp(18px,4vw,40px) calc(clamp(28px,4vw,56px) + var(--dock-h));
   }
+  .hero-tagline{display:none}
 }
 .hero-full .wordmark{
   font-family:var(--font-display);font-weight:600;color:#fff;line-height:.92;

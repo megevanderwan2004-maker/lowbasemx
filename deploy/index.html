@@ -19,7 +19,8 @@
 <link rel="preconnect" href="https://cdn.shopify.com">
 <!-- Typographie verrouillée : Outfit (titres) + DM Sans (texte courant). Aucune autre famille sur le site. -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="/media/hero-runners.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/media/hero-runners.jpg" media="(min-width: 760px)" fetchpriority="high">
+<link rel="preload" as="image" href="/media/hero-runners-mobile.jpg" media="(max-width: 759px)" fetchpriority="high">
 <script>
 document.documentElement.className += " js";
 try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.className += " rm"; }catch(e){}
@@ -37,7 +38,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 </script>
 <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
+<body class="has-hero">
 
 <a class="skip" href="#contenido">Saltar al contenido</a>
 
@@ -91,13 +92,21 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
   <!-- ===== Hero pleine largeur ===== -->
   <header class="hero-full" id="hero">
-    <img class="hero-still" src="/media/hero-runners.jpg" alt="" aria-hidden="true"
-         width="2000" height="1180" fetchpriority="high">
-    <!-- Le wordmark et la baseline sont incrustés dans l'image : les
-         répéter en HTML les dédoublerait. Le titre reste accessible via
-         le h1 hors écran, et l'overlay ne porte que les deux actions. -->
+    <!-- Deux cadrages du même visuel. La variante mobile est amputée de sa
+         bande basse : en recadrage portrait, la baseline incrustée n'y
+         apparaîtrait qu'à moitié. Elle est alors reprise en HTML
+         (.hero-tagline), qui reste masquée dès que la version large
+         l'affiche déjà. -->
+    <picture>
+      <source media="(max-width: 759px)" srcset="/media/hero-runners-mobile.jpg">
+      <img class="hero-still" src="/media/hero-runners.jpg" alt="" aria-hidden="true"
+           width="1366" height="768" fetchpriority="high">
+    </picture>
+    <!-- Le wordmark est incrusté dans l'image : le répéter en HTML le
+         dédoublerait. Le titre reste accessible via le h1 hors écran. -->
     <h1 class="sr-only">lowlabs — curated wellness and technology</h1>
     <div class="hero-full-inner">
+      <p class="hero-tagline rv" lang="en">Curated <b>wellness</b> and <b>technology</b></p>
       <div class="hero-actions rv">
         <a class="btn btn-smoke btn-lg" href="#objetivo">Encuentra lo tuyo</a>
         <a class="btn btn-smoke btn-lg" href="/tienda">Ver la tienda</a>
