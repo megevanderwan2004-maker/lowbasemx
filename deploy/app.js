@@ -41,11 +41,25 @@
 
   /* La carte produit est le seul gabarit : home, boutique et recommandation
      la réutilisent, aucune variante n'est dupliquée ailleurs. */
+  /* Un produit qui déclare une vidéo l'utilise comme visuel de carte : la
+     boucle remplace la photo dans la même boîte, l'affiche restant posée
+     tant que la lecture n'a pas démarré (ou si elle est refusée). */
+  function cardMedia(p){
+    if (!p.video){
+      return '<img loading="lazy" src="' + esc(p.image) + '" alt="" width="600" height="600">';
+    }
+    return '<video autoplay muted loop playsinline webkit-playsinline preload="metadata" ' +
+      'disablepictureinpicture disableremoteplayback poster="' + esc(p.poster || p.image) + '" ' +
+      'width="600" height="600" aria-hidden="true" tabindex="-1" data-autoloop>' +
+        '<source src="' + esc(p.video) + '" type="video/mp4">' +
+      '</video>';
+  }
+
   function productCard(p){
     var url = CATALOG.url(p.handle);
     return '<article class="prod">' +
         '<a class="prod-media" href="' + url + '" tabindex="-1" aria-hidden="true">' +
-          '<img loading="lazy" src="' + esc(p.image) + '" alt="" width="600" height="600">' +
+          cardMedia(p) +
           (p.badge ? '<span class="prod-badge glass-dark">' + esc(p.badge) + '</span>' : "") +
         '</a>' +
         '<div class="prod-body">' +
@@ -67,17 +81,20 @@
 
      Rendu AVANT le module de révélation : les cartes injectées doivent
      être observables, sinon elles resteraient à opacité nulle.
+
+     Une grille se déclare soit par exclusion (`data-exclude`, le reste du
+     catalogue sous une fiche produit), soit par liste explicite
+     (`data-handles`, la sélection éditoriale de la home).
      ===================================================================== */
   module("catalog", function(){
-    var grid = $("cat-grid");
-    if (!grid) return;
-    var only = grid.getAttribute("data-exclude");
-    var html = "";
-    each(CATALOG.products, function(p){
-      if (only && p.handle === only) return;
-      html += productCard(p);
+    each(document.querySelectorAll(".cat-grid[data-exclude],.cat-grid[data-handles]"), function(grid){
+      var only = grid.getAttribute("data-exclude");
+      var list = grid.getAttribute("data-handles");
+      var items = list
+        ? list.split(",").map(function(h){ return CATALOG.byHandle(h.replace(/^\s+|\s+$/g, "")); }).filter(Boolean)
+        : CATALOG.products.filter(function(p){ return !only || p.handle !== only; });
+      grid.innerHTML = items.map(productCard).join("");
     });
-    grid.innerHTML = html;
   });
 
   /* =====================================================================

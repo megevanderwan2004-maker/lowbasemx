@@ -57,7 +57,7 @@ const nav = () => `
 </div>
 
 <nav class="nav" aria-label="Principal">
-  <div class="nav-pill glass-light blurred">
+  <div class="nav-pill">
     <div class="nav-start">
       <div class="nav-links">
         <a href="/tienda">Tienda</a>
@@ -132,11 +132,66 @@ ${p.sizes
 }
 
 /* Chaque produit a sa boucle : la CIRQA garde le plan noir du hero, les
-   autres montres partagent la boucle tissu, la créatine la boucle dorée. */
+   autres montres partagent la boucle tissu, les suppléments la boucle
+   gélules. */
 const BAND_VIDEO = {
   cirqa: "hero-cirqa",
   creatina: "loop-brand",
+  "womens-multivitamin": "loop-capsulas",
+  "prenatal-multivitamin": "loop-capsulas",
+  synbiotic: "loop-capsulas",
 };
+
+/* Visuel principal : une boucle si la fiche en déclare une, la photo
+   sinon. L'affiche est toujours posée dessous — si la lecture est refusée
+   (économie d'énergie, mouvement réduit), la fiche reste complète. */
+function stageMedia(p) {
+  if (!p.video) {
+    return `              <img id="stage-img" src="${esc(p.image)}" alt="${esc(p.name)}" width="900" height="900" fetchpriority="high">`;
+  }
+  return `              <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+                     disablepictureinpicture disableremoteplayback
+                     poster="${esc(p.poster || p.image)}"
+                     width="900" height="900" aria-label="${esc(p.name)}" tabindex="-1" data-autoloop>
+                <source src="${esc(p.video)}" type="video/mp4">
+              </video>`;
+}
+
+/* Chapitre éditorial — même gabarit que « Todos tus datos, en una sola app
+   gratuita » sur la home : un média, un titre, un texte court. */
+function story(p) {
+  if (!p.story) return "";
+  const wide = p.videoRatio === "wide";
+  const ratio = wide ? " wide" : " portrait";
+  const box = wide ? 'width="1280" height="720"' : 'width="720" height="1280"';
+  const media = p.video
+    ? `            <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+                   disablepictureinpicture disableremoteplayback
+                   poster="${esc(p.poster || p.image)}"
+                   ${box} aria-hidden="true" tabindex="-1" data-autoloop>
+              <source src="${esc(p.video)}" type="video/mp4">
+            </video>`
+    : `            <img loading="lazy" src="${esc(p.image)}" alt="" width="1000" height="1000">`;
+
+  return `
+    <!-- ===== Chapitre éditorial ===== -->
+    <section class="chapter" aria-labelledby="story-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="chapter-media${ratio} rv">
+${media}
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">${esc(p.story.eyebrow)}</span>
+            <h2 id="story-t" class="rv">${esc(p.story.title)}</h2>
+            <p class="rv">${esc(p.story.text)}</p>
+            <a class="btn btn-ink rv" href="#comprar">Comprar — ${money(p.price)} MXN</a>
+          </div>
+        </div>
+      </div>
+    </section>
+`;
+}
 
 function band(p) {
   const src = BAND_VIDEO[p.handle] || "loop-wearables";
@@ -207,6 +262,20 @@ ${JSON.stringify(jsonld, null, 2)}
 </head>
 <body data-product="${p.handle}">
 
+<!-- Filtre de réfraction des boutons en verre liquide. Un bruit fractal
+     déplace le fond puis est refloué : c'est ce qui donne l'ondulation.
+     Seul Firefox honore \`backdrop-filter:url()\` — ailleurs les boutons
+     retombent sur le flou simple, l'arête portant déjà l'effet. -->
+<svg class="svg-defs" aria-hidden="true" focusable="false">
+  <filter id="lg-refract" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="turbulence"/>
+    <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise"/>
+    <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="26" xChannelSelector="R" yChannelSelector="B" result="displaced"/>
+    <feGaussianBlur in="displaced" stdDeviation="3" result="finalBlur"/>
+    <feComposite in="finalBlur" in2="finalBlur" operator="over"/>
+  </filter>
+</svg>
+
 <a class="skip" href="#contenido">Saltar al contenido</a>
 ${nav()}
 
@@ -227,7 +296,7 @@ ${nav()}
         <div class="pdp-grid">
           <div class="stage rv">
             <div class="pdp-media">
-              <img id="stage-img" src="${esc(p.image)}" alt="${esc(p.name)}" width="900" height="900" fetchpriority="high">
+${stageMedia(p)}
             </div>
           </div>
 
@@ -267,7 +336,7 @@ ${colorRail(p)}${sizeRow(p)}
 
     <!-- ===== Bannière produit ===== -->
 ${band(p)}
-
+${story(p)}
     <!-- ===== Fiche technique ===== -->
     <section aria-labelledby="specs-t">
       <div class="container">
@@ -307,7 +376,7 @@ ${footer()}
 
 <!-- ===== Dock d'achat ===== -->
 <div class="dock" role="region" aria-label="Comprar ${esc(p.short)}">
-  <div class="dock-shell glass-light blurred" id="dock-shell">
+  <div class="dock-shell" id="dock-shell">
     <div class="dock-info">
       <b class="price-num">${money(p.price)} MXN</b>
       <span id="dock-variant">${esc(p.short)} · Envío gratis</span>

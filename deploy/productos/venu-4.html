@@ -50,6 +50,20 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 </head>
 <body data-product="venu-4">
 
+<!-- Filtre de réfraction des boutons en verre liquide. Un bruit fractal
+     déplace le fond puis est refloué : c'est ce qui donne l'ondulation.
+     Seul Firefox honore `backdrop-filter:url()` — ailleurs les boutons
+     retombent sur le flou simple, l'arête portant déjà l'effet. -->
+<svg class="svg-defs" aria-hidden="true" focusable="false">
+  <filter id="lg-refract" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="turbulence"/>
+    <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise"/>
+    <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="26" xChannelSelector="R" yChannelSelector="B" result="displaced"/>
+    <feGaussianBlur in="displaced" stdDeviation="3" result="finalBlur"/>
+    <feComposite in="finalBlur" in2="finalBlur" operator="over"/>
+  </filter>
+</svg>
+
 <a class="skip" href="#contenido">Saltar al contenido</a>
 
 <!-- ===== Bandeau défilant : reprend les garanties et les standards des
@@ -80,7 +94,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 </div>
 
 <nav class="nav" aria-label="Principal">
-  <div class="nav-pill glass-light blurred">
+  <div class="nav-pill">
     <div class="nav-start">
       <div class="nav-links">
         <a href="/tienda">Tienda</a>
@@ -227,6 +241,9 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         <p><a href="/productos/venu-3s">Garmin Venu® 3S</a></p>
         <p><a href="/productos/vivoactive-6">Garmin Vívoactive® 6</a></p>
         <p><a href="/productos/creatina">Cymbiotika Liposomal Advanced Creatine</a></p>
+        <p><a href="/productos/womens-multivitamin">Cymbiotika Women's Multivitamin +18</a></p>
+        <p><a href="/productos/prenatal-multivitamin">Cymbiotika Prenatal Multivitamin</a></p>
+        <p><a href="/productos/synbiotic">Cymbiotika Synbiotic</a></p>
       </div>
       <div>
         <h3 class="foot-title">Ayuda</h3>
@@ -245,7 +262,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
 <!-- ===== Dock d'achat ===== -->
 <div class="dock" role="region" aria-label="Comprar Venu® 4">
-  <div class="dock-shell glass-light blurred" id="dock-shell">
+  <div class="dock-shell" id="dock-shell">
     <div class="dock-info">
       <b class="price-num">$10,999 MXN</b>
       <span id="dock-variant">Venu® 4 · Envío gratis</span>

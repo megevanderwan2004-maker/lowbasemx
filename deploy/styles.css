@@ -135,6 +135,9 @@ h4{font-size:1rem}
 .container{max-width:1240px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
 .price-num{font-variant-numeric:tabular-nums}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+/* Porte-filtres SVG : jamais display:none — un filtre référencé depuis un
+   ancêtre masqué n'est pas résolu par tous les moteurs. */
+.svg-defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
 .skip{
   position:absolute;left:-9999px;top:0;z-index:var(--z-skip);
   background:var(--cta);color:#fff;padding:14px 22px;
@@ -146,6 +149,9 @@ h4{font-size:1rem}
 a:focus-visible,button:focus-visible,summary:focus-visible,
 [tabindex]:focus-visible{outline:3px solid var(--teal-600);outline-offset:2px}
 .on-media a:focus-visible,.on-media button:focus-visible{outline-color:#fff}
+/* Sur verre clair, l'anneau blanc disparaîtrait : il repasse en encre. */
+.nav a:focus-visible,.nav button:focus-visible,
+.dock a:focus-visible,.dock button:focus-visible{outline-color:var(--ink)}
 
 /* =========================================================================
    Verre — socle partagé
@@ -189,7 +195,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,
 body:not(.past-hero) .dock-shell{
   -webkit-backdrop-filter:none;
   backdrop-filter:none;
-  background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b));
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.82));
 }
 
 @media (prefers-reduced-transparency:reduce){
@@ -199,47 +205,110 @@ body:not(.past-hero) .dock-shell{
 }
 
 /* =========================================================================
-   Boutons — quatre variantes, toutes en verre
+   Boutons — verre liquide
+
+   L'arête est faite d'une pile d'ombres internes à décalages opposés :
+   deux liserés diagonaux qui simulent la réfraction sur un bord bombé,
+   deux halos internes larges qui creusent le centre, une ombre portée.
+   C'est cette pile — et non le flou — qui porte l'effet : elle survit
+   partout, y compris là où backdrop-filter n'est pas disponible.
    ========================================================================= */
+:root{
+  /* Verre translucide clair. L'opacité plancher (.62) est ce qui rend
+     l'encre lisible quel que soit le fond traversé — c'est le principe
+     du verre d'Apple : on voit à travers, mais assez dépoli pour que le
+     texte tienne. En dessous, le contraste n'est plus garanti. */
+  --lg-fill:linear-gradient(180deg,rgba(255,255,255,.78) 0%,rgba(255,255,255,.64) 100%);
+  --lg-fill-hi:linear-gradient(180deg,rgba(255,255,255,.92) 0%,rgba(255,255,255,.8) 100%);
+  /* Profondeur : filet sombre pour la silhouette sur fond clair, halo
+     lumineux, ombre portée douce. */
+  --lg-depth:
+    inset 0 0 0 .5px rgba(23,25,27,.1),
+    0 1px 2px rgba(23,25,27,.06),
+    0 8px 24px rgba(23,25,27,.12),
+    inset 0 0 14px 6px rgba(255,255,255,.4);
+}
+
 .btn{
+  position:relative;isolation:isolate;
   display:inline-flex;align-items:center;justify-content:center;gap:10px;
   font-family:var(--font-display);font-weight:600;font-size:1rem;line-height:1.2;
   letter-spacing:-.004em;text-decoration:none;border:none;cursor:pointer;
   border-radius:var(--radius-pill);padding:15px 30px;min-height:48px;text-align:center;
-  transition:transform .18s ease-out,box-shadow .22s ease-out,background .22s ease-out;
+  transition:transform .2s ease-out,box-shadow .24s ease-out,
+             background .24s ease-out,filter .2s ease-out;
 }
-.btn:active{transform:scale(.975)}
-.btn[disabled],.btn[aria-disabled="true"]{opacity:.5;pointer-events:none;cursor:not-allowed}
+.btn::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  border-radius:inherit;overflow:hidden;
+}
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  .btn::before{
+    -webkit-backdrop-filter:blur(6px) saturate(150%);
+    backdrop-filter:blur(6px) saturate(150%);
+  }
+}
+/* La distorsion par déplacement est réservée à Firefox, seul moteur à
+   RENDRE un filtre SVG en backdrop-filter. Chromium en accepte la
+   syntaxe puis ne compose rien : sans ce garde, la déclaration écraserait
+   le flou ci-dessus et les boutons perdraient tout effet de verre chez
+   la majorité des visiteurs. -moz-appearance sert de détection. */
+@supports (-moz-appearance:none) and (backdrop-filter:url("#lg-refract")){
+  .btn::before{backdrop-filter:url("#lg-refract")}
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:scale(.975);filter:brightness(.94)}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.5;pointer-events:none;cursor:not-allowed;filter:none}
 
-/* Encre — CTA principal sur fond clair */
-.btn-ink{
-  background:linear-gradient(180deg,rgba(38,40,42,.97),rgba(22,24,26,.99));
-  color:#fff;box-shadow:var(--glass-edge-bright),0 12px 30px rgba(23,25,27,.26);
-}
-.btn-ink:hover{
-  background:linear-gradient(180deg,rgba(52,55,58,.98),rgba(34,37,40,1));
-  box-shadow:var(--glass-edge-bright),0 16px 38px rgba(23,25,27,.32);
-}
-
-/* Fumée — verre sombre sur média : contraste garanti sur n'importe quelle image */
-.btn-smoke{
-  background:linear-gradient(180deg,var(--glass-dark-a),var(--glass-dark-b));
-  color:#fff;box-shadow:var(--glass-edge-bright),0 12px 30px rgba(14,15,16,.3);
-}
-.btn-smoke:hover{background:linear-gradient(180deg,var(--glass-dark-hi-a),var(--glass-dark-hi-b))}
-
-/* Discret — verre clair sur fond clair */
-.btn-quiet{
-  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
+/* Une seule surface pour toutes les variantes : verre blanc translucide,
+   encre foncée. Les noms de classe subsistent pour ne pas réécrire le
+   HTML. Le liseré est porté par ::after. */
+.btn-ink,.btn-smoke,.btn-quiet{
+  background:var(--lg-fill);
   color:var(--ink);
-  box-shadow:var(--glass-edge),inset 0 0 0 1px rgba(118,124,128,.34),0 4px 14px rgba(23,25,27,.08);
+  box-shadow:var(--lg-depth);
 }
-.btn-quiet:hover{background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
+.btn-ink:hover,.btn-smoke:hover,.btn-quiet:hover{background:var(--lg-fill-hi)}
+
+/* Le liseré : un anneau d'un pixel dont l'intensité varie du haut vers le
+   bas. Une bordure ne sait pas faire ça — d'où le dégradé découpé au
+   masque, qui ne laisse que le contour. Sur verre clair, la lumière vient
+   du haut : liseré blanc en haut, filet encre en bas pour poser l'objet. */
+.btn::after,
+.nav-pill::after,
+.dock-shell::after,
+footer::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  border-radius:inherit;padding:1px;
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,.95) 0%,
+    rgba(255,255,255,.5) 22%,
+    rgba(23,25,27,.06) 55%,
+    rgba(23,25,27,.14) 80%,
+    rgba(23,25,27,.2) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+}
+
+/* Le grossissement au survol est réservé aux CTA isolés : sur un bouton
+   pleine largeur dans une carte, il déborderait la carte. */
+.btn-lg:hover{transform:scale(1.03)}
+.btn-block:hover,.btn-round:hover{transform:none}
 
 .btn-round{width:48px;height:48px;padding:0;border-radius:50%;flex:none;min-height:48px}
 .btn-sm{padding:12px 22px;font-size:.9rem;min-height:44px}
 .btn-lg{padding:18px 34px;font-size:1.05rem;min-height:56px}
 .btn-block{width:100%}
+
+@media(prefers-reduced-motion:reduce){
+  .btn:hover,.btn-lg:hover{transform:none;filter:none}
+}
+@media (prefers-reduced-transparency:reduce){
+  .btn::before{-webkit-backdrop-filter:none;backdrop-filter:none}
+}
 
 /* =========================================================================
    Coquille : la page est une carte posée sur la toile grise.
@@ -341,31 +410,21 @@ body:not(.has-hero) .shell{
   padding:8px 12px;
   border-radius:var(--radius-pill);
 }
-/* Verre transparent : la pilule laisse voir le hero au travers. Le flou
-   et le liseré portent la silhouette, la teinte reste très légère —
-   c'est le scrim haut du hero qui garantit la lisibilité de l'encre. */
+/* Même pastille que les boutons : remplissage presque noir, liseré
+   lumineux, halo. Le contenu passe donc en blanc. */
 .nav-pill{
-  background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.3));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.55),
-    inset 0 0 0 1px rgba(255,255,255,.24),
-    0 10px 34px rgba(14,15,16,.14);
+  position:relative;
+  background:var(--lg-fill);
+  box-shadow:var(--lg-depth);
 }
 @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
-  .nav-pill.blurred{
-    background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,.26));
-    -webkit-backdrop-filter:saturate(165%) blur(22px);
-    backdrop-filter:saturate(165%) blur(22px);
+  .nav-pill,.dock-shell{
+    -webkit-backdrop-filter:saturate(160%) blur(22px);
+    backdrop-filter:saturate(160%) blur(22px);
   }
 }
-/* Une fois le hero dépassé, la pilule repose sur du blanc : la même
-   teinte y deviendrait invisible, on la densifie. */
-body.past-hero .nav-pill,
-body.past-hero .nav-pill.blurred{
-  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.8));
-}
 @media (prefers-reduced-transparency:reduce){
-  .nav-pill,.nav-pill.blurred{background:rgba(255,255,255,.97)}
+  .nav-pill,.dock-shell,footer{background:rgba(255,255,255,.98)}
 }
 
 /* Les liens restent visibles à tous les formats : sous 1024px la rangée
@@ -381,7 +440,7 @@ body.past-hero .nav-pill.blurred{
 }
 .nav-links::-webkit-scrollbar{display:none}
 .nav-links a{
-  color:var(--teal-700);text-decoration:none;font-size:.86rem;white-space:nowrap;
+  color:var(--ink-soft);text-decoration:none;font-size:.86rem;white-space:nowrap;
   padding:12px 11px;border-radius:var(--radius-pill);
   display:inline-flex;align-items:center;min-height:44px;transition:color .2s;
 }
@@ -410,16 +469,20 @@ body.past-hero .nav-pill.blurred{
    passe sur deux rangs, logo et action en haut, navigation en dessous —
    toutes les entrées restent lisibles au lieu d'être rognées. */
 @media(max-width:1023px){
-  /* Trois colonnes dont la première reste vide : c'est ce qui garde le
-     logo au centre optique malgré le bouton posé à droite. */
   .nav-pill{
     grid-template-columns:1fr auto 1fr;
-    grid-template-areas:"spacer logo action" "links links links";
     gap:4px 8px;padding:8px 10px;border-radius:var(--radius-lg);
   }
-  .nav-start{grid-area:links;justify-self:stretch}
-  .logo{grid-area:logo;grid-column:auto;justify-self:center;font-size:1.2rem;padding:0}
-  .nav-end{grid-area:action;justify-self:end}
+  .nav-start{grid-row:2;grid-column:1 / -1;justify-self:stretch}
+  /* Le logo couvre toute la rangée et s'y centre : avec trois colonnes,
+     le bouton « Comprar » élargit la troisième au-delà de sa part et
+     décalait le logo vers la gauche. Le bouton est posé par-dessus, dans
+     la même rangée. */
+  .logo{
+    grid-row:1;grid-column:1 / -1;justify-self:center;
+    font-size:1.2rem;padding:0;
+  }
+  .nav-end{grid-row:1;grid-column:3;justify-self:end}
   /* Alignée à gauche : centrée, la rangée démarrerait au milieu de la
      liste et « Tienda » serait déjà sorti du cadre. */
   .nav-links{width:100%;justify-content:flex-start}
@@ -782,24 +845,32 @@ details .a{padding:18px 22px;color:var(--ink-soft);font-size:.94rem}
    Footer
    ========================================================================= */
 footer{
-  background:var(--cta);color:rgba(255,255,255,.86);padding:56px 0 40px;font-size:.9rem;
+  position:relative;
+  background:var(--lg-fill);color:var(--ink-soft);padding:56px 0 40px;font-size:.9rem;
+  box-shadow:var(--lg-depth);
   /* Même gouttière que la coquille : la bande grise reste continue. */
   max-width:1680px;
   width:calc(100% - 2 * var(--gutter));
   margin:var(--gutter) auto 0;
   border-radius:var(--radius-lg);
 }
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  footer{
+    -webkit-backdrop-filter:saturate(160%) blur(22px);
+    backdrop-filter:saturate(160%) blur(22px);
+  }
+}
 .foot-logo{
   display:inline-block;font-family:var(--font-display);font-weight:600;font-size:1.45rem;
-  color:#fff;text-decoration:none;letter-spacing:-.022em;line-height:1.1;
+  color:var(--ink);text-decoration:none;letter-spacing:-.022em;line-height:1.1;
 }
-.foot-logo span{display:block;font-family:var(--font-body);font-weight:400;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-top:5px}
+.foot-logo span{display:block;font-family:var(--font-body);font-weight:400;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-700);margin-top:5px}
 .foot-grid{display:grid;gap:32px;margin-bottom:36px}
-footer a{color:#fff}
+footer a{color:var(--ink)}
 /* Les liens de navigation du footer sont de vraies cibles tactiles. */
 .foot-grid p a{display:inline-flex;align-items:center;min-height:44px}
-.foot-title{font-size:.95rem;margin-bottom:12px;color:#fff;font-family:var(--font-display)}
-.legal{border-top:1px solid rgba(255,255,255,.15);padding-top:24px;font-size:.78rem;color:rgba(255,255,255,.62);line-height:1.7}
+.foot-title{font-size:.95rem;margin-bottom:12px;color:var(--ink);font-family:var(--font-display)}
+.legal{border-top:1px solid rgba(23,25,27,.12);padding-top:24px;font-size:.78rem;color:var(--teal-700);line-height:1.7}
 @media(min-width:768px){.foot-grid{grid-template-columns:2fr 1fr 1fr}}
 
 /* =========================================================================
@@ -814,10 +885,10 @@ footer a{color:#fff}
   pointer-events:auto;display:flex;align-items:center;gap:clamp(10px,2vw,20px);
   width:min(680px,100%);padding:8px 8px 8px 20px;border-radius:var(--radius-pill);
 }
-.dock-shell{box-shadow:var(--glass-edge),var(--glass-hairline),0 14px 40px rgba(14,15,16,.2)}
+.dock-shell{position:relative;background:var(--lg-fill);box-shadow:var(--lg-depth)}
 .dock-info{display:grid;gap:1px;min-width:0;line-height:1.3}
 .dock-info b{font-family:var(--font-display);font-size:1.05rem;font-weight:600;color:var(--ink);letter-spacing:-.02em}
-.dock-info span{font-size:.8rem;color:var(--teal-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock-info span{font-size:.8rem;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dock-shell .btn{margin-left:auto;flex:none}
 @media(max-width:430px){
   .dock-shell{padding-left:16px;gap:10px}
@@ -905,6 +976,12 @@ footer a{color:#fff}
   position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;object-position:center 46%;z-index:1;
 }
+/* Le cadrage mobile s'arrête juste avant la baseline incrustée. Sur un
+   écran plus large que 1:2, le débord doit donc être rogné à gauche —
+   sinon la fin du wordmark sort du cadre. */
+@media(max-width:759px){
+  .hero-still{object-position:72% center}
+}
 /* Deux planchers de contraste : en haut pour la nav en verre transparent,
    en bas pour les actions. Le milieu du visuel reste intact. */
 .hero-full::before{
@@ -976,13 +1053,14 @@ footer a{color:#fff}
     linear-gradient(168deg,#ffffff 0%,#f5f6f6 52%,#ebecec 100%);
   padding:clamp(56px,8vw,104px) 0;
 }
-/* Les six objectifs forment toujours un rectangle plein : 3 × 2 à partir
-   de 720px, 2 × 3 en dessous. auto-fit laisserait deux orphelins. */
+/* Les quatre objectifs forment toujours un rectangle plein : 4 × 1 à
+   partir de 900px, 2 × 2 en dessous. auto-fit laisserait un orphelin. */
 .goals{
   display:grid;gap:clamp(12px,1.6vw,18px);
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   max-width:1080px;margin:0 auto;
 }
+@media(max-width:899px){.goals{grid-template-columns:1fr 1fr}}
 .goal{
   display:flex;flex-direction:column;text-align:left;overflow:hidden;
   padding:0;border:none;cursor:pointer;
@@ -1001,10 +1079,10 @@ footer a{color:#fff}
   position:relative;display:block;aspect-ratio:16/10;overflow:hidden;
   background:var(--surface-teal);
 }
-/* Mobile : les six objectifs tiennent dans un rectangle 2 × 3. Les visuels
-   passent au carré pour que les six vignettes restent lisibles. */
+/* Mobile : les quatre objectifs tiennent dans un rectangle 2 × 2. Les
+   visuels passent au carré pour que les vignettes restent lisibles. */
 @media(max-width:719px){
-  .goals{grid-template-columns:1fr 1fr;gap:10px}
+  .goals{gap:10px}
   .goal{border-radius:var(--radius-md)}
   .goal-media{aspect-ratio:1}
   .goal-body{flex-direction:column;align-items:flex-start;gap:8px;padding:11px 12px 13px}
@@ -1165,6 +1243,22 @@ footer a{color:#fff}
   mix-blend-mode:multiply;
 }
 .prod:hover .prod-media img{transform:scale(1.04)}
+/* Boucle produit : elle remplit la boîte au lieu d'y flotter comme un
+   packshot — le fond de la vidéo fait déjà office de studio. */
+.prod-media video{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:transform .35s ease-out;
+}
+.prod:hover .prod-media video{transform:scale(1.04)}
+/* Variante éditoriale de la grille (maquette suppléments) : cartes
+   centrées, rangée pleine à toutes les largeurs — 4 × 1 au large,
+   2 × 2 en dessous, comme la grille des objectifs. */
+.cat-grid.centered{grid-template-columns:1fr 1fr}
+.cat-grid.centered .prod-body{text-align:center;align-items:center}
+.cat-grid.centered .prod-tag{max-width:32ch}
+.cat-grid.centered .prod-price{justify-content:center}
+.cat-grid.centered .prod .btn{width:100%}
+@media(min-width:900px){.cat-grid.centered{grid-template-columns:repeat(4,1fr)}}
 .prod-badge{
   position:absolute;top:12px;left:12px;z-index:var(--z-content);
   font-family:var(--font-display);font-size:.68rem;font-weight:600;
@@ -1242,6 +1336,16 @@ footer a{color:#fff}
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
 }
 .chapter-media.contain>img{object-fit:contain;padding:clamp(18px,3vw,44px);mix-blend-mode:multiply}
+/* En-tête de boutique : visuel à gauche, texte à droite. La hauteur du
+   visuel est plafonnée pour que le premier rayon entre dans l'écran dès
+   l'ouverture — c'est lui, pas l'image, qui doit appeler le scroll. */
+.shop-intro{display:grid;gap:clamp(18px,3vw,40px);align-items:center}
+@media(min-width:900px){
+  .shop-intro{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+.shop-hero{aspect-ratio:16/10;max-height:min(40vh,340px)}
+.shop-intro-copy h2{max-width:18ch}
+.shop-intro-copy .shop-jump{margin-top:22px}
 .chapter-copy .eyebrow{display:block;margin-bottom:12px}
 .chapter-copy h2{max-width:16ch;margin-bottom:14px}
 .chapter-copy p{color:var(--ink-soft);font-size:1.04rem;max-width:44ch;line-height:1.65}
@@ -1296,6 +1400,10 @@ footer a{color:#fff}
    carte commence déjà sous la pilule, la doubler creuserait un vide. */
 .pdp{padding-top:clamp(96px,12vw,140px)}
 @media(max-width:1023px){.pdp{padding-top:clamp(28px,5vw,44px)}}
+/* L'en-tête de boutique respire moins qu'une fiche produit : la place
+   gagnée sert à faire entrer le début du premier rayon. */
+.pdp.shop-head{padding-top:clamp(72px,8vw,96px);padding-bottom:clamp(26px,3.5vw,40px)}
+@media(max-width:1023px){.pdp.shop-head{padding-top:clamp(24px,4vw,36px)}}
 .pdp-grid{display:grid;gap:clamp(22px,3vw,44px);align-items:start}
 @media(min-width:980px){.pdp-grid{grid-template-columns:1.05fr .95fr}}
 .pdp-media{
@@ -1309,6 +1417,9 @@ footer a{color:#fff}
   mix-blend-mode:multiply;
 }
 .pdp-media.cover img{object-fit:cover;padding:0}
+/* Fiche dont le visuel principal est une boucle : elle remplit la boîte,
+   l'affiche restant posée dessous si la lecture est refusée. */
+.pdp-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .pdp-buy{display:grid;gap:14px}
 .pdp-buy .eyebrow{display:block}
 .pdp-buy h1{font-size:clamp(1.9rem,4vw,3rem);max-width:16ch}

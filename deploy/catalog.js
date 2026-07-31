@@ -159,13 +159,125 @@
         ["Tecnología", "Liposomal — absorción mejorada"],
         ["Certificaciones", "Vegan, Non-GMO, Clean Label Project"],
         ["Formulación", "Por dietistas y científicos"]
-      ]
+      ],
+      video: "/media/sup-creatina.mp4",
+      poster: "/media/poster-sup-creatina.jpg",
+      videoRatio: "portrait"
+    },
+    /* ---------------------------------------------------------------------
+       Les trois suppléments ajoutés au catalogue.
+       Prix, textes et fiches techniques sont provisoires : ils viennent de
+       la maquette Canva et seront repris depuis Shopify au branchement.
+       Chaque fiche porte sa vidéo produit — c'est elle qui sert de visuel
+       principal, la photo n'étant que l'affiche extraite de la boucle.
+       --------------------------------------------------------------------- */
+    {
+      handle: "womens-multivitamin",
+      name: "Cymbiotika Women's Multivitamin +18",
+      short: "Women's Multivitamin",
+      brand: "Cymbiotika",
+      tagline: "Multivitamínico liposomal para mujeres, en sobres líquidos.",
+      price: 400,
+      badge: "Nuevo",
+      category: "Suplementos",
+      image: "/media/sup-womens.jpg",
+      hero: "/media/sup-womens.jpg",
+      video: "/media/sup-womens.mp4",
+      poster: "/media/sup-womens.jpg",
+      videoRatio: "portrait",
+      highlights: [
+        "Vitaminas y minerales esenciales para mujeres de 18 años en adelante",
+        "Tecnología liposomal para una absorción mejorada",
+        "Sobres líquidos listos para tomar — sin mezclar, sin pastillas",
+        "Vegan, Non-GMO y con trazabilidad total de ingredientes"
+      ],
+      specs: [
+        ["Marca", "Cymbiotika"],
+        ["Formato", "Sobres líquidos individuales"],
+        ["Tecnología", "Liposomal — absorción mejorada"],
+        ["Certificaciones", "Vegan, Non-GMO, Clean Label Project"],
+        ["Formulación", "Por dietistas y científicos"],
+        ["Envío", "Gratis a todo México"]
+      ],
+      story: {
+        eyebrow: "Cymbiotika",
+        title: "Un solo sobre, todos los días.",
+        text: "Sin frascos, sin dosificadores, sin pastillas que cuesta pasar. Un sobre líquido que te llevas donde quieras y tomas en segundos.*"
+      }
+    },
+    {
+      handle: "prenatal-multivitamin",
+      name: "Cymbiotika Prenatal Multivitamin",
+      short: "Prenatal Multivitamin",
+      brand: "Cymbiotika",
+      tagline: "Apoyo prenatal en sobres líquidos, fácil de tomar cada día.",
+      price: 400,
+      category: "Suplementos",
+      image: "/media/sup-prenatal.jpg",
+      hero: "/media/sup-prenatal.jpg",
+      video: "/media/sup-prenatal.mp4",
+      poster: "/media/sup-prenatal.jpg",
+      videoRatio: "portrait",
+      highlights: [
+        "Formulado para el embarazo y la lactancia",
+        "Tecnología liposomal para una absorción mejorada",
+        "Sobres líquidos: sin cápsulas grandes ni sabor a hierro",
+        "Vegan, Non-GMO y con trazabilidad total de ingredientes"
+      ],
+      specs: [
+        ["Marca", "Cymbiotika"],
+        ["Formato", "Sobres líquidos individuales"],
+        ["Tecnología", "Liposomal — absorción mejorada"],
+        ["Certificaciones", "Vegan, Non-GMO, Clean Label Project"],
+        ["Formulación", "Por dietistas y científicos"],
+        ["Envío", "Gratis a todo México"]
+      ],
+      story: {
+        eyebrow: "Cymbiotika",
+        title: "Lo esencial del embarazo, sin el trago amargo.",
+        text: "Una fórmula líquida pensada para tomarse todos los días sin esfuerzo. Consulta siempre a tu profesional de salud antes de empezar cualquier suplemento.*"
+      }
+    },
+    {
+      handle: "synbiotic",
+      name: "Cymbiotika Synbiotic",
+      short: "Synbiotic",
+      brand: "Cymbiotika",
+      tagline: "Probióticos y prebióticos en una sola cápsula.",
+      price: 400,
+      category: "Suplementos",
+      image: "/media/sup-synbiotic.jpg",
+      hero: "/media/sup-synbiotic.jpg",
+      video: "/media/sup-synbiotic.mp4",
+      poster: "/media/sup-synbiotic.jpg",
+      videoRatio: "wide",
+      highlights: [
+        "Probióticos y prebióticos combinados en una sola toma",
+        "Cápsula de liberación dirigida",
+        "Apoya la digestión y el equilibrio intestinal*",
+        "Vegan, Non-GMO y con trazabilidad total de ingredientes"
+      ],
+      specs: [
+        ["Marca", "Cymbiotika"],
+        ["Formato", "Cápsulas"],
+        ["Tecnología", "Liberación dirigida"],
+        ["Certificaciones", "Vegan, Non-GMO, Clean Label Project"],
+        ["Formulación", "Por dietistas y científicos"],
+        ["Envío", "Gratis a todo México"]
+      ],
+      story: {
+        eyebrow: "Cymbiotika",
+        title: "La cápsula que llega hasta donde importa.",
+        text: "Probióticos y prebióticos protegidos por una cápsula que no se abre antes de tiempo. Un gesto al día para el equilibrio intestinal.*"
+      }
     }
   ];
 
   /* -----------------------------------------------------------------------
      Objectifs — le point d'entrée de l'assistant.
      `pick` est le handle recommandé en premier, `also` les compléments.
+     Quatre entrées : la grille les range en 4 × 1 au large et en 2 × 2 en
+     dessous, sans jamais laisser d'orphelin.
      ----------------------------------------------------------------------- */
   var GOALS = [
     {
@@ -189,16 +301,6 @@
       why: "Body Battery™ convierte tu frecuencia cardiaca y tu estrés en una sola cifra: cuándo empujar y cuándo parar."
     },
     {
-      id: "rendimiento",
-      label: "Mejorar mi rendimiento",
-      icon: "spark",
-      image: "/media/goal-rendimiento.jpg",
-      lede: "Entrenar con datos, no con sensaciones.",
-      pick: "venu-4",
-      also: ["creatina"],
-      why: "Predisposición para entrenar, VO2 max y estado del entreno en una pantalla AMOLED que lees de un vistazo."
-    },
-    {
       id: "recuperacion",
       label: "Optimizar mi recuperación",
       icon: "leaf",
@@ -217,16 +319,6 @@
       pick: "cirqa",
       also: ["creatina"],
       why: "Salud 24/7 en 18 gramos de tela: estrés, pulsioximetría¹ y más de 80 actividades detectadas solas."
-    },
-    {
-      id: "longevidad",
-      label: "Pensar a largo plazo",
-      icon: "infinity",
-      image: "/media/goal-longevidad.jpg",
-      lede: "Constancia antes que intensidad.",
-      pick: "venu-3s",
-      also: ["creatina"],
-      why: "Los hábitos que se sostienen años se miden con lo que llevas siempre puesto — y con lo que tomas cada día."
     }
   ];
 
