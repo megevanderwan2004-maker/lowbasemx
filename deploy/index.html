@@ -41,6 +41,33 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
 <a class="skip" href="#contenido">Saltar al contenido</a>
 
+<!-- ===== Bandeau défilant : reprend les garanties et les standards des
+     deux bandeaux retirés, en une seule barre fixe au-dessus de la nav.
+     La seconde liste est un doublon masqué : c'est elle qui rend la
+     boucle continue, la translation de -50% la ramenant pile en place. -->
+<div class="topbar glass-light blurred" role="region" aria-label="Garantías y estándares">
+  <div class="topbar-track">
+    <ul>
+      <li>Sin suscripción, para siempre</li>
+      <li>Pago seguro vía Shopify</li>
+      <li>Marcas seleccionadas</li>
+      <li>Vegan &amp; Non-GMO</li>
+      <li>100% Ingredients Made Traceable</li>
+      <li>Clean Label Project Certified</li>
+      <li>Formulated by Dietitians &amp; Scientists</li>
+    </ul>
+    <ul aria-hidden="true">
+      <li>Sin suscripción, para siempre</li>
+      <li>Pago seguro vía Shopify</li>
+      <li>Marcas seleccionadas</li>
+      <li>Vegan &amp; Non-GMO</li>
+      <li>100% Ingredients Made Traceable</li>
+      <li>Clean Label Project Certified</li>
+      <li>Formulated by Dietitians &amp; Scientists</li>
+    </ul>
+  </div>
+</div>
+
 <!-- ===== Nav flottante : logo centré, verre sombre, présente en permanence ===== -->
 <nav class="nav" aria-label="Principal">
   <div class="nav-pill glass-light blurred">
@@ -77,17 +104,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </div>
   </header>
-
-  <!-- ===== Bandeau de garanties (faits vérifiables, aucun témoignage) ===== -->
-  <div class="ticker">
-    <div class="container ticker-row">
-      <span>Garantía oficial</span>
-      <span>Envío gratis a todo México</span>
-      <span>Sin suscripción, para siempre</span>
-      <span>Pago seguro vía Shopify</span>
-      <span>Marcas seleccionadas</span>
-    </div>
-  </div>
 
   <main id="contenido">
 
@@ -131,24 +147,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <!-- ===== Bandeau doré de claims (maquette Canva) ===== -->
-    <div class="gold-strip" aria-label="Nuestros estándares">
-      <div class="gold-track">
-        <ul>
-          <li>Vegan &amp; Non-GMO</li>
-          <li>100% Ingredients Made Traceable</li>
-          <li>Clean Label Project Certified</li>
-          <li>Formulated by Dietitians &amp; Scientists</li>
-        </ul>
-        <ul aria-hidden="true">
-          <li>Vegan &amp; Non-GMO</li>
-          <li>100% Ingredients Made Traceable</li>
-          <li>Clean Label Project Certified</li>
-          <li>Formulated by Dietitians &amp; Scientists</li>
-        </ul>
-      </div>
-    </div>
-
     <!-- ===== Wearables — bannière vidéo ===== -->
     <section id="wearables" style="padding-bottom:0" aria-labelledby="wearables-t">
       <div class="container">
@@ -191,21 +189,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               <div><b>8.7 mm</b><span>Grosor</span></div>
               <div><b class="price-num">$0</b><span>Suscripción</span></div>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="chapter tinted flip" aria-labelledby="cap2-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media rv">
-            <img loading="lazy" src="/media/cirqa-sensor-negra.jpg" alt="Sensor óptico de frecuencia cardiaca de la CIRQA Smart Band" width="1448" height="1086">
-          </div>
-          <div class="chapter-copy">
-            <span class="eyebrow rv">Salud 24/7</span>
-            <h2 id="cap2-t" class="rv">Mide mientras vives, no cuando te acuerdas.</h2>
-            <p class="rv">Frecuencia cardiaca, estrés, Body Battery™ y pulsioximetría¹ de forma continua. El sensor trabaja de día y de noche, sin que tengas que abrir nada.</p>
           </div>
         </div>
       </div>

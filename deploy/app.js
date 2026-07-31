@@ -445,10 +445,14 @@
      ===================================================================== */
   module("dock-height", function(){
     var shell = $("dock-shell");
-    if (!shell) return;
+    var pill = document.querySelector(".nav-pill");
+    if (!shell && !pill) return;
     var t = null;
     function sync(){
-      document.documentElement.style.setProperty("--dock-h", shell.offsetHeight + "px");
+      if (shell) document.documentElement.style.setProperty("--dock-h", shell.offsetHeight + "px");
+      /* La pilule passe de un à deux rangs selon la largeur : sa hauteur
+         est la seule façon fiable de savoir où commencer la page. */
+      if (pill) document.documentElement.style.setProperty("--nav-h", pill.offsetHeight + "px");
     }
     sync();
     window.addEventListener("resize", function(){
@@ -605,6 +609,70 @@
     if (dockBtn){
       var dockLabel = dockBtn.textContent;
       dockBtn.addEventListener("click", function(){ goToCheckout(dockBtn, dockLabel); }, false);
+    }
+  });
+
+  /* =====================================================================
+     Texte replié sur mobile
+
+     Le repli est purement décoratif : le paragraphe complet reste dans le
+     DOM, seul l'affichage est tronqué. Sans JS il s'affiche entier — on
+     n'ajoute jamais une troncature qu'on ne saurait pas dérouler.
+     ===================================================================== */
+  module("read-more", function(){
+    var mq = window.matchMedia ? window.matchMedia("(max-width: 719px)") : null;
+    if (!mq) return;
+
+    var targets = document.querySelectorAll(
+      ".chapter-copy > p, .section-head p, .band-inner > p, .pdp-lede, .reco-head > p"
+    );
+    if (!targets.length) return;
+
+    var items = [];
+    each(targets, function(p){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "more-btn";
+      btn.textContent = "Ver más";
+      btn.setAttribute("aria-expanded", "false");
+      p.parentNode.insertBefore(btn, p.nextSibling);
+
+      btn.addEventListener("click", function(){
+        var open = p.className.indexOf("open") > -1;
+        p.className = open
+          ? p.className.replace(/\s*open/g, "")
+          : (p.className + " open");
+        btn.textContent = open ? "Ver más" : "Ver menos";
+        btn.setAttribute("aria-expanded", open ? "false" : "true");
+      }, false);
+
+      items.push({ p: p, btn: btn });
+    });
+
+    function sync(){
+      each(items, function(it){
+        if (!mq.matches){
+          it.p.className = it.p.className.replace(/\s*clamped/g, "").replace(/\s*open/g, "");
+          it.btn.className = "more-btn";
+          return;
+        }
+        /* On ne replie que ce qui déborde vraiment : sur un texte court le
+           bouton n'aurait rien à dérouler. La mesure se fait déplié. */
+        it.p.className = it.p.className.replace(/\s*clamped/g, "");
+        var overflows = it.p.scrollHeight > it.p.clientHeight + 4 ||
+          it.p.getBoundingClientRect().height > parseFloat(getComputedStyle(it.p).lineHeight) * 3.4;
+        if (!overflows){ it.btn.className = "more-btn"; return; }
+        if (it.p.className.indexOf("open") === -1) it.p.className += " clamped";
+        else it.p.className += " clamped";
+        it.btn.className = "more-btn on";
+      });
+    }
+
+    sync();
+    if (mq.addEventListener) mq.addEventListener("change", sync);
+    else if (mq.addListener) mq.addListener(sync);
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then){
+      document.fonts.ready.then(sync);
     }
   });
 
