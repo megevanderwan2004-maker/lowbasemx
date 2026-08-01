@@ -86,11 +86,24 @@
       '</div>';
   }
 
+  /* Les suppléments qui ont une boucle la jouent dans le carrousel ; les
+     wearables gardent leur packshot détouré. Le fond de studio de la
+     boucle est dissous par le masque radial du CSS, sans quoi elle
+     redeviendrait un rectangle au milieu des fiches qui flottent. */
+  function flyMedia(p){
+    if (p.category === "Suplementos" && p.video){
+      return '<video autoplay muted loop playsinline webkit-playsinline preload="metadata" ' +
+        'disablepictureinpicture disableremoteplayback poster="' + esc(p.poster || p.packshot || p.image) + '" ' +
+        'width="600" height="600" aria-hidden="true" tabindex="-1" data-autoloop>' +
+          '<source src="' + esc(p.video) + '" type="video/mp4">' +
+        '</video>';
+    }
+    return '<img loading="lazy" src="' + esc(p.packshot || p.image) + '" alt="" width="600" height="600">';
+  }
+
   function flyCard(p){
     return '<a class="fcard" href="' + CATALOG.url(p.handle) + '">' +
-        '<span class="fcard-media">' +
-          '<img loading="lazy" src="' + esc(p.packshot || p.image) + '" alt="" width="600" height="600">' +
-        '</span>' +
+        '<span class="fcard-media">' + flyMedia(p) + '</span>' +
         '<b class="fcard-name">' + esc(p.short) + '</b>' +
         '<span class="fcard-price price-num">' + CATALOG.money(p.price) + ' <small>MXN</small></span>' +
       '</a>';
