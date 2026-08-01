@@ -22,6 +22,9 @@
       category: "Wearables",
       image: CDN + "cirqa-negra.jpg?v=1785272697",
       hero: CDN + "cirqa-hero-entrenamiento.jpg?v=1785272697",
+      /* Détouré : c'est cette vue qui sert au carrousel « Los más buscados »,
+         où les produits flottent sans cadre. */
+      packshot: "/media/cirqa-packshot.png",
       video: "/media/hero-cirqa.mp4",
       poster: "/media/poster-hero-cirqa.jpg",
       shopify: { handle: "garmin-cirqa-smart-band", variants: {
@@ -183,6 +186,7 @@
       image: "/media/sup-womens.jpg",
       hero: "/media/sup-womens.jpg",
       video: "/media/sup-womens.mp4",
+      packshot: "/media/sup-womens-cut.png",
       poster: "/media/sup-womens.jpg",
       videoRatio: "portrait",
       highlights: [
@@ -216,6 +220,7 @@
       image: "/media/sup-prenatal.jpg",
       hero: "/media/sup-prenatal.jpg",
       video: "/media/sup-prenatal.mp4",
+      packshot: "/media/sup-prenatal-cut.png",
       poster: "/media/sup-prenatal.jpg",
       videoRatio: "portrait",
       highlights: [
@@ -249,6 +254,7 @@
       image: "/media/sup-synbiotic.jpg",
       hero: "/media/sup-synbiotic.jpg",
       video: "/media/sup-synbiotic.mp4",
+      packshot: "/media/sup-synbiotic-cut.png",
       poster: "/media/sup-synbiotic.jpg",
       videoRatio: "wide",
       highlights: [
@@ -269,6 +275,71 @@
         eyebrow: "Cymbiotika",
         title: "La cápsula que llega hasta donde importa.",
         text: "Probióticos y prebióticos protegidos por una cápsula que no se abre antes de tiempo. Un gesto al día para el equilibrio intestinal.*"
+      }
+    },
+    /* ---------------------------------------------------------------------
+       Promix Nutrition. Prix convertis depuis les tarifs américains
+       (59 $ et 29 $ US) à un taux arrondi : provisoires, à confirmer.
+       Les packshots viennent du CDN de la marque, copiés en local.
+       --------------------------------------------------------------------- */
+    {
+      handle: "promix-creatina",
+      name: "Promix Micronized Creatine",
+      short: "Micronized Creatine",
+      brand: "Promix",
+      tagline: "Creatina monohidratada micronizada, sin sabor ni aditivos.",
+      price: 1199,
+      category: "Suplementos",
+      image: "/media/promix-creatine.png",
+      hero: "/media/promix-creatine.png",
+      highlights: [
+        "5 g de creatina monohidratada por porción",
+        "Partículas micronizadas, hasta 20 veces más finas, para disolverse mejor",
+        "Sin sabor, sin endulzantes, sin rellenos ni transgénicos",
+        "Probada por laboratorio externo"
+      ],
+      specs: [
+        ["Marca", "Promix Nutrition"],
+        ["Formato", "Bolsa de 900 g — 180 porciones"],
+        ["Creatina", "5 g por porción"],
+        ["Sabor", "Sin sabor"],
+        ["Procesado", "Micronizado"],
+        ["Envío", "Gratis a todo México"]
+      ],
+      story: {
+        eyebrow: "Promix",
+        title: "Creatina y nada más.",
+        text: "Un solo ingrediente, molido lo bastante fino para desaparecer en el agua. Sin sabor que tapar, sin aditivos que explicar.*"
+      }
+    },
+    {
+      handle: "promix-debloat",
+      name: "Promix Debloat Prebiotic + Probiotic",
+      short: "Debloat",
+      brand: "Promix",
+      tagline: "Prebióticos y probióticos en sobres, tres sabores.",
+      price: 599,
+      category: "Suplementos",
+      image: "/media/promix-debloat.png",
+      hero: "/media/promix-debloat.png",
+      highlights: [
+        "Prebióticos y probióticos en un mismo sobre",
+        "Pensado para la digestión y el confort intestinal*",
+        "Paquete variado: Tropical Mango, Florida Orange y White Peach",
+        "Ingredientes naturales, sin aditivos artificiales"
+      ],
+      specs: [
+        ["Marca", "Promix Nutrition"],
+        ["Formato", "12 sobres — paquete variado"],
+        ["Sabores", "Tropical Mango, Florida Orange, White Peach"],
+        ["Fórmula", "Prebióticos + probióticos"],
+        ["Ingredientes", "Naturales, sin aditivos artificiales"],
+        ["Envío", "Gratis a todo México"]
+      ],
+      story: {
+        eyebrow: "Promix",
+        title: "Un sobre, un vaso de agua.",
+        text: "Prebióticos y probióticos que se toman como una bebida, en tres sabores para no cansarte del mismo. Para el confort digestivo de todos los días.*"
       }
     }
   ];

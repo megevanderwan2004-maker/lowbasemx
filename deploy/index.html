@@ -143,7 +143,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <p class="rv">El mercado del bienestar es ruidoso. lowlabs es el filtro: estudiamos la ciencia, probamos el hardware y nos quedamos solo con lo que de verdad te ayuda a sentirte, recuperarte y rendir mejor.</p>
             <div class="chapter-stats rv">
               <div><b class="price-num">120+</b><span>Productos revisados</span></div>
-              <div><b class="price-num">8</b><span>Seleccionados</span></div>
+              <div><b class="price-num">10</b><span>Seleccionados</span></div>
               <div><b class="price-num">0</b><span>Concesiones</span></div>
             </div>
           </div>
@@ -168,6 +168,28 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
              l'utilisateur n'a pas choisi, et le focus s'y déplace au clic. -->
         <div class="reco" id="reco" hidden tabindex="-1" aria-live="polite"></div>
       </div>
+    </section>
+
+    <!-- ===== Los más buscados — carrousel de produits détourés. Montres et
+         suppléments mélangés, sans cadre : packshot, nom court, prix. La
+         liste vient de catalog.js via data-handles. ===== -->
+    <section class="best" id="mas-buscados" aria-labelledby="best-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">04 — Favoritos</span>
+            <h2 id="best-t">Los más buscados</h2>
+          </div>
+          <div class="head-aside">
+            <div class="card-arrows">
+              <button class="btn btn-quiet btn-sm" type="button" data-dir="-1" aria-label="Ver los anteriores">←</button>
+              <button class="btn btn-quiet btn-sm" type="button" data-dir="1" aria-label="Ver los siguientes">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cards fcards rv" id="cards"
+           data-handles="cirqa,creatina,venu-4,promix-debloat,vivoactive-6,promix-creatina,venu-3s"></div>
     </section>
 
     <!-- ===== Wearables — bannière vidéo ===== -->
@@ -268,10 +290,10 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <!-- ===== Les quatre suppléments — mêmes cartes que la boutique,
-         alignées au centre comme sur la maquette. Le contenu vient de
-         catalog.js : aucune fiche n'est écrite en dur ici. ===== -->
-    <section aria-labelledby="sup-cards-t">
+    <!-- ===== Les quatre suppléments — même carrousel que « Los más
+         buscados ». Le contenu vient de catalog.js : aucune fiche n'est
+         écrite en dur ici. ===== -->
+    <section class="best" aria-labelledby="sup-cards-t">
       <div class="container">
         <div class="section-head center rv">
           <div>
@@ -279,10 +301,16 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <h2 id="sup-cards-t">Cuatro fórmulas, un gesto al día</h2>
             <p>Sobres líquidos y cápsulas de absorción mejorada. Sin suscripción, sin letra chica.</p>
           </div>
+          <div class="head-aside">
+            <div class="card-arrows">
+              <button class="btn btn-quiet btn-sm" type="button" data-dir="-1" aria-label="Ver los anteriores">←</button>
+              <button class="btn btn-quiet btn-sm" type="button" data-dir="1" aria-label="Ver los siguientes">→</button>
+            </div>
+          </div>
         </div>
-        <div class="cat-grid centered rv" id="sup-grid"
-             data-handles="creatina,womens-multivitamin,prenatal-multivitamin,synbiotic"></div>
       </div>
+      <div class="cards fcards rv" id="sup-grid"
+           data-handles="creatina,womens-multivitamin,prenatal-multivitamin,synbiotic"></div>
     </section>
 
     <!-- ===== Un chapitre par supplément : même gabarit que les chapitres
@@ -371,6 +399,38 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
+    <section class="chapter flip sand" aria-labelledby="cap11-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="chapter-media contain rv">
+            <img loading="lazy" src="/media/promix-creatine.png" alt="Promix Micronized Creatine" width="1200" height="1500">
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Promix</span>
+            <h2 id="cap11-t" class="rv">Creatina y nada más.</h2>
+            <p class="rv">Un solo ingrediente, molido lo bastante fino para desaparecer en el agua. Sin sabor que tapar, sin aditivos que explicar.*</p>
+            <a class="btn btn-ink rv" href="/productos/promix-creatina">Ver Micronized Creatine — $1,199 MXN</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter tinted" aria-labelledby="cap12-t">
+      <div class="container">
+        <div class="chapter-grid">
+          <div class="chapter-media contain rv">
+            <img loading="lazy" src="/media/promix-debloat.png" alt="Promix Debloat Prebiotic + Probiotic" width="1200" height="1500">
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Promix</span>
+            <h2 id="cap12-t" class="rv">Un sobre, un vaso de agua.</h2>
+            <p class="rv">Prebióticos y probióticos que se toman como una bebida, en tres sabores para no cansarte del mismo. Para el confort digestivo de todos los días.*</p>
+            <a class="btn btn-ink rv" href="/productos/promix-debloat">Ver Debloat — $599 MXN</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== FAQ ===== -->
     <section id="faq" aria-labelledby="faq-t">
       <div class="container">
@@ -448,6 +508,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         <p><a href="/productos/womens-multivitamin">Cymbiotika Women's Multivitamin +18</a></p>
         <p><a href="/productos/prenatal-multivitamin">Cymbiotika Prenatal Multivitamin</a></p>
         <p><a href="/productos/synbiotic">Cymbiotika Synbiotic</a></p>
+        <p><a href="/productos/promix-creatina">Promix Micronized Creatine</a></p>
+        <p><a href="/productos/promix-debloat">Promix Debloat Prebiotic + Probiotic</a></p>
       </div>
       <div>
         <h3 class="foot-title">Ayuda</h3>
@@ -469,7 +531,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   <div class="dock-shell" id="dock-shell">
     <div class="dock-info">
       <b class="price-num">Desde $400 MXN</b>
-      <span>8 productos · Envío gratis a todo México</span>
+      <span>10 productos · Envío gratis a todo México</span>
     </div>
     <a class="btn btn-ink" href="/tienda">Ver la tienda</a>
   </div>

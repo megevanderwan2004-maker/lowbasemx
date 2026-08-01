@@ -623,6 +623,40 @@ section{padding:clamp(56px,8vw,104px) 0}
 .card-arrows{display:none;gap:10px}
 @media(min-width:900px){.card-arrows{display:flex}}
 
+/* Carrousel « Los más buscados » : les produits flottent, sans carte ni
+   fond. L'ombre portée suit le détourage — c'est elle, et pas un cadre,
+   qui les décolle de la page. */
+.fcards{align-items:stretch;gap:clamp(10px,2vw,22px)}
+.fcard{
+  flex:0 0 min(46vw,230px);scroll-snap-align:start;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  text-decoration:none;color:var(--ink);text-align:center;
+  padding:6px 4px 10px;
+}
+.fcard-media{
+  display:block;width:100%;aspect-ratio:1;position:relative;
+}
+.fcard-media img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  mix-blend-mode:multiply;
+  filter:drop-shadow(0 18px 22px rgba(23,25,27,.16));
+  transition:transform .3s ease-out;
+}
+.fcard:hover .fcard-media img{transform:translateY(-6px) scale(1.03)}
+.fcard-name{
+  font-family:var(--font-display);font-weight:600;font-size:.98rem;
+  letter-spacing:-.015em;line-height:1.25;margin-top:8px;
+}
+.fcard-price{font-family:var(--font-display);font-size:1.02rem;font-weight:600;letter-spacing:-.02em}
+.fcard-price small{font-size:.68rem;color:var(--teal-700);letter-spacing:.04em;font-weight:500}
+.best{padding-bottom:clamp(40px,6vw,72px)}
+.best .section-head{margin-bottom:clamp(20px,3vw,32px)}
+@media(min-width:900px){
+  /* Les flèches reviennent à droite du titre centré sans le décaler. */
+  .best .section-head.center{grid-template-columns:1fr;justify-items:center}
+  .best .head-aside{align-items:center}
+}
+
 /* =========================================================================
    Déclaration éditoriale
    ========================================================================= */
@@ -1221,11 +1255,6 @@ footer a{color:var(--ink)}
 /* Les quatre produits restants tiennent sur une rangée sous la fiche
    produit : auto-fill s'arrêterait avant et laisserait un orphelin. */
 @media(min-width:1120px){.cat-grid[data-exclude]{grid-template-columns:repeat(4,1fr)}}
-/* En rayon, un plafond de largeur évite qu'un rayon d'un seul produit
-   étire sa carte sur toute la ligne. */
-@media(min-width:720px){
-  .shop-sec .cat-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),290px))}
-}
 .prod{
   display:flex;flex-direction:column;
   background:var(--surface);border-radius:var(--radius-lg);overflow:hidden;
@@ -1250,15 +1279,6 @@ footer a{color:var(--ink)}
   transition:transform .35s ease-out;
 }
 .prod:hover .prod-media video{transform:scale(1.04)}
-/* Variante éditoriale de la grille (maquette suppléments) : cartes
-   centrées, rangée pleine à toutes les largeurs — 4 × 1 au large,
-   2 × 2 en dessous, comme la grille des objectifs. */
-.cat-grid.centered{grid-template-columns:1fr 1fr}
-.cat-grid.centered .prod-body{text-align:center;align-items:center}
-.cat-grid.centered .prod-tag{max-width:32ch}
-.cat-grid.centered .prod-price{justify-content:center}
-.cat-grid.centered .prod .btn{width:100%}
-@media(min-width:900px){.cat-grid.centered{grid-template-columns:repeat(4,1fr)}}
 .prod-badge{
   position:absolute;top:12px;left:12px;z-index:var(--z-content);
   font-family:var(--font-display);font-size:.68rem;font-weight:600;

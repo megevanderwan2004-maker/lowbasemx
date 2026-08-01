@@ -76,6 +76,26 @@
       '</article>';
   }
 
+  /* La carte du carrousel « Los más buscados » : le produit flotte, sans
+     cadre ni fond. Elle n'affiche que le packshot, un nom court et le
+     prix — d'où le packshot détouré plutôt que la photo de la fiche. */
+  function arrows(label){
+    return '<div class="card-arrows">' +
+        '<button class="btn btn-quiet btn-sm" type="button" data-dir="-1" aria-label="Ver los anteriores de ' + esc(label) + '">←</button>' +
+        '<button class="btn btn-quiet btn-sm" type="button" data-dir="1" aria-label="Ver los siguientes de ' + esc(label) + '">→</button>' +
+      '</div>';
+  }
+
+  function flyCard(p){
+    return '<a class="fcard" href="' + CATALOG.url(p.handle) + '">' +
+        '<span class="fcard-media">' +
+          '<img loading="lazy" src="' + esc(p.packshot || p.image) + '" alt="" width="600" height="600">' +
+        '</span>' +
+        '<b class="fcard-name">' + esc(p.short) + '</b>' +
+        '<span class="fcard-price price-num">' + CATALOG.money(p.price) + ' <small>MXN</small></span>' +
+      '</a>';
+  }
+
   /* =====================================================================
      Catalogue — rendu des cartes produit
 
@@ -86,14 +106,23 @@
      catalogue sous une fiche produit), soit par liste explicite
      (`data-handles`, la sélection éditoriale de la home).
      ===================================================================== */
+  function pickHandles(list){
+    return list.split(",")
+      .map(function(h){ return CATALOG.byHandle(h.replace(/^\s+|\s+$/g, "")); })
+      .filter(Boolean);
+  }
+
   module("catalog", function(){
     each(document.querySelectorAll(".cat-grid[data-exclude],.cat-grid[data-handles]"), function(grid){
       var only = grid.getAttribute("data-exclude");
       var list = grid.getAttribute("data-handles");
       var items = list
-        ? list.split(",").map(function(h){ return CATALOG.byHandle(h.replace(/^\s+|\s+$/g, "")); }).filter(Boolean)
+        ? pickHandles(list)
         : CATALOG.products.filter(function(p){ return !only || p.handle !== only; });
       grid.innerHTML = items.map(productCard).join("");
+    });
+    each(document.querySelectorAll(".fcards[data-handles]"), function(track){
+      track.innerHTML = pickHandles(track.getAttribute("data-handles")).map(flyCard).join("");
     });
   });
 
@@ -118,6 +147,9 @@
       var items = CATALOG.inCategory(cat);
       if (!items.length) return;
       var id = slug(cat);
+      /* La piste sort du conteneur : c'est son encoche interne qui aligne
+         la première carte sur la grille, et le débord qui laisse deviner
+         la suivante. */
       html +=
         '<section class="shop-sec" id="' + id + '" aria-labelledby="' + id + '-t">' +
           '<div class="container">' +
@@ -129,10 +161,11 @@
               '<div class="head-aside">' +
                 '<p class="shop-count">' + items.length +
                   (items.length > 1 ? " productos" : " producto") + '</p>' +
+                arrows(cat) +
               '</div>' +
             '</div>' +
-            '<div class="cat-grid rv">' + items.map(productCard).join("") + '</div>' +
           '</div>' +
+          '<div class="cards fcards rv">' + items.map(flyCard).join("") + '</div>' +
         '</section>';
     });
     host.innerHTML = html;
@@ -699,18 +732,32 @@
   /* =====================================================================
      Carrousel
      ===================================================================== */
+  /* Remonte jusqu'à la section porteuse : chaque paire de flèches ne pilote
+     que la piste de son propre rayon. */
+  function ownerSection(el){
+    while (el && el.tagName !== "SECTION") el = el.parentNode;
+    return el;
+  }
+
   module("carousel", function(){
-    var cards = $("cards");
-    if (!cards) return;
-    each(document.querySelectorAll(".card-arrows button"), function(b){
-      b.addEventListener("click", function(){
-        var step = (cards.querySelector(".pcard") || { offsetWidth: 300 }).offsetWidth + 14;
-        var dx = step * Number(b.getAttribute("data-dir"));
-        /* La forme à objet de scrollBy n'existe pas sur les Safari anciens :
-           on retombe sur une affectation directe de scrollLeft. */
-        try { cards.scrollBy({ left: dx, behavior: reduceMotion ? "auto" : "smooth" }); }
-        catch(e){ cards.scrollLeft += dx; }
-      }, false);
+    each(document.querySelectorAll(".card-arrows"), function(arrows){
+      var cards = (ownerSection(arrows) || document).querySelector(".cards");
+      if (!cards) return;
+      each(arrows.querySelectorAll("button"), function(b){
+        b.addEventListener("click", function(){
+          /* Le pas est l'écart réel entre deux éléments : le mesurer évite de
+             dupliquer la gouttière du CSS, et un pas faux ferait recaler
+             l'ancrage sur la carte d'à côté à chaque appui. */
+          var a = cards.children[0], c = cards.children[1];
+          var step = a && c ? (c.offsetLeft - a.offsetLeft)
+                   : a ? a.offsetWidth + 14 : 300;
+          var dx = step * Number(b.getAttribute("data-dir"));
+          /* La forme à objet de scrollBy n'existe pas sur les Safari anciens :
+             on retombe sur une affectation directe de scrollLeft. */
+          try { cards.scrollBy({ left: dx, behavior: reduceMotion ? "auto" : "smooth" }); }
+          catch(e){ cards.scrollLeft += dx; }
+        }, false);
+      });
     });
   });
 
