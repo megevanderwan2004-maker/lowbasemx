@@ -191,34 +191,23 @@
      est une simple correspondance objectif → handle, résolue dans
      catalog.js. Le bloc reste absent du DOM tant que rien n'est choisi.
      ===================================================================== */
-  var GOAL_ICONS = {
-    moon:     '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
-    bolt:     '<path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z"/>',
-    spark:    '<path d="M12 2v5M12 17v5M2 12h5M17 12h5M5.6 5.6l3.5 3.5M14.9 14.9l3.5 3.5M18.4 5.6l-3.5 3.5M9.1 14.9l-3.5 3.5"/>',
-    leaf:     '<path d="M4 20c0-8 6-14 16-14 0 10-6 15-13 15H4v-1zM8 17c2-4 5-7 9-9"/>',
-    heart:    '<path d="M12 20.5S3.5 15 3.5 9.2A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.5 2.8c0 5.8-8.5 11.3-8.5 11.3z"/>',
-    infinity: '<path d="M7.5 15.5a3.5 3.5 0 1 1 0-7c3 0 6 7 9 7a3.5 3.5 0 1 0 0-7c-3 0-6 7-9 7z"/>'
-  };
-
-  function icon(name){
-    return '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" ' +
-      'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      (GOAL_ICONS[name] || GOAL_ICONS.spark) + '</svg>';
-  }
-
   module("goals", function(){
     var host = $("goals"), out = $("reco");
     if (!host || !out || !CATALOG.goals) return;
 
+    /* Le visuel occupe toute la carte ; la nacelle de verre se pose dessus,
+       titre et affordance à l'intérieur. Le pseudo-bouton « Ver selección »
+       est un span : la carte est déjà un bouton radio, un bouton imbriqué
+       serait invalide. */
     host.innerHTML = CATALOG.goals.map(function(g, i){
       return '<button class="goal" type="button" role="radio" aria-checked="false" ' +
           'tabindex="' + (i === 0 ? "0" : "-1") + '" data-goal="' + esc(g.id) + '">' +
           (g.image
-            ? '<span class="goal-media"><img loading="lazy" src="' + esc(g.image) + '" alt="" width="600" height="600"></span>'
+            ? '<span class="goal-media"><img loading="lazy" src="' + esc(g.image) + '" alt="" width="600" height="900"></span>'
             : "") +
-          '<span class="goal-body">' +
-            '<span class="goal-icon">' + icon(g.icon) + '</span>' +
-            '<span class="goal-txt"><b>' + esc(g.label) + '</b><span>' + esc(g.lede) + '</span></span>' +
+          '<span class="goal-body glass-dark blurred">' +
+            '<span class="goal-txt"><b>' + esc(g.label) + '</b></span>' +
+            '<span class="goal-cta glass-light blurred">Ver selección</span>' +
           '</span>' +
         '</button>';
     }).join("");

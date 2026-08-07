@@ -130,27 +130,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
   <main id="contenido">
 
-    <!-- ===== Manifeste : pourquoi cette sélection existe ===== -->
-    <section class="chapter" aria-labelledby="manifiesto-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media wide rv">
-            <img loading="lazy" src="/media/cirqa-tan-wide.jpg" alt="Garmin CIRQA Smart Band en color arena" width="1600" height="900">
-          </div>
-          <div class="chapter-copy">
-            <span class="eyebrow rv">02 — Bienestar, curado</span>
-            <h2 id="manifiesto-t" class="rv">Buscamos los productos que valen la pena integrar a tu rutina.</h2>
-            <p class="rv">El mercado del bienestar es ruidoso. lowlabs es el filtro: estudiamos la ciencia, probamos el hardware y nos quedamos solo con lo que de verdad te ayuda a sentirte, recuperarte y rendir mejor.</p>
-            <div class="chapter-stats rv">
-              <div><b class="price-num">120+</b><span>Productos revisados</span></div>
-              <div><b class="price-num">10</b><span>Seleccionados</span></div>
-              <div><b class="price-num">0</b><span>Concesiones</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- ===== Assistant : commencer par l'objectif, pas par le produit ===== -->
     <section class="goals-sec" id="objetivo" aria-labelledby="objetivo-t">
       <div class="container">
@@ -218,27 +197,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <!-- ===== Chapitres éditoriaux : une idée, un visuel, un texte court ===== -->
-    <section class="chapter" aria-labelledby="cap1-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media rv">
-            <img loading="lazy" src="/media/wrist-negra.jpg" alt="La CIRQA Smart Band Negra en la muñeca" width="1122" height="1402">
-          </div>
-          <div class="chapter-copy">
-            <span class="eyebrow rv">Sin pantalla</span>
-            <h2 id="cap1-t" class="rv">Cero distracciones. Solo registro.</h2>
-            <p class="rv">Ninguna notificación, ninguna luz de noche. Dieciocho gramos de tela que no te piden nada y lo miden todo.</p>
-            <div class="chapter-stats rv">
-              <div><b>18 g</b><span>Peso</span></div>
-              <div><b>8.7 mm</b><span>Grosor</span></div>
-              <div><b class="price-num">$0</b><span>Suscripción</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="chapter" aria-labelledby="cap3-t">
       <div class="container">
         <div class="chapter-grid">
@@ -290,7 +248,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <!-- ===== Les six suppléments — même carrousel que « Los más
+    <!-- ===== Les cinq suppléments — même carrousel que « Los más
          buscados ». Le contenu vient de catalog.js : aucune fiche n'est
          écrite en dur ici. ===== -->
     <section class="best" aria-labelledby="sup-cards-t">
@@ -298,7 +256,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         <div class="section-head center rv">
           <div>
             <span class="eyebrow">La selección de suplementos</span>
-            <h2 id="sup-cards-t">Seis fórmulas, un gesto al día</h2>
+            <h2 id="sup-cards-t">Cinco fórmulas, un gesto al día</h2>
             <p>Sobres líquidos y cápsulas de absorción mejorada. Sin suscripción, sin letra chica.</p>
           </div>
           <div class="head-aside">
@@ -310,7 +268,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         </div>
       </div>
       <div class="cards fcards rv" id="sup-grid"
-           data-handles="creatina,womens-multivitamin,prenatal-multivitamin,synbiotic,promix-creatina,promix-debloat"></div>
+           data-handles="creatina,womens-multivitamin,synbiotic,promix-creatina,promix-debloat"></div>
     </section>
 
     <!-- ===== Un chapitre par supplément : même gabarit que les chapitres
@@ -321,15 +279,15 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           <div class="chapter-media portrait rv">
             <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
                    disablepictureinpicture disableremoteplayback
-                   poster="/media/poster-sup-creatina.jpg"
-                   width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
-              <source src="/media/sup-creatina.mp4" type="video/mp4">
+                   poster="/media/poster-cymbiotika-shot.jpg"
+                   width="1080" height="1920" aria-hidden="true" tabindex="-1" data-autoloop>
+              <source src="/media/cymbiotika-shot.mp4" type="video/mp4">
             </video>
           </div>
           <div class="chapter-copy">
-            <span class="eyebrow rv">Advanced Creatine</span>
-            <h2 id="cap7-t" class="rv">5 g de creatina. Sin mezclar, sin grumos.</h2>
-            <p class="rv">Veinticuatro sobres líquidos de sabor Tangerine Vanilla. Tecnología liposomal para absorción mejorada, tono muscular y recuperación.*</p>
+            <span class="eyebrow rv">Cymbiotika</span>
+            <h2 id="cap7-t" class="rv" lang="en">Wellness, in one shot.</h2>
+            <p class="rv">5 gramos. Cero complicaciones. Sobres líquidos de absorción mejorada, listos para tomar donde estés.*</p>
             <a class="btn btn-ink rv" href="/productos/creatina">Ver Advanced Creatine — $1,349 MXN</a>
           </div>
         </div>
@@ -357,75 +315,40 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <section class="chapter flip tinted" aria-labelledby="cap9-t">
+    <!-- ===== Bannière Ritual : fond plein, la main déborde du cadre,
+         le texte centré à droite. ===== -->
+    <section class="ritual" aria-labelledby="cap10-t">
+      <div class="container">
+        <div class="ritual-grid">
+          <div class="ritual-media rv">
+            <img loading="lazy" src="/media/ritual-hand.png" alt="Ritual Essential Prenatal en la mano" width="599" height="768">
+          </div>
+          <div class="ritual-copy">
+            <h2 id="cap10-t" class="rv" lang="en">Made for her.</h2>
+            <p class="rv">Tu base diaria, bien hecha.</p>
+            <span class="ritual-mark rv">Ritual</span>
+            <a class="btn btn-quiet rv" href="/productos/synbiotic">Descubre</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter sand" aria-labelledby="cap12-t">
       <div class="container">
         <div class="chapter-grid">
           <div class="chapter-media portrait rv">
             <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
                    disablepictureinpicture disableremoteplayback
-                   poster="/media/sup-prenatal.jpg"
-                   width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
-              <source src="/media/sup-prenatal.mp4" type="video/mp4">
+                   poster="/media/poster-promix-loop.jpg"
+                   width="1080" height="1920" aria-hidden="true" tabindex="-1" data-autoloop>
+              <source src="/media/promix-loop.mp4" type="video/mp4">
             </video>
           </div>
           <div class="chapter-copy">
-            <span class="eyebrow rv">Prenatal Multivitamin</span>
-            <h2 id="cap9-t" class="rv">Lo esencial del embarazo, sin el trago amargo.</h2>
-            <p class="rv">Una fórmula líquida pensada para tomarse todos los días sin esfuerzo. Consulta siempre a tu profesional de salud antes de empezar cualquier suplemento.*</p>
-            <a class="btn btn-ink rv" href="/productos/prenatal-multivitamin">Ver Prenatal Multivitamin — $400 MXN</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="chapter" aria-labelledby="cap10-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media wide rv">
-            <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
-                   disablepictureinpicture disableremoteplayback
-                   poster="/media/sup-synbiotic.jpg"
-                   width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
-              <source src="/media/sup-synbiotic.mp4" type="video/mp4">
-            </video>
-          </div>
-          <div class="chapter-copy">
-            <span class="eyebrow rv">Synbiotic</span>
-            <h2 id="cap10-t" class="rv">La cápsula que llega hasta donde importa.</h2>
-            <p class="rv">Probióticos y prebióticos protegidos por una cápsula que no se abre antes de tiempo. Un gesto al día para el equilibrio intestinal.*</p>
-            <a class="btn btn-ink rv" href="/productos/synbiotic">Ver Synbiotic — $400 MXN</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="chapter flip sand" aria-labelledby="cap11-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media contain rv">
-            <img loading="lazy" src="/media/promix-creatine.png" alt="Promix Micronized Creatine" width="1200" height="1500">
-          </div>
-          <div class="chapter-copy">
             <span class="eyebrow rv">Promix</span>
-            <h2 id="cap11-t" class="rv">Creatina y nada más.</h2>
-            <p class="rv">Un solo ingrediente, molido lo bastante fino para desaparecer en el agua. Sin sabor que tapar, sin aditivos que explicar.*</p>
-            <a class="btn btn-ink rv" href="/productos/promix-creatina">Ver Micronized Creatine — $1,199 MXN</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="chapter tinted" aria-labelledby="cap12-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media contain rv">
-            <img loading="lazy" src="/media/promix-debloat.png" alt="Promix Debloat Prebiotic + Probiotic" width="1200" height="1500">
-          </div>
-          <div class="chapter-copy">
-            <span class="eyebrow rv">Promix</span>
-            <h2 id="cap12-t" class="rv">Un sobre, un vaso de agua.</h2>
-            <p class="rv">Prebióticos y probióticos que se toman como una bebida, en tres sabores para no cansarte del mismo. Para el confort digestivo de todos los días.*</p>
-            <a class="btn btn-ink rv" href="/productos/promix-debloat">Ver Debloat — $599 MXN</a>
+            <h2 id="cap12-t" class="rv" lang="en">Clean nutrition. Real performance.</h2>
+            <p class="rv">Nutrición limpia diseñada para ayudarte a rendir mejor. Sin aditivos artificiales, sin transgénicos, probada por laboratorio externo.*</p>
+            <a class="btn btn-ink rv" href="/tienda#suplementos">Descubre Promix</a>
           </div>
         </div>
       </div>
@@ -506,7 +429,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         <p><a href="/productos/vivoactive-6">Garmin Vívoactive® 6</a></p>
         <p><a href="/productos/creatina">Cymbiotika Advanced Creatine</a></p>
         <p><a href="/productos/womens-multivitamin">Cymbiotika Women's Multivitamin +18</a></p>
-        <p><a href="/productos/prenatal-multivitamin">Cymbiotika Prenatal Multivitamin</a></p>
         <p><a href="/productos/synbiotic">Cymbiotika Synbiotic</a></p>
         <p><a href="/productos/promix-creatina">Promix Micronized Creatine</a></p>
         <p><a href="/productos/promix-debloat">Promix Debloat Prebiotic + Probiotic</a></p>
@@ -531,7 +453,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   <div class="dock-shell" id="dock-shell">
     <div class="dock-info">
       <b class="price-num">Desde $400 MXN</b>
-      <span>10 productos · Envío gratis a todo México</span>
+      <span>9 productos · Envío gratis a todo México</span>
     </div>
     <a class="btn btn-ink" href="/tienda">Ver la tienda</a>
   </div>

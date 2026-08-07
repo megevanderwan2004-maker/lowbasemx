@@ -9,23 +9,23 @@
 
 **Lowlabs** is a Mexican reseller working directly with Garmin at reseller pricing, plus a curated supplement line. Brand positioning is "curated wellness and technology" — premium wellness editorial, not sporty gadget. All customer-facing content is in Spanish (es-MX), prices in MXN.
 
-The site started as a **single-product landing page** for the Garmin CIRQA Smart Band (launched 2026-07-21) and became, on 2026-07-30, a **five-product storefront**, then on 2026-07-31 a **ten-product storefront** (three Cymbiotika supplements, then two Promix). The homepage no longer sells one product — it opens on a goal-based assistant and routes to a dedicated shop page and per-product pages.
+The site started as a **single-product landing page** for the Garmin CIRQA Smart Band (launched 2026-07-21) and became, on 2026-07-30, a **five-product storefront**, then on 2026-07-31 a **nine-product storefront** (three Cymbiotika supplements, then two Promix; Prenatal Multivitamin was later dropped as a duplicate of Women's Multivitamin). The homepage no longer sells one product — it opens on a goal-based assistant and routes to a dedicated shop page and per-product pages.
 
 The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor in Mexico for 18 years. Lowlabs differentiates on price, a much shorter catalogue, and brand aesthetics.
 
 ## 2. Current state
 
-`deploy/` is **canonical and the only actively maintained variant.** It is a static site of 12 HTML pages plus a shared CSS/JS/catalogue triplet. No build step at request time; product pages are generated ahead of time by a Node script (section 4).
+`deploy/` is **canonical and the only actively maintained variant.** It is a static site of 11 HTML pages plus a shared CSS/JS/catalogue triplet. No build step at request time; product pages are generated ahead of time by a Node script (section 4).
 
 **What works today**
-- 12 pages: home, `/tienda`, and 10 product pages, all internally linked and verified.
+- 11 pages: home, `/tienda`, and 9 product pages, all internally linked and verified.
 - Goal-based assistant on the homepage (4 goals → recommended product + complements → link to the product page).
 - Shopify checkout for the CIRQA only — colour/size selection drives a pre-selected variant redirect.
 - Liquid-glass design system: white translucent surfaces, ink text, a masked gradient rim shared by buttons, both bars, and the footer.
 
 **What is NOT connected**
 - **Vercel: nothing is deployed.** `vercel whoami` returns no credentials on this machine and the connected Vercel account has zero projects. `vercel.json` is correct and ready; someone has to run `vercel login` (browser flow) then `vercel --prod`, or import the GitHub repo from the Vercel dashboard.
-- **Shopify: only the CIRQA is wired.** The other nine products have no `shopify` block in `catalog.js`, so their buy button opens a `mailto:` order instead. See section 7.
+- **Shopify: only the CIRQA is wired.** The other eight products have no `shopify` block in `catalog.js`, so their buy button opens a `mailto:` order instead. See section 7.
 - **Prices are provisional for every product except the CIRQA** — chosen below MSRP, not confirmed by the owner. The three supplements are at $400 MXN, the placeholder price from the Canva mock-up; their copy, highlights and spec tables are placeholders too.
 - **No real packshots for the three supplements** — card and PDP stills are frames extracted from the product loops.
 - **Custom domain** — not configured.
@@ -68,7 +68,6 @@ lowlabs-cirqa-context/
 │   │   ├── vivoactive-6.html
 │   │   ├── creatina.html
 │   │   ├── womens-multivitamin.html
-│   │   ├── prenatal-multivitamin.html
 │   │   ├── synbiotic.html
 │   │   ├── promix-creatina.html
 │   │   └── promix-debloat.html
@@ -89,13 +88,13 @@ lowlabs-cirqa-context/
 ## 4. Technology stack and the generation step
 
 - **No framework, no npm, no `package.json`.** Vanilla HTML/CSS/ES5-compatible JS.
-- **One build step, run manually**: `node build/gen-products.js` reads `deploy/catalog.js` in a `vm` sandbox (exposing a fake `window`) and writes the ten product pages. This exists because `vercel.json` declares `buildCommand: null` — the generated files must be committed.
+- **One build step, run manually**: `node build/gen-products.js` reads `deploy/catalog.js` in a `vm` sandbox (exposing a fake `window`) and writes the nine product pages. This exists because `vercel.json` declares `buildCommand: null` — the generated files must be committed.
 
 ```bash
 node build/gen-products.js
 ```
 
-**Run it after any change to `catalog.js`, or to the nav/footer/band templates inside `gen-products.js`.** Forgetting leaves the ten product pages stale, and nothing warns you.
+**Run it after any change to `catalog.js`, or to the nav/footer/band templates inside `gen-products.js`.** Forgetting leaves the nine product pages stale, and nothing warns you.
 
 - **Google Fonts**: Outfit (display) + DM Sans (body) — web-safe stand-ins for the brand fonts Codec Pro and Canva Sans.
 - **Images**: mixed. CIRQA photography is served from the Shopify CDN; everything added since 2026-07-30 (watches, supplement, goal visuals, hero, videos) lives in `deploy/media/` and is committed.
@@ -106,16 +105,16 @@ node build/gen-products.js
 |-------|------|-------|
 | `/` | `deploy/index.html` | Homepage. Carries `class="has-hero"` on `<body>` — this drives the top spacing (section 6). |
 | `/tienda` | `deploy/tienda.html` | Shop. `<div id="shop-sections">` is filled by the `shop` module, one carousel aisle per category (floating cards, same template as "Los más buscados"). |
-| `/productos/{handle}` | generated | 10 pages. `<body data-product="{handle}">` is how `app.js` knows which catalogue entry to bind. |
+| `/productos/{handle}` | generated | 9 pages. `<body data-product="{handle}">` is how `app.js` knows which catalogue entry to bind. |
 
 `cleanUrls: true` in `vercel.json` is what makes `/tienda` and `/productos/cirqa` resolve without `.html`. `build/serve.js` reproduces that locally.
 
 ### Homepage section order
-top bar (scrolling) → floating nav → full-bleed hero → manifesto chapter (`120+ / 10 / 0` stats) → **goal assistant** (`#objetivo`) → **Los más buscados** carousel (`#mas-buscados`, detoured packshots, watches and supplements mixed) → Wearables video band (`#wearables`) → CIRQA chapters (no-screen / Garmin Connect with the vertical loop) → Suplementos video band (`#suplementos`) → supplements carousel (`#sup-grid`, six floating cards — the Cymbiotika loops, then the two Promix packshots) → one chapter per supplement (creatine / women's / prenatal / synbiotic with their product loops, then the two Promix packshots) → FAQ (`#faq`) → closing banner → footer → buy dock.
+top bar (scrolling) → floating nav → full-bleed hero → **goal assistant** (`#objetivo`, three full-bleed photo cards with a liquid-glass footer) → **Los más buscados** carousel (`#mas-buscados`, detoured packshots, watches and supplements mixed) → Wearables video band (`#wearables`) → the single CIRQA chapter (Garmin Connect, vertical loop) → Suplementos video band (`#suplementos`) → supplements carousel (`#sup-grid`, five floating cards — the Cymbiotika loops, then the two Promix packshots) → one chapter per supplement — "Wellness, in one shot." (Cymbiotika bubbles loop), women's, the full-bleed blue **Ritual banner** ("Made for her."), then the "Clean nutrition. Real performance." Promix brand section on the stick loop → FAQ (`#faq`) → closing banner → footer → buy dock.
 
 Deliberately **removed** and not to be reinstated without asking: the comparison table, the "Menos ruido / Mejor bienestar" statement, the "Se pone una vez" band, the "Salud 24/7" chapter, and the Venu 3S, Venu 4 and Vívoactive 6 chapters (the three watches appear only in `/tienda`, the footer and their own pages).
 
-The Tienda header is a two-column block: image left (`.shop-hero`, height capped so the first aisle enters the first screen), text right.
+The Tienda has no header block any more: the page opens straight on the first aisle, whose extra `padding-top` clears the floating nav.
 
 ## 6. Design system
 
@@ -200,14 +199,13 @@ Full-bleed, `100svh − topbar − gutter`, `object-fit: cover`. The wordmark an
 | `vivoactive-6` | Garmin Vívoactive® 6 | 5,999 | 6,299 | ❌ |
 | `creatina` | Cymbiotika Liposomal Advanced Creatine | 1,349 | 1,499 | ❌ |
 | `womens-multivitamin` | Cymbiotika Women's Multivitamin +18 | 400 | — | ❌ |
-| `prenatal-multivitamin` | Cymbiotika Prenatal Multivitamin | 400 | — | ❌ |
 | `synbiotic` | Cymbiotika Synbiotic | 400 | — | ❌ |
 | `promix-creatina` | Promix Micronized Creatine | 1,199 | — | ❌ |
 | `promix-debloat` | Promix Debloat Prebiotic + Probiotic | 599 | — | ❌ |
 
 The "compare at" values are the real MSRPs (Garmin MX / Cymbiotika USD converted). The lowlabs prices are placeholders picked below MSRP — **confirm before launch.** The three $400 supplements come straight from the Canva mock-up: price, tagline, highlights and spec table are all placeholders, and they drive the "Desde $400 MXN" dock on the home and the shop.
 
-A product that declares `video` (+ `poster`, and `videoRatio: "portrait" | "wide"`) uses that loop as its card visual, its PDP stage and its editorial chapter, in place of the packshot. The four Cymbiotika entries do. An optional `packshot` is the detoured view used everywhere products float without a frame (the two home carousels and the shop aisles). `cirqa` points at its cut-out PNG; the three Cymbiotika supplements point at `sup-*-cut.png`, generated from their video stills by a flood-fill background removal (Pillow) — the source frames are kept as posters.
+A product that declares `video` (+ `poster`, and `videoRatio: "portrait" | "wide"`) uses that loop as its card visual, its PDP stage and its editorial chapter, in place of the packshot. The four Cymbiotika entries do. An optional `packshot` is the detoured view used everywhere products float without a frame (the two home carousels and the shop aisles). `cirqa` points at its cut-out PNG; the Cymbiotika supplements point at `sup-*-cut.png`, generated from their video stills by a flood-fill background removal (Pillow) — the source frames are kept as posters.
 
 The two Promix prices are converted from the US store ($59 and $29) at a rounded rate — provisional like the rest. Their packshots were copied from `promixnutrition.com` into `deploy/media/`.
 
@@ -232,7 +230,7 @@ The two Promix prices are converted from the US store ($59 and $29) at a rounded
 - **With one** → redirect to `{STORE}/products/{handle}?variant={ID}&locale=es&country=MX`, colour and size pre-selected.
 - **Without one** → `mailto:lowlabsmx@gmail.com` with the product name as subject. Deliberate: it must never send a customer to a Shopify URL that does not exist.
 
-### To wire the remaining nine products
+### To wire the remaining eight products
 1. Create the product in Shopify admin, note the variant IDs.
 2. Add to the entry in `deploy/catalog.js`:
    ```js
@@ -245,16 +243,15 @@ No other file needs touching — the button label, the note under it, and the JS
 
 ## 8. The goal assistant
 
-Four goals in `catalog.js`, each with `id`, `label`, `icon`, `image`, `lede`, `pick` (recommended handle), `also` (complements), and `why` (the sentence shown as justification).
+Three goals in `catalog.js`, each with `id`, `label`, `icon`, `image`, `lede`, `pick` (recommended handle), `also` (complements), and `why` (the sentence shown as justification).
 
 | Goal | Recommends | Complement |
 |------|-----------|-----------|
 | `dormir` — Dormir mejor | cirqa | creatina |
-| `energia` — Tener más energía | cirqa | creatina |
-| `recuperacion` — Optimizar mi recuperación | creatina | cirqa |
+| `rendimiento` — Performance | venu-4 | promix-creatina |
 | `salud` — Cuidar mi salud diaria | cirqa | creatina |
 
-Cut on 2026-07-31: `rendimiento` (recommended the Venu 4) and `longevidad` (the Venu 3S). Four entries is deliberate — the grid lays them out 4 × 1 above 900px and 2 × 2 below, never leaving an orphan.
+Three entries, as in the Canva reference: the grid lays them out 3 × 1 above 760px and 2 columns below.
 
 Nothing is stored or sent — it is a pure client-side lookup. The result block stays out of the DOM until a goal is chosen, then receives focus on click (but not on arrow-key navigation, so keyboard users can keep browsing the group).
 

@@ -25,7 +25,7 @@
   --sand:#dec8a7;
   --surface:#ffffff;
   --surface-teal:#f3f4f5;
-  --surface-sand:#faf6f0;
+  --surface-sand:#faf1e8;   /* la crème du fond de la boucle Promix */
   --border:#e2e4e6;
   --border-strong:#767c80;
   --cta:#17191b;
@@ -1092,69 +1092,66 @@ footer a{color:var(--ink)}
 .goals-sec{
   position:relative;overflow:hidden;
   background:
-    linear-gradient(168deg,#ffffff 0%,#f5f6f6 52%,#ebecec 100%);
+    linear-gradient(168deg,#ffffff 0%,var(--surface-sand) 52%,#f2e8da 100%);
   padding:clamp(56px,8vw,104px) 0;
 }
-/* Les quatre objectifs forment toujours un rectangle plein : 4 × 1 à
-   partir de 900px, 2 × 2 en dessous. auto-fit laisserait un orphelin. */
+/* Trois objectifs sur une rangée à partir de 760px, deux colonnes en
+   dessous. auto-fit laisserait un orphelin. */
 .goals{
   display:grid;gap:clamp(12px,1.6vw,18px);
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(3,1fr);
   max-width:1080px;margin:0 auto;
 }
-@media(max-width:899px){.goals{grid-template-columns:1fr 1fr}}
+@media(max-width:759px){.goals{grid-template-columns:1fr 1fr}}
+/* Carte objectif : le visuel occupe toute la carte, la nacelle de verre
+   se pose dessus. Rien d'autre ne partage la place — c'est la photo qui
+   porte le choix. */
 .goal{
-  display:flex;flex-direction:column;text-align:left;overflow:hidden;
-  padding:0;border:none;cursor:pointer;
+  position:relative;isolation:isolate;display:block;overflow:hidden;
+  aspect-ratio:3/4.05;padding:0;border:none;cursor:pointer;text-align:center;
   border-radius:var(--radius-lg);font-family:var(--font-body);
-  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
-  box-shadow:var(--glass-edge),var(--glass-hairline),var(--glass-drop);
-  color:var(--ink);
-  transition:transform .18s ease-out,background .2s ease-out,box-shadow .22s ease-out;
-}
-.goal:hover{transform:translateY(-3px);background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
-.goal.active{
-  background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b));
-  box-shadow:var(--glass-edge),var(--glass-drop),inset 0 0 0 2px var(--ink);
-}
-.goal-media{
-  position:relative;display:block;aspect-ratio:16/10;overflow:hidden;
   background:var(--surface-teal);
+  box-shadow:var(--glass-hairline),var(--shadow-lift);
+  transition:transform .18s ease-out,box-shadow .22s ease-out;
 }
-/* Mobile : les quatre objectifs tiennent dans un rectangle 2 × 2. Les
-   visuels passent au carré pour que les vignettes restent lisibles. */
-@media(max-width:719px){
-  .goals{gap:10px}
-  .goal{border-radius:var(--radius-md)}
-  .goal-media{aspect-ratio:1}
-  .goal-body{flex-direction:column;align-items:flex-start;gap:8px;padding:11px 12px 13px}
-  .goal-icon{width:32px;height:32px}
-  .goal-icon svg{width:17px;height:17px}
-  .goal-txt b{font-size:.9rem;line-height:1.2}
-  /* Deux lignes maximum : sinon la hauteur des six cartes est dictée par
-     la description la plus longue et le rectangle se déforme. */
-  .goal-txt span{
-    font-size:.74rem;line-height:1.35;
-    display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;
-    -webkit-line-clamp:2;line-clamp:2;
-  }
-}
+.goal:hover{transform:translateY(-3px)}
+.goal.active{box-shadow:var(--shadow-lift),inset 0 0 0 2px var(--ink)}
+.goal-media{position:absolute;inset:0;display:block;overflow:hidden;z-index:1}
 .goal-media img{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   transition:transform .35s ease-out;
 }
 .goal:hover .goal-media img{transform:scale(1.05)}
-.goal-body{display:flex;align-items:center;gap:13px;padding:15px 17px 17px}
-.goal-icon{
-  width:38px;height:38px;flex:none;border-radius:50%;
-  display:grid;place-items:center;color:var(--ink-soft);
-  background:var(--surface);box-shadow:inset 0 0 0 1px rgba(30,32,34,.12);
-  transition:background .2s ease-out,color .2s ease-out;
+/* Un voile sous la nacelle : sans lui, une photo claire laisserait le
+   verre sans contraste et le titre deviendrait illisible. */
+.goal::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(12,13,14,0) 46%,rgba(12,13,14,.42) 100%);
 }
-.goal.active .goal-icon{background:var(--cta);color:#fff}
-.goal-txt{display:grid;gap:2px;min-width:0}
-.goal-txt b{font-family:var(--font-display);font-weight:600;font-size:1rem;letter-spacing:-.015em;line-height:1.25}
-.goal-txt span{font-size:.8rem;color:var(--teal-700);line-height:1.4}
+.goal-body{
+  position:absolute;left:0;right:0;bottom:0;z-index:var(--z-content);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:clamp(12px,1.6vw,18px);
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+}
+.goal-txt{display:block;min-width:0}
+.goal-txt b{
+  font-family:var(--font-display);font-weight:600;color:#fff;
+  font-size:clamp(.95rem,1.5vw,1.12rem);letter-spacing:-.015em;line-height:1.25;
+}
+.goal-cta{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:9px 18px;border-radius:var(--radius-pill);
+  font-family:var(--font-display);font-weight:600;font-size:.82rem;
+  letter-spacing:-.01em;line-height:1.2;color:var(--ink);
+}
+.goal.active .goal-cta{background:var(--cta);color:#fff;box-shadow:none}
+@media(max-width:719px){
+  .goals{gap:10px}
+  .goal{border-radius:var(--radius-md);aspect-ratio:3/3.9}
+  .goal-body{gap:8px;border-radius:0 0 var(--radius-md) var(--radius-md)}
+  .goal-cta{padding:8px 14px;font-size:.76rem}
+}
 
 /* Recommandation — n'existe pas tant que rien n'est choisi. */
 .reco{
@@ -1340,6 +1337,51 @@ footer a{color:var(--ink)}
 .band.tall .band-inner{min-height:clamp(400px,66vh,660px)}
 
 /* =========================================================================
+   Bannière Ritual — fond plein, la main déborde du cadre, texte centré.
+   ========================================================================= */
+.ritual{background:#8fc0d8;padding:0;overflow:hidden}
+.ritual-grid{
+  display:grid;gap:clamp(18px,3vw,40px);align-items:end;
+  min-height:clamp(360px,52vh,560px);
+}
+@media(min-width:900px){.ritual-grid{grid-template-columns:1fr 1fr}}
+.ritual-media{align-self:end;display:flex;justify-content:center}
+/* La main touche le bas de la bannière comme sur la maquette. La hauteur
+   est bornée par la largeur disponible autant que par le viewport : sur
+   tablette et mobile, une hauteur en vh seule la ferait déborder. */
+/* Largeur définie plutôt qu'intrinsèque : dans un conteneur flex, une
+   image en chargement paresseux dont les deux dimensions sont `auto`
+   s'effondre à zéro tant qu'elle n'est pas décodée. Avec une largeur et
+   un rapport, la boîte est réservée dès la première peinture. */
+.ritual-media img{
+  display:block;width:min(100%,340px);height:auto;aspect-ratio:599/768;
+  object-fit:contain;object-position:bottom;
+  margin-bottom:-1px;
+}
+/* Le texte est centré dans sa colonne, pas collé au bas de la bannière :
+   sans align-self, `align-items:end` de la grille le pousserait vers le
+   coin bas droit. */
+.ritual-copy{
+  display:grid;gap:10px;justify-items:center;text-align:center;
+  align-self:center;align-content:center;
+  padding:clamp(28px,4vw,56px) clamp(12px,2vw,24px);
+}
+.ritual-copy h2{color:var(--ink);max-width:14ch;margin-inline:auto}
+.ritual-copy p{color:var(--ink);font-size:1.04rem;max-width:30ch;margin-inline:auto}
+.ritual-mark{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(1.5rem,3vw,2.1rem);letter-spacing:-.03em;line-height:1.1;
+  color:#12356b;margin-top:6px;
+}
+.ritual-copy .btn{margin-top:10px}
+@media(max-width:899px){
+  .ritual-grid{align-items:end;min-height:0}
+  .ritual-copy{order:2;padding-top:clamp(20px,4vw,32px);padding-bottom:clamp(24px,5vw,40px)}
+  .ritual-media{order:1;padding-top:clamp(24px,6vw,40px)}
+  .ritual-media img{width:min(70%,250px)}
+}
+
+/* =========================================================================
    Chapitre éditorial : média + texte court, alternés.
    Remplace l'ancien carrousel de cartes — une seule idée par écran.
    ========================================================================= */
@@ -1364,16 +1406,7 @@ footer a{color:var(--ink)}
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
 }
 .chapter-media.contain>img{object-fit:contain;padding:clamp(18px,3vw,44px);mix-blend-mode:multiply}
-/* En-tête de boutique : visuel à gauche, texte à droite. La hauteur du
-   visuel est plafonnée pour que le premier rayon entre dans l'écran dès
-   l'ouverture — c'est lui, pas l'image, qui doit appeler le scroll. */
-.shop-intro{display:grid;gap:clamp(18px,3vw,40px);align-items:center}
-@media(min-width:900px){
-  .shop-intro{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-}
-.shop-hero{aspect-ratio:16/10;max-height:min(40vh,340px)}
-.shop-intro-copy h2{max-width:18ch}
-.shop-intro-copy .shop-jump{margin-top:22px}
+
 .chapter-copy .eyebrow{display:block;margin-bottom:12px}
 .chapter-copy h2{max-width:16ch;margin-bottom:14px}
 .chapter-copy p{color:var(--ink-soft);font-size:1.04rem;max-width:44ch;line-height:1.65}
@@ -1391,8 +1424,21 @@ footer a{color:var(--ink)}
   font-size:.72rem;color:var(--teal-700);text-transform:uppercase;
   letter-spacing:.1em;line-height:1.4;
 }
-.chapter.tinted{background:var(--surface-teal)}
+.chapter.tinted{background:var(--surface-sand)}
 .chapter.sand{background:var(--surface-sand)}
+
+/* Mobile : les médias sont plafonnés. En 4/5 ou en 9/16 pleine largeur,
+   un seul visuel occupait tout l'écran et le texte passait sous la ligne
+   de flottaison à chaque chapitre. */
+@media(max-width:719px){
+  .chapter-media{aspect-ratio:4/3.4}
+  .chapter-media.wide{aspect-ratio:16/10}
+  .chapter-media.portrait{aspect-ratio:3/4;max-width:250px}
+  .chapter-media.contain>img{padding:clamp(10px,4vw,20px)}
+  .fcard{flex:0 0 min(42vw,190px)}
+  .goal{aspect-ratio:3/3.6}
+  .goal-txt b{font-size:.88rem}
+}
 
 /* =========================================================================
    Texte repliable — sur mobile, trois lignes puis « Ver más »
@@ -1428,10 +1474,12 @@ footer a{color:var(--ink)}
    carte commence déjà sous la pilule, la doubler creuserait un vide. */
 .pdp{padding-top:clamp(96px,12vw,140px)}
 @media(max-width:1023px){.pdp{padding-top:clamp(28px,5vw,44px)}}
-/* L'en-tête de boutique respire moins qu'une fiche produit : la place
-   gagnée sert à faire entrer le début du premier rayon. */
-.pdp.shop-head{padding-top:clamp(72px,8vw,96px);padding-bottom:clamp(26px,3.5vw,40px)}
-@media(max-width:1023px){.pdp.shop-head{padding-top:clamp(24px,4vw,36px)}}
+/* La boutique n'a plus d'en-tête : c'est le premier rayon qui doit
+   dégager la nav flottante. */
+#shop-sections .shop-sec:first-child{padding-top:clamp(40px,5vw,72px)}
+@media(min-width:1024px){
+  #shop-sections .shop-sec:first-child{padding-top:clamp(96px,10vw,128px)}
+}
 .pdp-grid{display:grid;gap:clamp(22px,3vw,44px);align-items:start}
 @media(min-width:980px){.pdp-grid{grid-template-columns:1.05fr .95fr}}
 .pdp-media{

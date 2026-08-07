@@ -168,7 +168,7 @@
       videoRatio: "portrait"
     },
     /* ---------------------------------------------------------------------
-       Les trois suppléments ajoutés au catalogue.
+       Les suppléments Cymbiotika ajoutés au catalogue.
        Prix, textes et fiches techniques sont provisoires : ils viennent de
        la maquette Canva et seront repris depuis Shopify au branchement.
        Chaque fiche porte sa vidéo produit — c'est elle qui sert de visuel
@@ -210,40 +210,6 @@
       }
     },
     {
-      handle: "prenatal-multivitamin",
-      name: "Cymbiotika Prenatal Multivitamin",
-      short: "Prenatal Multivitamin",
-      brand: "Cymbiotika",
-      tagline: "Apoyo prenatal en sobres líquidos, fácil de tomar cada día.",
-      price: 400,
-      category: "Suplementos",
-      image: "/media/sup-prenatal.jpg",
-      hero: "/media/sup-prenatal.jpg",
-      video: "/media/sup-prenatal.mp4",
-      packshot: "/media/sup-prenatal-cut.png",
-      poster: "/media/sup-prenatal.jpg",
-      videoRatio: "portrait",
-      highlights: [
-        "Formulado para el embarazo y la lactancia",
-        "Tecnología liposomal para una absorción mejorada",
-        "Sobres líquidos: sin cápsulas grandes ni sabor a hierro",
-        "Vegan, Non-GMO y con trazabilidad total de ingredientes"
-      ],
-      specs: [
-        ["Marca", "Cymbiotika"],
-        ["Formato", "Sobres líquidos individuales"],
-        ["Tecnología", "Liposomal — absorción mejorada"],
-        ["Certificaciones", "Vegan, Non-GMO, Clean Label Project"],
-        ["Formulación", "Por dietistas y científicos"],
-        ["Envío", "Gratis a todo México"]
-      ],
-      story: {
-        eyebrow: "Cymbiotika",
-        title: "Lo esencial del embarazo, sin el trago amargo.",
-        text: "Una fórmula líquida pensada para tomarse todos los días sin esfuerzo. Consulta siempre a tu profesional de salud antes de empezar cualquier suplemento.*"
-      }
-    },
-    {
       handle: "synbiotic",
       name: "Cymbiotika Synbiotic",
       short: "Synbiotic",
@@ -251,12 +217,9 @@
       tagline: "Probióticos y prebióticos en una sola cápsula.",
       price: 400,
       category: "Suplementos",
-      image: "/media/sup-synbiotic.jpg",
-      hero: "/media/sup-synbiotic.jpg",
-      video: "/media/sup-synbiotic.mp4",
-      packshot: "/media/sup-synbiotic-cut.png",
-      poster: "/media/sup-synbiotic.jpg",
-      videoRatio: "wide",
+      image: "/media/ritual-essential.png",
+      hero: "/media/ritual-essential.png",
+      packshot: "/media/ritual-essential.png",
       highlights: [
         "Probióticos y prebióticos combinados en una sola toma",
         "Cápsula de liberación dirigida",
@@ -322,6 +285,10 @@
       category: "Suplementos",
       image: "/media/promix-debloat.png",
       hero: "/media/promix-debloat.png",
+      video: "/media/promix-loop.mp4",
+      poster: "/media/poster-promix-loop.jpg",
+      packshot: "/media/promix-debloat.png",
+      videoRatio: "portrait",
       highlights: [
         "Prebióticos y probióticos en un mismo sobre",
         "Pensado para la digestión y el confort intestinal*",
@@ -347,8 +314,8 @@
   /* -----------------------------------------------------------------------
      Objectifs — le point d'entrée de l'assistant.
      `pick` est le handle recommandé en premier, `also` les compléments.
-     Quatre entrées : la grille les range en 4 × 1 au large et en 2 × 2 en
-     dessous, sans jamais laisser d'orphelin.
+     Trois entrées, comme la maquette : la grille les range en 3 × 1 au
+     large et en 2 colonnes en dessous.
      ----------------------------------------------------------------------- */
   var GOALS = [
     {
@@ -362,24 +329,14 @@
       why: "La CIRQA mide el sueño sin una pantalla que te despierte: puntuación, fases, VFC y temperatura de la piel, toda la noche."
     },
     {
-      id: "energia",
-      label: "Tener más energía",
-      icon: "bolt",
-      image: "/media/goal-energia.jpg",
-      lede: "Saber cuánta batería te queda antes de gastarla.",
-      pick: "cirqa",
-      also: ["creatina"],
-      why: "Body Battery™ convierte tu frecuencia cardiaca y tu estrés en una sola cifra: cuándo empujar y cuándo parar."
-    },
-    {
-      id: "recuperacion",
-      label: "Optimizar mi recuperación",
-      icon: "leaf",
-      image: "/media/goal-recuperacion.jpg",
-      lede: "El descanso también es entrenamiento.",
-      pick: "creatina",
-      also: ["cirqa"],
-      why: "Creatina liposomal para el tono muscular y la recuperación,* medida con el tiempo de recuperación de tu Garmin."
+      id: "rendimiento",
+      label: "Performance",
+      icon: "spark",
+      image: "/media/goal-rendimiento.jpg",
+      lede: "Entrenar con datos, no con sensaciones.",
+      pick: "venu-4",
+      also: ["promix-creatina"],
+      why: "Predisposición para entrenar, VO2 max y estado del entreno en una pantalla AMOLED que lees de un vistazo."
     },
     {
       id: "salud",
@@ -388,7 +345,7 @@
       image: "/media/goal-salud.jpg",
       lede: "Un registro continuo, sin volverlo una obsesión.",
       pick: "cirqa",
-      also: ["creatina"],
+      also: ["womens-multivitamin", "synbiotic", "creatina"],
       why: "Salud 24/7 en 18 gramos de tela: estrés, pulsioximetría¹ y más de 80 actividades detectadas solas."
     }
   ];

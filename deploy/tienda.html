@@ -88,34 +88,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <div class="shell">
   <main id="contenido">
 
-    <!-- ===== En-tête de boutique : visuel à gauche, texte à droite.
-         Le bloc reste court volontairement — le premier rayon doit
-         apparaître dès l'ouverture de la page. ===== -->
-    <section class="pdp shop-head" aria-labelledby="tienda-t">
-      <div class="container">
-        <nav class="crumbs rv" aria-label="Migas de pan">
-          <a href="/">Inicio</a>
-          <span aria-hidden="true">/</span>
-          <span>Tienda</span>
-        </nav>
-        <div class="shop-intro">
-          <div class="chapter-media wide shop-hero rv">
-            <img src="/media/cirqa-tan-wide.jpg" alt="Garmin CIRQA Smart Band en color arena"
-                 width="1600" height="900" fetchpriority="high">
-          </div>
-          <div class="chapter-copy shop-intro-copy">
-            <span class="eyebrow rv">La selección completa</span>
-            <h2 id="tienda-t" class="rv">Una lista corta, elegida con criterio.</h2>
-            <p class="rv">Cada producto se gana su lugar. Sin catálogos infinitos, sin ruido — solo lo que vale la pena integrar a tu rutina.</p>
-            <div class="shop-jump rv">
-              <a class="btn btn-quiet btn-sm" href="#wearables">Wearables</a>
-              <a class="btn btn-quiet btn-sm" href="#suplementos">Suplementos</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Les rayons sont rendus depuis catalog.js : une seule source de vérité
          pour la home, la boutique et les pages produit. -->
     <div id="shop-sections"></div>
@@ -157,7 +129,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         <p><a href="/productos/vivoactive-6">Garmin Vívoactive® 6</a></p>
         <p><a href="/productos/creatina">Cymbiotika Advanced Creatine</a></p>
         <p><a href="/productos/womens-multivitamin">Cymbiotika Women's Multivitamin +18</a></p>
-        <p><a href="/productos/prenatal-multivitamin">Cymbiotika Prenatal Multivitamin</a></p>
         <p><a href="/productos/synbiotic">Cymbiotika Synbiotic</a></p>
         <p><a href="/productos/promix-creatina">Promix Micronized Creatine</a></p>
         <p><a href="/productos/promix-debloat">Promix Debloat Prebiotic + Probiotic</a></p>
@@ -181,7 +152,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   <div class="dock-shell" id="dock-shell">
     <div class="dock-info">
       <b class="price-num">Desde $400 MXN</b>
-      <span>10 productos · Envío gratis a todo México</span>
+      <span>9 productos · Envío gratis a todo México</span>
     </div>
     <a class="btn btn-ink" href="/#objetivo">Guíame</a>
   </div>
