@@ -89,10 +89,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
     <div class="nav-start">
       <div class="nav-links">
         <a href="/tienda">Tienda</a>
-        <a href="#objetivo">Tu objetivo</a>
         <a href="#wearables">Wearables</a>
         <a href="#suplementos">Suplementos</a>
-        <a href="#faq">FAQ</a>
       </div>
     </div>
     <a class="logo" href="/">lowlabs</a>
@@ -122,41 +120,23 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
     <div class="hero-full-inner">
       <p class="hero-tagline rv" lang="en">Curated <b>wellness</b> and <b>technology</b></p>
       <div class="hero-actions rv">
-        <a class="btn btn-smoke btn-lg" href="#objetivo">Encuentra lo tuyo</a>
-        <a class="btn btn-smoke btn-lg" href="/tienda">Ver la tienda</a>
+        <a class="btn btn-smoke btn-lg" href="#suplementos">Suplementos</a>
+        <a class="btn btn-smoke btn-lg" href="#wearables">Wearables</a>
       </div>
     </div>
   </header>
 
   <main id="contenido">
 
-    <!-- ===== Assistant : commencer par l'objectif, pas par le produit ===== -->
-    <section class="goals-sec" id="objetivo" aria-labelledby="objetivo-t">
-      <div class="container">
-        <div class="section-head center rv">
-          <div>
-            <span class="eyebrow">03 — Compra por objetivo</span>
-            <h2 id="objetivo-t">Empieza por cómo quieres sentirte.</h2>
-            <p>Dinos qué buscas y te decimos con qué empezar. Sin cuestionarios largos, sin correo.</p>
-          </div>
-        </div>
-
-        <div class="goals rv" id="goals" role="radiogroup" aria-label="¿Qué buscas?"></div>
-
-        <!-- La recommandation est injectée ici : elle n'existe pas tant que
-             l'utilisateur n'a pas choisi, et le focus s'y déplace au clic. -->
-        <div class="reco" id="reco" hidden tabindex="-1" aria-live="polite"></div>
-      </div>
-    </section>
-
-    <!-- ===== Los más buscados — carrousel de produits détourés. Montres et
-         suppléments mélangés, sans cadre : packshot, nom court, prix. La
-         liste vient de catalog.js via data-handles. ===== -->
+    <!-- ===== Los más buscados — tout le catalogue sauf les deux montres
+         qui n'ont plus de place ici (Vívoactive 6, Venu 3S) : produits
+         détourés, sans cadre — packshot, nom court, bouton prix. La liste
+         vient de catalog.js via data-handles. ===== -->
     <section class="best" id="mas-buscados" aria-labelledby="best-t">
       <div class="container">
         <div class="section-head center rv">
           <div>
-            <span class="eyebrow">04 — Favoritos</span>
+            <span class="eyebrow">01 — Favoritos</span>
             <h2 id="best-t">Los más buscados</h2>
           </div>
           <div class="head-aside">
@@ -168,7 +148,32 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         </div>
       </div>
       <div class="cards fcards rv" id="cards"
-           data-handles="cirqa,creatina,venu-4,promix-debloat,vivoactive-6,promix-creatina,venu-3s"></div>
+           data-handles="cirqa,creatina,venu-4,promix-debloat,womens-multivitamin,promix-creatina,synbiotic"></div>
+      <!-- Repère de défilement : rempli par app.js, retiré s'il n'y a
+           qu'une page à voir. -->
+      <div class="card-dots" aria-hidden="true"></div>
+    </section>
+
+    <!-- ===== Assistant : commencer par l'objectif, pas par le produit ===== -->
+    <section class="goals-sec" id="objetivo" aria-labelledby="objetivo-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">02 — Compra por objetivo</span>
+            <h2 id="objetivo-t">Empieza por cómo quieres sentirte.</h2>
+            <p>Dinos qué buscas y te decimos con qué empezar. Sin cuestionarios largos, sin correo.</p>
+          </div>
+        </div>
+
+        <div class="goals rv" id="goals" role="radiogroup" aria-label="¿Qué buscas?"></div>
+        <!-- Même repère que sous les carrousels : présent seulement là où
+             la piste défile, donc sur mobile. -->
+        <div class="card-dots" aria-hidden="true"></div>
+
+        <!-- La recommandation est injectée ici : elle n'existe pas tant que
+             l'utilisateur n'a pas choisi, et le focus s'y déplace au clic. -->
+        <div class="reco" id="reco" hidden tabindex="-1" aria-live="polite"></div>
+      </div>
     </section>
 
     <!-- ===== Wearables — bannière vidéo ===== -->
@@ -197,7 +202,9 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <section class="chapter" aria-labelledby="cap3-t">
+    <!-- Même composition que les chapitres suppléments : la boucle à
+         gauche, le texte en face. -->
+    <section class="chapter editorial" aria-labelledby="cap3-t">
       <div class="container">
         <div class="chapter-grid">
           <div class="chapter-media portrait rv">
@@ -269,11 +276,12 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
       <div class="cards fcards rv" id="sup-grid"
            data-handles="creatina,womens-multivitamin,synbiotic,promix-creatina,promix-debloat"></div>
+      <div class="card-dots" aria-hidden="true"></div>
     </section>
 
-    <!-- ===== Un chapitre par supplément : même gabarit que les chapitres
-         Garmin, la boucle produit remplaçant le packshot. ===== -->
-    <section class="chapter flip" aria-labelledby="cap7-t">
+    <!-- ===== Un chapitre par supplément : composition éditoriale, image
+         réduite d'un côté, texte de l'autre, sur toute la hauteur. ===== -->
+    <section class="chapter editorial flip" aria-labelledby="cap7-t">
       <div class="container">
         <div class="chapter-grid">
           <div class="chapter-media portrait rv">
@@ -288,27 +296,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <span class="eyebrow rv">Cymbiotika</span>
             <h2 id="cap7-t" class="rv" lang="en">Wellness, in one shot.</h2>
             <p class="rv">5 gramos. Cero complicaciones. Sobres líquidos de absorción mejorada, listos para tomar donde estés.*</p>
-            <a class="btn btn-ink rv" href="/productos/creatina">Ver Advanced Creatine — $1,349 MXN</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="chapter sand" aria-labelledby="cap8-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media portrait rv">
-            <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
-                   disablepictureinpicture disableremoteplayback
-                   poster="/media/sup-womens.jpg"
-                   width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
-              <source src="/media/sup-womens.mp4" type="video/mp4">
-            </video>
-          </div>
-          <div class="chapter-copy">
-            <span class="eyebrow rv">Women's Multivitamin +18</span>
-            <h2 id="cap8-t" class="rv">Un solo sobre, todos los días.</h2>
-            <p class="rv">Sin frascos, sin dosificadores, sin pastillas que cuesta pasar. Un sobre líquido que te llevas donde quieras y tomas en segundos.*</p>
             <a class="btn btn-ink rv" href="/productos/womens-multivitamin">Ver Women's Multivitamin — $400 MXN</a>
           </div>
         </div>
@@ -333,15 +320,17 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <section class="chapter sand" aria-labelledby="cap12-t">
+    <!-- Fond blanc, exactement celui de la boucle : le produit flotte, sans
+         plaque ni cadre autour de la vidéo. -->
+    <section class="chapter editorial flip on-white" aria-labelledby="cap12-t">
       <div class="container">
         <div class="chapter-grid">
           <div class="chapter-media portrait rv">
             <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
                    disablepictureinpicture disableremoteplayback
-                   poster="/media/poster-promix-loop.jpg"
+                   poster="/media/poster-debloat-loop.jpg"
                    width="1080" height="1920" aria-hidden="true" tabindex="-1" data-autoloop>
-              <source src="/media/promix-loop.mp4" type="video/mp4">
+              <source src="/media/debloat-loop.mp4" type="video/mp4">
             </video>
           </div>
           <div class="chapter-copy">
@@ -350,52 +339,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <p class="rv">Nutrición limpia diseñada para ayudarte a rendir mejor. Sin aditivos artificiales, sin transgénicos, probada por laboratorio externo.*</p>
             <a class="btn btn-ink rv" href="/tienda#suplementos">Descubre Promix</a>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== FAQ ===== -->
-    <section id="faq" aria-labelledby="faq-t">
-      <div class="container">
-        <div class="section-head center rv">
-          <div>
-            <span class="eyebrow">Preguntas frecuentes</span>
-            <h2 id="faq-t">Lo que necesitas saber</h2>
-          </div>
-        </div>
-        <div class="faq-list rv">
-          <details>
-            <summary>¿Necesito pagar una suscripción?</summary>
-            <div class="a">No. En los wearables Garmin todas las métricas y funciones están incluidas en la app gratuita Garmin Connect™, para siempre.</div>
-          </details>
-          <details>
-            <summary>¿Es compatible con mi teléfono?</summary>
-            <div class="a">Sí. Funciona con iPhone y con teléfonos Android a través de la app Garmin Connect™ (Bluetooth®). Para registrar rutas al aire libre con la CIRQA usa el GPS de tu teléfono (GPS conectado).</div>
-          </details>
-          <details>
-            <summary>¿Qué talla de CIRQA me queda?</summary>
-            <div class="a">S–M es para muñecas de 120 a 200 mm; L–XL, de 145 a 240 mm. Mide el contorno de tu muñeca con una cinta métrica: si estás entre las dos, la mayoría prefiere S–M porque queda más justa para las lecturas nocturnas.</div>
-          </details>
-          <details>
-            <summary>¿Puedo cambiarla o devolverla si no me queda?</summary>
-            <div class="a">Sí. Escríbenos a <a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a> con tu número de pedido y te ayudamos a coordinar el cambio de talla o la devolución, con el producto en su empaque original. Las condiciones completas se muestran al finalizar tu compra.</div>
-          </details>
-          <details>
-            <summary>¿Qué métodos de pago aceptan?</summary>
-            <div class="a">Tarjetas de crédito y débito a través de Shopify Checkout, con cifrado de extremo a extremo. Los métodos disponibles se muestran al finalizar tu compra.</div>
-          </details>
-          <details>
-            <summary>¿Cuánto dura la batería y cómo se carga?</summary>
-            <div class="a">La CIRQA dura hasta 10 días con una carga e incluye cable USB-C. Venu® 4 llega hasta 12 días, Vívoactive® 6 hasta 11 y Venu® 3S hasta 10, en modo smartwatch.</div>
-          </details>
-          <details>
-            <summary>¿Tienen garantía en México?</summary>
-            <div class="a">Sí. Todos los wearables son producto 100% original Garmin con garantía oficial válida en México.</div>
-          </details>
-          <details>
-            <summary>¿Cuándo llega mi pedido?</summary>
-            <div class="a">Hacemos envíos a todo México sin costo. El tiempo estimado de entrega se confirma al finalizar tu compra según tu código postal.</div>
-          </details>
         </div>
       </div>
     </section>
@@ -436,7 +379,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       <div>
         <h3 class="foot-title">Ayuda</h3>
         <p><a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a></p>
-        <p><a href="/#faq">Garantía y devoluciones</a></p>
+        <p><a href="mailto:lowlabsmx@gmail.com">Garantía y devoluciones</a></p>
       </div>
     </div>
     <div class="legal">

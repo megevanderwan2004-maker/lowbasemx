@@ -105,7 +105,10 @@
     return '<a class="fcard" href="' + CATALOG.url(p.handle) + '">' +
         '<span class="fcard-media">' + flyMedia(p) + '</span>' +
         '<b class="fcard-name">' + esc(p.short) + '</b>' +
-        '<span class="fcard-price price-num">' + CATALOG.money(p.price) + ' <small>MXN</small></span>' +
+        /* Le prix devient l'affordance : un bouton au même langage que
+           « Comprar ». C'est un span — la carte entière est déjà un lien,
+           et un <button> imbriqué dans un <a> serait invalide. */
+        '<span class="btn btn-ink btn-sm fcard-buy price-num">' + CATALOG.money(p.price) + ' <small>MXN</small></span>' +
       '</a>';
   }
 
@@ -205,7 +208,10 @@
           (g.image
             ? '<span class="goal-media"><img loading="lazy" src="' + esc(g.image) + '" alt="" width="600" height="900"></span>'
             : "") +
-          '<span class="goal-body glass-dark blurred">' +
+          /* La nacelle est transparente : c'est le voile en dégradé de la
+             carte (.goal::after) qui porte la lisibilité, et seul le
+             pseudo-bouton garde sa surface de verre. */
+          '<span class="goal-body">' +
             '<span class="goal-txt"><b>' + esc(g.label) + '</b></span>' +
             '<span class="goal-cta glass-light blurred">Ver selección</span>' +
           '</span>' +
@@ -760,6 +766,70 @@
           catch(e){ cards.scrollLeft += dx; }
         }, false);
       });
+    });
+  });
+
+  /* =====================================================================
+     Pastilles sous les carrousels — un repère que la piste se fait
+     glisser. Purement décoratives : le geste et les flèches restent les
+     seules commandes, elles ne prennent donc jamais le focus. Le nombre
+     de pastilles suit le nombre d'écrans réellement disponibles, et
+     tombe à zéro quand tout tient déjà à l'écran.
+     ===================================================================== */
+  module("carousel-dots", function(){
+    each(document.querySelectorAll(".card-dots"), function(host){
+      /* Les objectifs défilent aussi, mais dans .goals — une piste qui
+         n'est un carrousel que sous 760px. Rien à conditionner ici : la
+         piste ne déborde pas au-dessus, donc aucune pastille n'est
+         produite. */
+      var cards = (ownerSection(host) || document).querySelector(".cards, .goals");
+      if (!cards) return;
+      var dots = [];
+
+      /* Le compte se déduit du pas réel entre deux cartes, pas du rapport
+         scrollWidth/clientWidth : ce dernier compte les gouttières et
+         réclame une page de plus dès qu'une carte occupe toute la piste. */
+      function pageCount(){
+        var a = cards.children[0], b = cards.children[1];
+        if (!a || !cards.clientWidth) return 1;
+        var step = b ? (b.offsetLeft - a.offsetLeft) : a.offsetWidth;
+        if (!step) return 1;
+        var perPage = Math.max(1, Math.round(cards.clientWidth / step));
+        return Math.max(1, Math.ceil(cards.children.length / perPage));
+      }
+
+      function mark(){
+        if (!dots.length) return;
+        var max = cards.scrollWidth - cards.clientWidth;
+        var i = max <= 0 ? 0 : Math.round(cards.scrollLeft / max * (dots.length - 1));
+        each(dots, function(d, k){ d.className = k === i ? "on" : ""; });
+      }
+
+      function build(){
+        var n = pageCount();
+        if (n === dots.length || (n < 2 && !dots.length)) return;
+        host.innerHTML = "";
+        dots = [];
+        if (n < 2) return;
+        for (var i = 0; i < n; i++){
+          dots.push(host.appendChild(document.createElement("i")));
+        }
+        mark();
+      }
+
+      var ticking = false;
+      cards.addEventListener("scroll", function(){
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function(){ ticking = false; mark(); });
+      }, false);
+
+      window.addEventListener("resize", build, false);
+      build();
+      /* Les cartes sont injectées juste avant ce module, mais leurs
+         images ne le sont pas : la largeur de piste bouge encore après
+         le premier calcul. */
+      window.addEventListener("load", build, false);
     });
   });
 

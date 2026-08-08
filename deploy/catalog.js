@@ -285,8 +285,8 @@
       category: "Suplementos",
       image: "/media/promix-debloat.png",
       hero: "/media/promix-debloat.png",
-      video: "/media/promix-loop.mp4",
-      poster: "/media/poster-promix-loop.jpg",
+      video: "/media/debloat-loop.mp4",
+      poster: "/media/poster-debloat-loop.jpg",
       packshot: "/media/promix-debloat.png",
       videoRatio: "portrait",
       highlights: [

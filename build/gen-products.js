@@ -61,10 +61,8 @@ const nav = () => `
     <div class="nav-start">
       <div class="nav-links">
         <a href="/tienda">Tienda</a>
-        <a href="/#objetivo">Tu objetivo</a>
         <a href="/#wearables">Wearables</a>
         <a href="/#suplementos">Suplementos</a>
-        <a href="/#faq">FAQ</a>
       </div>
     </div>
     <a class="logo" href="/">lowlabs</a>
@@ -90,7 +88,7 @@ ${products.map((p) => `        <p><a href="/productos/${p.handle}">${esc(p.name)
       <div>
         <h3 class="foot-title">Ayuda</h3>
         <p><a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a></p>
-        <p><a href="/#faq">Garantía y devoluciones</a></p>
+        <p><a href="mailto:lowlabsmx@gmail.com">Garantía y devoluciones</a></p>
       </div>
     </div>
     <div class="legal">
