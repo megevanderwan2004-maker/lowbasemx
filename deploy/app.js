@@ -794,7 +794,12 @@
         if (!a || !cards.clientWidth) return 1;
         var step = b ? (b.offsetLeft - a.offsetLeft) : a.offsetWidth;
         if (!step) return 1;
-        var perPage = Math.max(1, Math.round(cards.clientWidth / step));
+        /* La piste porte son encoche en padding : c'est la boîte de
+           contenu, pas clientWidth, qui dit combien de cartes tiennent. */
+        var cs = window.getComputedStyle(cards);
+        var inner = cards.clientWidth
+          - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+        var perPage = Math.max(1, Math.round(inner / step));
         return Math.max(1, Math.ceil(cards.children.length / perPage));
       }
 

@@ -601,6 +601,20 @@ section{padding:clamp(56px,8vw,104px) 0}
 @media(min-width:1240px){
   .cards{--cards-inset:max(40px,calc((100vw - 1240px)/2 + 40px))}
 }
+/* Les deux carrousels de la home ne courent plus jusqu'aux bords de la
+   fenêtre : c'est la piste elle-même qui est bornée et centrée, pas son
+   encoche — le débord de la carte suivante est donc coupé avant la
+   marge, et non contre le bord de l'écran. Les rayons de la boutique
+   gardent leur encoche, qui aligne la première carte sur leur titre. */
+@media(min-width:900px){
+  .best .cards{
+    /* Une encoche courte suffit : elle ne sert plus qu'à laisser passer
+       l'ombre portée des packshots. */
+    --cards-inset:12px;
+    width:min(1080px,100% - clamp(80px,10vw,170px));
+    margin-inline:auto;
+  }
+}
 .pcard{
   position:relative;isolation:isolate;flex:0 0 min(74vw,300px);scroll-snap-align:start;
   aspect-ratio:3/4.15;border-radius:var(--radius-md);overflow:hidden;
