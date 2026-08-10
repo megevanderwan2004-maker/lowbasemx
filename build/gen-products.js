@@ -135,9 +135,8 @@ ${p.sizes
 const BAND_VIDEO = {
   cirqa: "hero-cirqa",
   creatina: "loop-brand",
-  "womens-multivitamin": "loop-capsulas",
-  "prenatal-multivitamin": "loop-capsulas",
-  synbiotic: "loop-capsulas",
+  "promix-relax": "loop-capsulas",
+  "absorption-sleep": "loop-capsulas",
 };
 
 /* Visuel principal : une boucle si la fiche en déclare une, la photo

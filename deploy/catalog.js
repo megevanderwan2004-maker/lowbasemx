@@ -153,10 +153,10 @@
         "5 g de creatina por sobre, sabor Tangerine Vanilla",
         "Tecnología liposomal para una absorción mejorada",
         "Apoya el rendimiento, la recuperación muscular y la salud cerebral*",
-        "24 sobres líquidos de 30 mL — sin mezclar, sin grumos"
+        "12 sobres líquidos listos para tomar — sin mezclar, sin grumos"
       ],
       specs: [
-        ["Formato", "24 sobres líquidos × 30 mL (720 mL)"],
+        ["Formato", "12 sobres líquidos"],
         ["Creatina", "5 g por porción"],
         ["Sabor", "Tangerine Vanilla"],
         ["Tecnología", "Liposomal — absorción mejorada"],
@@ -175,104 +175,103 @@
        principal, la photo n'étant que l'affiche extraite de la boucle.
        --------------------------------------------------------------------- */
     {
-      handle: "womens-multivitamin",
-      name: "Cymbiotika Women's Multivitamin +18",
-      short: "Women's Multivitamin",
-      brand: "Cymbiotika",
-      tagline: "Multivitamínico liposomal para mujeres, en sobres líquidos.",
-      price: 400,
+      handle: "promix-relax",
+      name: "Promix Relax: Magnesium Complex",
+      short: "Relax",
+      brand: "Promix",
+      tagline: "Magnesio bisglicinato y melisa, para el descanso y la recuperación.",
+      price: 989,
       badge: "Nuevo",
       category: "Suplementos",
-      image: "/media/sup-womens.jpg",
-      hero: "/media/sup-womens.jpg",
-      video: "/media/sup-womens.mp4",
-      packshot: "/media/sup-womens-cut.png",
-      poster: "/media/sup-womens.jpg",
-      videoRatio: "portrait",
+      image: "/media/promix-relax.png",
+      hero: "/media/promix-relax.png",
+      packshot: "/media/promix-relax.png",
       highlights: [
-        "Vitaminas y minerales esenciales para mujeres de 18 años en adelante",
-        "Tecnología liposomal para una absorción mejorada",
-        "Sobres líquidos listos para tomar — sin mezclar, sin pastillas",
-        "Vegan, Non-GMO y con trazabilidad total de ingredientes"
+        "Apoya un sueño reparador¹",
+        "Favorece la relajación muscular¹",
+        "Ayuda a calmar el sistema nervioso¹",
+        "Magnesio bisglicinato, la forma más biodisponible y suave para la digestión"
       ],
       specs: [
-        ["Marca", "Cymbiotika"],
-        ["Formato", "Sobres líquidos individuales"],
-        ["Tecnología", "Liposomal — absorción mejorada"],
-        ["Certificaciones", "Vegan, Non-GMO, Clean Label Project"],
-        ["Formulación", "Por dietistas y científicos"],
+        ["Marca", "Promix Nutrition"],
+        ["Formato", "90 cápsulas — 30 porciones"],
+        ["Porción", "3 cápsulas, 30–60 min antes de dormir"],
+        ["Fórmula", "Magnesio bisglicinato + extracto orgánico de melisa"],
+        ["Sin", "Glifosato, gluten, soya, transgénicos ni ingredientes artificiales"],
         ["Envío", "Gratis a todo México"]
       ],
       story: {
-        eyebrow: "Cymbiotika",
-        title: "Un solo sobre, todos los días.",
-        text: "Sin frascos, sin dosificadores, sin pastillas que cuesta pasar. Un sobre líquido que te llevas donde quieras y tomas en segundos.*"
+        eyebrow: "Promix",
+        title: "Bajar el ritmo, también se entrena.",
+        text: "Magnesio bisglicinato y melisa orgánica: la melisa actúa sobre el GABA para favorecer la relajación, el magnesio acompaña la recuperación muscular.¹"
       }
     },
     {
-      handle: "synbiotic",
-      name: "Cymbiotika Synbiotic",
-      short: "Synbiotic",
-      brand: "Cymbiotika",
-      tagline: "Probióticos y prebióticos en una sola cápsula.",
-      price: 400,
+      handle: "absorption-sleep",
+      name: "The Absorption Company Sleep",
+      short: "Sleep",
+      brand: "The Absorption Company",
+      tagline: "Siete sticks para dormir profundo, sin melatonina.",
+      price: 499,
+      badge: "Nuevo",
       category: "Suplementos",
-      image: "/media/ritual-essential.png",
-      hero: "/media/ritual-essential.png",
-      packshot: "/media/ritual-essential.png",
+      image: "/media/absorption-sleep.png",
+      hero: "/media/absorption-sleep.png",
+      packshot: "/media/absorption-sleep.png",
       highlights: [
-        "Probióticos y prebióticos combinados en una sola toma",
-        "Cápsula de liberación dirigida",
-        "Apoya la digestión y el equilibrio intestinal*",
-        "Vegan, Non-GMO y con trazabilidad total de ingredientes"
+        "Sin melatonina — descanso sin dependencia ni niebla matinal",
+        "Azafrán liposomal Capsoil® y aceite de pasiflora Capsoil® para reducir el estrés",
+        "PharmaGABA® y glicina para relajarte y mejorar la calidad del sueño",
+        "Jugo de cereza ácida y magnesio bisglicinato liposomal para despertar sin pesadez"
       ],
       specs: [
-        ["Marca", "Cymbiotika"],
-        ["Formato", "Cápsulas"],
-        ["Tecnología", "Liberación dirigida"],
-        ["Certificaciones", "Vegan, Non-GMO, Clean Label Project"],
-        ["Formulación", "Por dietistas y científicos"],
+        ["Marca", "The Absorption Company"],
+        ["Formato", "7 sticks × 7.13 g (49.91 g)"],
+        ["Sabor", "Chamomile Lemonade"],
+        ["Ingredientes clave", "Azafrán liposomal, pasiflora, PharmaGABA®, apigenina, magnesio bisglicinato liposomal, cereza ácida, L-teanina, L-triptófano, L-glicina"],
+        ["Tecnología", "Capsoil® — hasta 5 veces más absorción"],
         ["Envío", "Gratis a todo México"]
       ],
       story: {
-        eyebrow: "Cymbiotika",
-        title: "La cápsula que llega hasta donde importa.",
-        text: "Probióticos y prebióticos protegidos por una cápsula que no se abre antes de tiempo. Un gesto al día para el equilibrio intestinal.*"
+        eyebrow: "The Absorption Company",
+        title: "Duerme profundo, despierta ligero.",
+        text: "Una mezcla respaldada por la ciencia, sin melatonina: te ayuda a caer en un sueño profundo y a despertar sin esa sensación de resaca.*"
       }
     },
     /* ---------------------------------------------------------------------
        Promix Nutrition. Prix convertis depuis les tarifs américains
-       (59 $ et 29 $ US) à un taux arrondi : provisoires, à confirmer.
+       (32 $ et 29 $ US) à un taux arrondi : provisoires, à confirmer.
        Les packshots viennent du CDN de la marque, copiés en local.
        --------------------------------------------------------------------- */
     {
       handle: "promix-creatina",
-      name: "Promix Micronized Creatine",
-      short: "Micronized Creatine",
+      name: "Promix Non-GMO Creatine",
+      short: "Non-GMO Creatine",
       brand: "Promix",
-      tagline: "Creatina monohidratada micronizada, sin sabor ni aditivos.",
-      price: 1199,
+      tagline: "Creatina monohidratada micronizada, en sticks de 5 g.",
+      price: 659,
       category: "Suplementos",
-      image: "/media/promix-creatine.png",
-      hero: "/media/promix-creatine.png",
+      image: "/media/promix-creatine-sticks.png",
+      hero: "/media/promix-creatine-sticks.png",
+      packshot: "/media/promix-creatine-sticks.png",
       highlights: [
-        "5 g de creatina monohidratada por porción",
-        "Partículas micronizadas, hasta 20 veces más finas, para disolverse mejor",
-        "Sin sabor, sin endulzantes, sin rellenos ni transgénicos",
-        "Probada por laboratorio externo"
+        "Creatina monohidratada micronizada, sin endulzar y sin sabor",
+        "Apoya de forma segura el aumento de tamaño, fuerza y potencia muscular*",
+        "Esencial en los programas de entrenamiento de fuerza y potencia",
+        "Fácil de digerir y de mezclar"
       ],
       specs: [
         ["Marca", "Promix Nutrition"],
-        ["Formato", "Bolsa de 900 g — 180 porciones"],
-        ["Creatina", "5 g por porción"],
+        ["Formato", "30 sticks individuales × 5 g"],
+        ["Creatina", "5 g por stick"],
         ["Sabor", "Sin sabor"],
-        ["Procesado", "Micronizado"],
+        ["Certificaciones", "Non-GMO Project Verified, vegano, keto y paleo"],
         ["Envío", "Gratis a todo México"]
       ],
       story: {
         eyebrow: "Promix",
         title: "Creatina y nada más.",
-        text: "Un solo ingrediente, molido lo bastante fino para desaparecer en el agua. Sin sabor que tapar, sin aditivos que explicar.*"
+        text: "Un solo ingrediente, molido lo bastante fino para desaparecer en el agua. Un stick por sesión, sin sabor que tapar ni aditivos que explicar.*"
       }
     },
     {
@@ -325,7 +324,7 @@
       image: "/media/goal-dormir.jpg",
       lede: "Sueño profundo, despertares medidos, rutina que se sostiene.",
       pick: "cirqa",
-      also: ["creatina"],
+      also: ["absorption-sleep", "promix-relax"],
       why: "La CIRQA mide el sueño sin una pantalla que te despierte: puntuación, fases, VFC y temperatura de la piel, toda la noche."
     },
     {
@@ -335,7 +334,7 @@
       image: "/media/goal-rendimiento.jpg",
       lede: "Entrenar con datos, no con sensaciones.",
       pick: "venu-4",
-      also: ["promix-creatina"],
+      also: ["promix-creatina", "creatina"],
       why: "Predisposición para entrenar, VO2 max y estado del entreno en una pantalla AMOLED que lees de un vistazo."
     },
     {
@@ -345,7 +344,7 @@
       image: "/media/goal-salud.jpg",
       lede: "Un registro continuo, sin volverlo una obsesión.",
       pick: "cirqa",
-      also: ["womens-multivitamin", "synbiotic", "creatina"],
+      also: ["promix-debloat", "promix-relax", "creatina"],
       why: "Salud 24/7 en 18 gramos de tela: estrés, pulsioximetría¹ y más de 80 actividades detectadas solas."
     }
   ];
