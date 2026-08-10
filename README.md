@@ -80,24 +80,44 @@ Conventions :
 - La photographie CIRQA reste servie depuis le **CDN Shopify** — les URL sont
   dans `assets-hd/cdn-urls.json`.
 
-## `assets/` — sources brutes
+## `assets/` — sources brutes, un dossier par produit
 
-Jamais servi en production (`vercel.json` ne publie que `deploy/`). C'est le
-vrac d'origine, trié par nature :
+Jamais servi en production (`vercel.json` ne publie que `deploy/`). Un
+sous-dossier **au nom du produit**, comme dans `deploy/media/productos/` :
 
 ```
 assets/
-├── garmin/          fiches produit officielles (PDF) et packshots Garmin HD
-├── fotos/           photos sources (noms UUID) : lifestyle, produit, app
-├── videos/          rushes vidéo avant montage/compression
-├── marca/           logo, rendus ChatGPT/Canva, moodboards
-└── fotosyvideos2/   dépôt d'origine, laissé tel quel
+├── cirqa/                  Garmin CIRQA™ Smart Band
+│   ├── producto/           packshots studio et rendus produit
+│   ├── lifestyle/          photos d'usage (sommeil, sport, quotidien)
+│   ├── app/                captures Garmin Connect™
+│   ├── video/              rush de la boucle hero
+│   └── documentos/         fiches produit officielles Garmin (PDF)
+├── venu-4/  venu-3s/  vivoactive-6/     packshots officiels Garmin
+├── creatina/               Cymbiotika Advanced Creatine — packshot + rush
+├── promix-creatina/        Promix Non-GMO Creatine — packshot 30 sticks
+├── promix-debloat/         Promix Debloat — packshot + les deux boucles
+├── promix-relax/           Promix Relax: Magnesium Complex — packshot
+├── absorption-sleep/       The Absorption Company Sleep — packshot 7 sticks
+│
+├── landing/                visuels transverses : hero, logo, boucles des
+│                           bandeaux, rendus de gélules
+├── archivo/ritual/         produit retiré du catalogue, sources gardées
+└── fotosyvideos2/          dépôt d'origine, laissé tel quel
 ```
 
-Seules les copies optimisées atterrissent dans `deploy/media/`. Les sources les
-plus récentes restent **non suivies** par git : le dépôt est public et
-`assets/garmin/` contient des documents revendeur confidentiels — voir
-l'avertissement de `PROJECT_CONTEXT.md` §10 avant d'y toucher.
+Le nom du dossier est **le `handle` du catalogue** : `assets/promix-relax/` et
+`deploy/media/productos/promix-relax/` parlent du même produit — l'un les
+sources, l'autre les copies optimisées qui partent en production.
+
+Les fichiers gardent le nom d'origine de la marque quand il est parlant ; les
+rushes ont été renommés d'après la boucle qu'ils produisent
+(`landing/loop-wearables.mp4` → `deploy/media/landing/bandas/loop-wearables.mp4`).
+
+Les sources les plus récentes restent **non suivies** par git : le dépôt est
+public et `assets/cirqa/documentos/` contient des documents revendeur
+confidentiels — voir l'avertissement de `PROJECT_CONTEXT.md` §10 avant d'y
+toucher.
 
 ---
 
