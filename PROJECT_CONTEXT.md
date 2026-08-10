@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-08-07 (Ritual banner + warm palette pass)
+> Last updated: 2026-08-10 (supplement catalogue swap + media/assets reorganisation)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -9,7 +9,7 @@
 
 **Lowlabs** is a Mexican reseller working directly with Garmin at reseller pricing, plus a curated supplement line. Brand positioning is "curated wellness and technology" — premium wellness editorial, not sporty gadget. All customer-facing content is in Spanish (es-MX), prices in MXN.
 
-The site started as a **single-product landing page** for the Garmin CIRQA Smart Band (launched 2026-07-21) and became, on 2026-07-30, a **five-product storefront**, then a **nine-product storefront** carrying three brands — Garmin (4 wearables), Cymbiotika (3 supplements) and Promix (2 supplements). Prenatal Multivitamin was added then dropped as a duplicate of Women's Multivitamin. The homepage no longer sells one product: it opens on a goal-based assistant, then two product carousels, then one editorial chapter per supplement.
+The site started as a **single-product landing page** for the Garmin CIRQA Smart Band (launched 2026-07-21), became a five- then nine-product storefront, and on 2026-08-10 **swapped its supplement half**: the two Cymbiotika newcomers (Women's Multivitamin, Synbiotic) left, Promix Relax and The Absorption Company Sleep arrived. The catalogue still holds **nine products across four brands** — Garmin (4 wearables), Cymbiotika (1), Promix (3) and The Absorption Company (1).
 
 The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor in Mexico for 18 years. Lowlabs differentiates on price, a much shorter catalogue, and brand aesthetics.
 
@@ -19,76 +19,75 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 
 **What works today**
 - 11 pages: home, `/tienda`, and 9 product pages, all internally linked and verified.
-- Goal-based assistant on the homepage (3 goals → recommended product + complements → link to the product page). The cards are full-bleed photos with a liquid-glass footer.
-- Two floating carousels on the home ("Los más buscados" and the supplements selection) plus one carousel per Tienda aisle: cut-out packshots or product loops, no card frame, arrows above 900px.
+- Home opens on the two carousels, then the goal assistant, then the video bands and the editorial chapters.
+- Carousel cards carry a **price button** in the same glass language as "Comprar", and discreet **dots** signal that a track scrolls.
+- Editorial chapters (Garmin Connect, Cymbiotika, Absorption, Promix): reduced visual on one side, copy on the other, full viewport height on desktop, **side by side on mobile too**.
 - Shopify checkout for the CIRQA only — colour/size selection drives a pre-selected variant redirect.
 - Liquid-glass design system: white translucent surfaces, ink text, a masked gradient rim shared by buttons, both bars, and the footer.
 
 **What is NOT connected**
-- **Vercel: nothing is deployed.** `vercel whoami` returns no credentials on this machine and the connected Vercel account has zero projects. `vercel.json` is correct and ready; someone has to run `vercel login` (browser flow) then `vercel --prod`, or import the GitHub repo from the Vercel dashboard.
-- **Shopify: only the CIRQA is wired.** The other eight products have no `shopify` block in `catalog.js`, so their buy button opens a `mailto:` order instead. See section 7.
-- **Prices are provisional for every product except the CIRQA** — chosen below MSRP, not confirmed by the owner. The two Cymbiotika newcomers sit at $400 MXN, the placeholder price from the Canva mock-up; the Promix pair is converted from the US store at a rounded rate. Copy, highlights and spec tables for all five supplements are placeholders.
-- **Brand mismatch on `synbiotic`** — the entry is still named *Cymbiotika Synbiotic* but its visual (card, PDP, home banner) is a **Ritual Essential Prenatal** bottle. Name, brand, price and spec table all need reconciling before launch.
-- **Third-party imagery** — the Promix packshots were copied from `promixnutrition.com`, and the Ritual shots came from the owner. Usage rights are unconfirmed.
+- **Vercel: nothing is deployed from this machine.** `vercel.json` is correct and ready; someone has to run `vercel login` (browser flow) then `vercel --prod`, or import the GitHub repo from the Vercel dashboard. A preview build has been seen at `lowbasemx-1er1.vercel.app`.
+- **Shopify: only the CIRQA is wired.** The other eight products have no `shopify` block in `catalog.js`, so their buy button opens a `mailto:` order instead. A read-only check on 2026-08-10 confirmed the store still contains exactly one product. See section 7.
+- **Prices are provisional for every product except the CIRQA.** The supplements are converted from their US store prices at the rounded rate the catalogue has always used (≈ ×20.6) — they are conversions of real one-time prices, not invented figures, but nobody has confirmed them.
+- **The Cymbiotika creatine is listed as a 12-sachet pack** while Cymbiotika only sells a 24-packet box at $65 US. The format was changed on request; **the price still reflects the 24-pack** and needs an owner decision.
+- **Third-party imagery** — Promix and Absorption packshots come from the brands' own Shopify CDNs. Usage rights unconfirmed.
 - **Custom domain** — not configured.
 
 **Recent history** (`git log`, newest first)
 | Commit | Date | What changed |
 |--------|------|--------------|
-| `24d83c8` | 08-07 | Home tightened (manifesto + no-screen chapter cut), 3 goal cards with glass footer, Ritual banner, Promix cream palette, mobile media caps, Tienda header removed |
-| `7ae70db` | 08-01 | Product loops play inside the carousels; the two Promix join the home selection |
-| `5595624` | 08-01 | Promix products, "Los más buscados" carousel, Tienda aisles become floating carousels |
-| `a53d7e5` | 07-31 | Three Cymbiotika supplements, goals cut to four, Venu 4 / Vívoactive 6 chapters removed |
-| `561cc15` | 07-31 | Full-bleed hero, transparent glass nav, 6 distinct goal images |
-| `1e0a8c0` | 07-31 | Mobile pass; the two banners merged into one scrolling top bar |
-| `42ac258` | 07-30 | `/tienda` page + goal assistant; neutral palette; comparison table removed |
-| `e61525a` | 07-30 | Single product → 5-product catalogue, editorial rewrite |
+| `4709947` | 08-10 | `assets/` reorganised by product handle |
+| `e09c1a3` | 08-10 | `deploy/media/` split into `productos/`, `landing/`, `archivo/`; README rewritten |
+| `ad9b73d` | 08-10 | Supplement catalogue swapped (see below) |
+| `2eb0807` | 08-08 | Home carousels bounded to 1080px and centred on desktop |
+| `a74a69b` | 08-08 | Home rebuilt: carousels first, price buttons, editorial chapters, FAQ removed |
+| `44e40d7` | 08-08 | PROJECT_CONTEXT update after the Ritual pass |
+| `24d83c8` | 08-07 | Home tightened, 3 goal cards, Ritual banner, warm palette |
+| `7ae70db` | 08-01 | Product loops play inside the carousels |
 
-**Latest pass (2026-08-07)**: the manifesto chapter and the "Cero distracciones" chapter left the homepage (the watch now has a single chapter, Garmin Connect); goals cut to three (`dormir`, `rendimiento` → "Performance", `salud`) and restyled as full-bleed photo cards; the Synbiotic chapter became the full-bleed **Ritual banner** (`#8fc0d8`, "Made for her."); Prenatal Multivitamin deleted from the catalogue; the cream of the Promix loop (`#faf1e8`) became the site's warm tint; media capped below 720px; the Tienda header block removed.
+**Latest pass (2026-08-10)** — three chained changes:
+1. **Supplements swapped.** Women's Multivitamin and Synbiotic deleted everywhere (cards, pages, footers, goals). The **Ritual banner went with them** — its visual and CTA pointed at the Synbiotic page — replaced by an Absorption Company chapter in the editorial template. Promix Micronized Creatine became **Promix Non-GMO Creatine** on the 30-stick variant; Cymbiotika creatine switched to a 12-sachet format.
+2. **`deploy/media/` reorganised** into `productos/<handle>/`, `landing/{hero,objetivos,bandas,capitulos}/` and `archivo/`. Every reference was rewritten; `gen-products.js` now derives a band poster from the loop's full path.
+3. **`assets/` reorganised** by product handle, mirroring `deploy/media/productos/`.
 
 ## 3. Project structure
 
 ```
 lowlabs-cirqa-context/
-├── CLAUDE.md                  # Product specs, brand, competition. Read first.
-├── PROJECT_CONTEXT.md         # This file
-├── vercel.json                # outputDirectory: "deploy", cleanUrls: true
-├── .gitignore                 # .DS_Store, *.zip, zi5VaVFL, node_modules/
+├── README.md                  ★ Structure, media conventions, commands, rules
+├── CLAUDE.md                  Product specs, brand, competition. Read first.
+├── PROJECT_CONTEXT.md         This file
+├── vercel.json                outputDirectory: "deploy", cleanUrls: true
+├── .gitignore                 .DS_Store, *.zip, zi5VaVFL, node_modules/
 ├── .claude/
-│   ├── launch.json            # Dev server: node build/serve.js on port 4175
-│   ├── serve.py               # Legacy Python server — NOT used (see section 11)
-│   └── skills/                # Claude Code skills (design/brand/UI, not project code)
+│   ├── launch.json            Dev server: node build/serve.js on port 4175
+│   ├── serve.py               Legacy Python server — NOT used (see section 11)
+│   └── skills/                Claude Code skills (design/brand/UI, not project code)
 │
 ├── build/
-│   ├── gen-products.js        # ★ Generates deploy/productos/*.html from catalog.js
-│   └── serve.js               # Static preview server that emulates Vercel cleanUrls
+│   ├── gen-products.js        ★ Generates deploy/productos/*.html from catalog.js
+│   └── serve.js               Static preview server that emulates Vercel cleanUrls
 │
-├── deploy/                    # ★ CANONICAL — the deployed site
-│   ├── index.html             # Homepage (465 lines)
-│   ├── tienda.html            # Shop page; aisles rendered client-side (164 lines)
-│   ├── productos/             # GENERATED — do not hand-edit
-│   │   ├── cirqa.html
-│   │   ├── venu-4.html
-│   │   ├── venu-3s.html
-│   │   ├── vivoactive-6.html
-│   │   ├── creatina.html
-│   │   ├── womens-multivitamin.html
-│   │   ├── synbiotic.html
-│   │   ├── promix-creatina.html
-│   │   └── promix-debloat.html
-│   ├── catalog.js             # ★ Single source of truth: products + goals (381 lines)
-│   ├── app.js                 # All behaviour, 12 isolated modules (766 lines)
-│   ├── styles.css             # Full design system (1566 lines)
-│   └── media/                 # 57 MB, 55 files — local images and videos, committed
+├── deploy/                    ★ CANONICAL — the deployed site
+│   ├── index.html             Homepage (410 lines)
+│   ├── tienda.html            Shop page; aisles rendered client-side
+│   ├── productos/             GENERATED — do not hand-edit
+│   │   ├── cirqa.html  venu-4.html  venu-3s.html  vivoactive-6.html
+│   │   ├── creatina.html  promix-creatina.html  promix-debloat.html
+│   │   └── promix-relax.html  absorption-sleep.html
+│   ├── catalog.js             ★ Single source of truth: products + goals (380 lines)
+│   ├── app.js                 All behaviour, 13 isolated modules (841 lines)
+│   ├── styles.css             Full design system (1698 lines)
+│   └── media/                 66 MB, 60 files — see section 10
 │
-├── site/                      # ⚠️ ABANDONED — single-file version, ~5 revisions behind
-├── shopify-theme/             # ⚠️ ABANDONED — Liquid theme, matches the old single-product page
+├── site/                      ⚠️ ABANDONED — single-file version, many revisions behind
+├── shopify-theme/             ⚠️ ABANDONED — Liquid theme, matches the old single-product page
 │
-├── assets/                    # 122 MB source uploads (PDFs, photos, raw videos)
-└── assets-hd/                 # 59 MB processed assets + CDN URL maps
+├── assets/                    150 MB source uploads, one folder per product
+└── assets-hd/                 59 MB processed assets + CDN URL maps
 ```
 
-`site/` and `shopify-theme/` have **not** been touched since the 5-product rewrite. They still describe a single-product page with a comparison table and the old teal palette. Treat them as historical unless someone explicitly asks to revive them; regenerate from `deploy/` rather than patching.
+`site/` and `shopify-theme/` have **not** been touched since the 5-product rewrite. Treat them as historical; regenerate from `deploy/` rather than patching.
 
 ## 4. Technology stack and the generation step
 
@@ -102,24 +101,24 @@ node build/gen-products.js
 **Run it after any change to `catalog.js`, or to the nav/footer/band templates inside `gen-products.js`.** Forgetting leaves the nine product pages stale, and nothing warns you.
 
 - **Google Fonts**: Outfit (display) + DM Sans (body) — web-safe stand-ins for the brand fonts Codec Pro and Canva Sans.
-- **Images**: mixed. CIRQA photography is served from the Shopify CDN; everything added since 2026-07-30 (watches, supplement, goal visuals, hero, videos) lives in `deploy/media/` and is committed.
+- **Images**: mostly local under `deploy/media/`; CIRQA photography still comes from the Shopify CDN.
 
 ## 5. Page inventory
 
 | Route | File | Notes |
 |-------|------|-------|
 | `/` | `deploy/index.html` | Homepage. Carries `class="has-hero"` on `<body>` — this drives the top spacing (section 6). |
-| `/tienda` | `deploy/tienda.html` | Shop. `<div id="shop-sections">` is filled by the `shop` module, one carousel aisle per category (floating cards, same template as "Los más buscados"). |
+| `/tienda` | `deploy/tienda.html` | Shop. `<div id="shop-sections">` is filled by the `shop` module, one carousel aisle per category. |
 | `/productos/{handle}` | generated | 9 pages. `<body data-product="{handle}">` is how `app.js` knows which catalogue entry to bind. |
 
 `cleanUrls: true` in `vercel.json` is what makes `/tienda` and `/productos/cirqa` resolve without `.html`. `build/serve.js` reproduces that locally.
 
 ### Homepage section order
-top bar (scrolling) → floating nav → full-bleed hero → **goal assistant** (`#objetivo`, three full-bleed photo cards with a liquid-glass footer) → **Los más buscados** carousel (`#mas-buscados`, detoured packshots, watches and supplements mixed) → Wearables video band (`#wearables`) → the single CIRQA chapter (Garmin Connect, vertical loop) → Suplementos video band (`#suplementos`) → supplements carousel (`#sup-grid`, five floating cards — the Cymbiotika loops, then the two Promix packshots) → one chapter per supplement — "Wellness, in one shot." (Cymbiotika bubbles loop), women's, the full-bleed blue **Ritual banner** ("Made for her."), then the "Clean nutrition. Real performance." Promix brand section on the stick loop → FAQ (`#faq`) → closing banner → footer → buy dock.
+top bar (scrolling) → floating nav (Tienda / Wearables / Suplementos) → full-bleed hero, two centred CTAs **Suplementos** and **Wearables** → **Los más buscados** carousel (`#mas-buscados`, everything but the two extra watches) → **goal assistant** (`#objetivo`) → Wearables video band (`#wearables`) → **Garmin Connect chapter** (editorial) → Suplementos video band (`#suplementos`) → **supplements carousel** (`#sup-grid`) → "Wellness, in one shot." (Cymbiotika, editorial flip) → "Duerme profundo, despierta ligero." (Absorption, editorial) → "Clean nutrition. Real performance." (Promix, editorial flip on white) → closing banner → footer → buy dock.
 
-Deliberately **removed** and not to be reinstated without asking: the comparison table, the "Menos ruido / Mejor bienestar" statement, the "Se pone una vez" band, the "Salud 24/7" chapter, the **manifesto chapter** ("Buscamos los productos que valen la pena…", with its `120+ / 9 / 0` stats), the **"Cero distracciones. Solo registro."** chapter, and the Venu 3S, Venu 4 and Vívoactive 6 chapters (the three watches appear only in `/tienda`, the footer and their own pages).
+Deliberately **removed** and not to be reinstated without asking: the comparison table, the "Menos ruido / Mejor bienestar" statement, the "Se pone una vez" band, the "Salud 24/7" chapter, the manifesto chapter, the "Cero distracciones" chapter, the Venu 3S / Venu 4 / Vívoactive 6 chapters, the **FAQ** (removed 08-08; the footer's "Garantía y devoluciones" now points at `mailto:`), the **Women's Multivitamin chapter** and the **Ritual "Made for her." banner** (both removed 08-10 with their products).
 
-The Tienda has no header block any more: the page opens straight on the first aisle, whose extra `padding-top` clears the floating nav.
+The Tienda has no header block: the page opens straight on the first aisle, whose extra `padding-top` clears the floating nav.
 
 ## 6. Design system
 
@@ -135,103 +134,99 @@ The teal palette was removed on 2026-07-30. The `--teal-*` variable **names** we
 | `--teal-brand` | `#a2a8ac` | Eyebrow / label grey |
 | `--sand` | `#dec8a7` | Brand warm accent — the only remaining colour |
 | `--surface` | `#ffffff` | Card background |
-| `--surface-teal` | `#f3f4f5` | Media placeholders, `.compare` background |
-| `--surface-sand` | `#faf1e8` | **The cream of the Promix loop background.** Carries both `.chapter.sand` and `.chapter.tinted`, plus the goal section's gradient, so the video blends into its section instead of sitting on a grey plate. |
+| `--surface-teal` | `#f3f4f5` | Media placeholders |
+| `--surface-sand` | `#faf1e8` | Cream of the Promix loop; carries `.chapter.sand` and `.chapter.tinted` |
 | `--cta` | `#17191b` | Near-black |
 | `--canvas` | `#eaebec` | Page background behind the shell |
 
 ### Liquid glass — the current implementation
 Three custom properties plus one pseudo-element carry the whole look:
 
-- `--lg-fill` / `--lg-fill-hi` — white translucent gradient. **The floor opacity (`.64`) is load-bearing**: it is what keeps ink text legible over any backdrop. Lowering it breaks contrast on photos.
+- `--lg-fill` / `--lg-fill-hi` — white translucent gradient. **The floor opacity (`.64`) is load-bearing**: it is what keeps ink text legible over any backdrop.
 - `--lg-depth` — dark hairline for silhouette, soft drop shadow, inner white glow.
-- **The rim** — a 1px ring whose intensity varies top-to-bottom (bright white at the top, ink hairline at the bottom). A `border` cannot do this, so it is a gradient clipped with `mask-composite: exclude`. Shared by `.btn::after`, `.nav-pill::after`, `.dock-shell::after`, `footer::after`.
-
-Applied to: all buttons, the floating nav, the buy dock, and the footer.
+- **The rim** — a 1px ring whose intensity varies top-to-bottom. A `border` cannot do this, so it is a gradient clipped with `mask-composite: exclude`. Shared by `.btn::after`, `.nav-pill::after`, `.dock-shell::after`, `footer::after`.
 
 ### SVG refraction filter — read before touching
-Each page embeds `<filter id="lg-refract">` (turbulence → displacement → blur) and `.btn::before` can use it as a `backdrop-filter`.
-
-**It is scoped to Firefox on purpose.** Chromium parses `backdrop-filter: url(...)` and then composites nothing — leaving it unscoped silently destroys the plain blur for most visitors. The guard is:
+Each page embeds `<filter id="lg-refract">`. **It is scoped to Firefox on purpose.** Chromium parses `backdrop-filter: url(...)` then composites nothing — leaving it unscoped silently destroys the plain blur for most visitors:
 
 ```css
 @supports (-moz-appearance:none) and (backdrop-filter:url("#lg-refract")){ … }
 ```
 
-Everything else falls back to `blur(6px) saturate(150%)`. Verified: computed value stays `blur(6px) saturate(1.5)` in Chromium.
+### Legacy glass helpers
+`.glass-light` / `.glass-dark` / `.blurred` remain for the top bar and the goal CTA pill. Rules that still hold:
+1. **Never put `var()` inside `-webkit-backdrop-filter`** — Safari ≤17 does not resolve custom properties there.
+2. **Tint alpha alone carries contrast, never blur.**
+3. **Nothing with `opacity < 1`, `filter`, `mask`, `clip-path`, `mix-blend-mode` or `will-change` may be an ancestor of a blurred surface** — each creates a backdrop root.
 
-### Legacy glass helpers (still present, narrower use)
-`.glass-light` / `.glass-dark` / `.blurred` remain for the top bar, product badges, and selection cards. Historical rules that still hold:
-1. **Never put `var()` inside `-webkit-backdrop-filter`** — Safari ≤17 does not resolve custom properties there, so the glass vanishes on exactly the browsers needing the prefix.
-2. **Tint alpha alone carries contrast, never blur.** Blur can disappear (unsupported, reduced-transparency, backdrop root).
-3. **Nothing with `opacity < 1`, `filter`, `mask`, `clip-path`, `mix-blend-mode`, or `will-change` may be an ancestor of a blurred surface** — each creates a backdrop root and kills the descendant's blur. This is why `.rail` never carries `.rv`, and why `.shell` clips its corners with `position/z-index/isolation` rather than a mask.
-
-### The three card families
+### The card families
 | Family | Where | Shape |
 |--------|-------|-------|
-| `.prod` | `/productos/*` "Otros productos", nothing else now | Framed card: media box, category, name, tagline, price, button |
-| `.fcard` inside `.cards.fcards` | both home carousels and every Tienda aisle | **Floating**: cut-out packshot or product loop, `mix-blend-mode: multiply`, drop shadow, short name, price. No frame, no background |
-| `.goal` | the assistant | Full-bleed photo, 3/4 portrait, `.goal-body` in `glass-dark blurred` at the bottom with the label and a `.goal-cta` pseudo-button (a `span` — the card is already a radio `button`) |
+| `.prod` | `/productos/*` "Otros productos" | Framed card: media box, category, name, tagline, price, button |
+| `.fcard` inside `.cards.fcards` | both home carousels and every Tienda aisle | **Floating**: cut-out packshot or product loop, `mix-blend-mode: multiply`, drop shadow, short name, then **`.fcard-buy`** — the price as a `btn btn-ink btn-sm` pill. It is a `span` with `pointer-events:none` (the card is already the link) and `margin-top:auto`, so every button lines up whatever the name's line count |
+| `.goal` | the assistant | Full-bleed photo. **`.goal-body` is fully transparent** — the card's own gradient scrim carries legibility; only the `.goal-cta` pill keeps a glass surface |
 
-A supplement that declares a `video` plays it inside `.fcard`; a radial mask dissolves the studio background so the loop floats like the cut-outs. Wearables always use their `packshot`.
+A supplement that declares a `video` plays it inside `.fcard`; a radial mask dissolves the studio background. Wearables always use their `packshot` — that rule is in `flyMedia()`, keyed on the category.
 
-`.ritual` is a one-off full-bleed banner (`#8fc0d8`): cut-out hand flush with the bottom edge on the left, centred copy on the right, stacked below 900px. Its image carries an explicit `aspect-ratio` — in a flex container a lazy-loaded image with two `auto` dimensions collapses to zero until it decodes.
+### Carousels
+- `.card-dots` — one dot per page of scroll, filled by the `carousel-dots` module, purely indicative (no focus, no click). Empty when the track fits, so the container takes no space.
+- Above 900px the two **home** carousels are bounded and centred: `width:min(1080px, 100% - clamp(80px,10vw,170px))`, `margin-inline:auto`. The Tienda aisles keep the full-bleed track whose `--cards-inset` aligns the first card with the aisle title — do not merge the two behaviours.
+
+### Editorial chapters — `.chapter.editorial`
+- ≥900px: `display:flex`, `min-height:100svh`, media capped at `280px`, copy facing it.
+- ≤899px: **still side by side** — narrow column for the visual (38%), wide one for the copy, and the column template flips with `.flip` so the alternation survives on mobile.
+- `.chapter.on-white` (Promix): white section, no plate or radius behind the video, `object-fit:contain` + `mix-blend-mode:multiply`, and two crossed linear masks (`mask-composite:intersect`) that dissolve the loop's near-white studio edge (253,251,249) into the page.
 
 ### Measured layout variables
-Three values are measured in JS because they change with fonts, breakpoints, and content:
-- `--dock-h` — buy dock height; `body { padding-bottom }` reserves it so the footer always clears.
-- `--nav-h` — nav pill height; it doubles below 1024px where the pill goes two-row.
+- `--dock-h` — buy dock height; `body { padding-bottom }` reserves it.
+- `--nav-h` — nav pill height; doubles below 1024px.
 - `--topbar-h` — scrolling top bar (static `34px`), offsets the nav, the shell, and every scroll anchor.
 
-`body.has-hero` (set statically in `index.html`, not by JS) decides whether the shell starts under the nav or lets the hero run beneath it. It is static precisely so the first paint is correct.
+`body.has-hero` (static in `index.html`) decides whether the shell starts under the nav or lets the hero run beneath it.
 
 ### Hero
-Full-bleed, `100svh − topbar − gutter`, `object-fit: cover`. The wordmark and tagline are **baked into the image**, which constrains cropping:
-- Source is `1366×768` — do not upscale it, an earlier 2400px version was just blurrier.
-- Measured text positions: wordmark at x 535–834, baseline at x 849–1230.
-- `hero-runners-mobile.jpg` is cropped to x 461–845 (ratio 1:2, baseline excluded) and served via `<picture>` under 760px; `.hero-tagline` supplies the missing baseline in HTML there and is hidden above 760px.
-- `object-position: 72%` on mobile makes any overflow crop from the left so the wordmark's end is never cut.
+Full-bleed, `object-fit: cover`. The wordmark and tagline are **baked into the image**:
+- Source is `1366×768` — do not upscale it.
+- `hero-runners-mobile.jpg` is a `384×768` (1:2) crop served under 760px; `.hero-tagline` supplies the missing baseline in HTML there.
+- **Below 760px the hero takes its image's ratio** (`aspect-ratio:1/2; height:auto; max-height:calc(100svh - topbar - gutter)`) instead of filling the screen — a full-height box is narrower than 1:2, so `cover` used to crop the sides and cut the wordmark.
+- Above 760px the two CTAs are **centred** (`.hero-full-inner{align-items:center}`).
 
 ### Responsive breakpoints
 | Width | What changes |
 |-------|--------------|
 | `640px` | Top bar text shrinks to stay on one line |
-| `719/720px` | Media caps kick in (chapter 4/3.4, portrait ≤250px, `.fcard` ≤190px, goal 3/3.6); grids go 2-per-row; `Ver más` clamping activates |
-| `759/760px` | Hero switches image variant; goals drop from 3 columns to 2 |
-| `899/900px` | Chapters, section heads and the floating grids go multi-column; carousel arrows appear; the Ritual banner un-stacks |
+| `719/720px` | Media caps kick in; grids go 2-per-row; `Ver más` clamping activates |
+| `759/760px` | Hero switches image variant **and drops its full-height rule**; goal cards become a **full-width carousel** (one card per screen, sized like the closing banner, with dots); hero CTAs stop being centred |
+| `899/900px` | Chapters and floating grids go multi-column; carousel arrows appear; editorial chapters take their full-height desktop form; home carousels get their bounded track |
 | `980px` | Product page splits into gallery + buy rail |
-| `1023/1024px` | Nav collapses to two rows; the first Tienda aisle takes its tall `padding-top` to clear the floating nav |
+| `1023/1024px` | Nav collapses to two rows; the first Tienda aisle takes its tall `padding-top` |
 
 ## 7. Catalogue and Shopify
 
-`deploy/catalog.js` exports `window.LOWLABS` with `products`, `goals`, `categories`, and the helpers `byHandle`, `byGoal`, `inCategory`, `money`, `url`. It is the only place prices, images, specs, and variant IDs live — the homepage, shop, product pages, and generator all read from it.
+`deploy/catalog.js` exports `window.LOWLABS` with `products`, `goals`, `categories`, and the helpers `byHandle`, `byGoal`, `inCategory`, `money`, `url`. It is the only place prices, images, specs and variant IDs live.
 
 ### Products and provisional prices
-| Handle | Product | Price (MXN) | Compare at | Shopify |
-|--------|---------|-------------|-----------|---------|
-| `cirqa` | Garmin CIRQA™ Smart Band | 3,999 | 4,199 | ✅ wired |
-| `venu-4` | Garmin Venu® 4 | 10,999 | 11,499 | ❌ |
-| `venu-3s` | Garmin Venu® 3S | 8,899 | 9,399 | ❌ |
-| `vivoactive-6` | Garmin Vívoactive® 6 | 5,999 | 6,299 | ❌ |
-| `creatina` | Cymbiotika Liposomal Advanced Creatine | 1,349 | 1,499 | ❌ |
-| `womens-multivitamin` | Cymbiotika Women's Multivitamin +18 | 400 | — | ❌ |
-| `synbiotic` | Cymbiotika Synbiotic ⚠️ *visual is a Ritual bottle* | 400 | — | ❌ |
-| `promix-creatina` | Promix Micronized Creatine | 1,199 | — | ❌ |
-| `promix-debloat` | Promix Debloat Prebiotic + Probiotic | 599 | — | ❌ |
+| Handle | Product | Price (MXN) | Compare at | Source price | Shopify |
+|--------|---------|-------------|-----------|--------------|---------|
+| `cirqa` | Garmin CIRQA™ Smart Band | 3,999 | 4,199 | MSRP MX | ✅ wired |
+| `venu-4` | Garmin Venu® 4 | 10,999 | 11,499 | MSRP MX | ❌ |
+| `venu-3s` | Garmin Venu® 3S | 8,899 | 9,399 | MSRP MX | ❌ |
+| `vivoactive-6` | Garmin Vívoactive® 6 | 5,999 | 6,299 | MSRP MX | ❌ |
+| `creatina` | Cymbiotika Liposomal Advanced Creatine ⚠️ *listed 12 sachets, priced as the 24-pack* | 1,349 | 1,499 | $65 US | ❌ |
+| `promix-creatina` | Promix Non-GMO Creatine — 30 sticks × 5 g | 659 | — | $32 US | ❌ |
+| `promix-relax` | Promix Relax: Magnesium Complex — 90 caps / 30 servings | 989 | — | $48 US | ❌ |
+| `promix-debloat` | Promix Debloat Prebiotic + Probiotic | 599 | — | $29 US | ❌ |
+| `absorption-sleep` | The Absorption Company Sleep — 7 sticks, Chamomile Lemonade | 499 | — | $24 US | ❌ |
 
-The "compare at" values are the real MSRPs (Garmin MX / Cymbiotika USD converted). The lowlabs prices are placeholders picked below MSRP — **confirm before launch.** The three $400 supplements come straight from the Canva mock-up: price, tagline, highlights and spec table are all placeholders, and they drive the "Desde $400 MXN" dock on the home and the shop.
+Supplement prices are the brands' **one-time** (non-subscription) prices converted at the rounded rate used since the first Promix pair (≈ ×20.6). The dock's floor is **"Desde $499 MXN"** and its count **9 productos** — both are hand-written in `index.html` and `tienda.html`.
 
 **Media fields on a product**
 
 | Field | Effect |
 |-------|--------|
 | `image` / `hero` | The still. Used by the PDP stage, the `.prod` card and the recommendation block when no loop exists. |
-| `video` + `poster` + `videoRatio` (`"portrait"` \| `"wide"`) | The loop replaces the packshot on the PDP stage, in the editorial chapter, and — for `category: "Suplementos"` only — inside the floating carousels. `creatina`, `womens-multivitamin` and `promix-debloat` declare one. |
-| `packshot` | The cut-out used wherever products float without a frame. `cirqa` → `cirqa-packshot.png`; `womens-multivitamin` → `sup-womens-cut.png`; the Promix pair uses its transparent PNGs. The `sup-*-cut.png` files were generated from video stills by a border flood-fill in Pillow. |
-
-Wearables never play a loop in a carousel — that rule is in `flyMedia()` in `app.js`, keyed on the category.
-
-The two Promix prices are converted from the US store ($59 and $29) at a rounded rate — provisional like the rest. Their packshots were copied from `promixnutrition.com` into `deploy/media/`.
+| `video` + `poster` + `videoRatio` (`"portrait"` \| `"wide"`) | The loop replaces the packshot on the PDP stage, in the editorial chapter, and — for `category: "Suplementos"` only — inside the floating carousels. `creatina` and `promix-debloat` declare one. |
+| `packshot` | The cut-out used wherever products float without a frame. Without it a product shows a visible rectangle in the carousels. |
 
 ### Store
 | Setting | Value |
@@ -251,90 +246,105 @@ The two Promix prices are converted from the US store ($59 and $29) at a rounded
 
 ### Checkout behaviour
 `goToCheckout()` in `app.js` branches on whether the product has a `shopify` block:
-- **With one** → redirect to `{STORE}/products/{handle}?variant={ID}&locale=es&country=MX`, colour and size pre-selected.
+- **With one** → redirect to `{STORE}/products/{handle}?variant={ID}&locale=es&country=MX`.
 - **Without one** → `mailto:lowlabsmx@gmail.com` with the product name as subject. Deliberate: it must never send a customer to a Shopify URL that does not exist.
 
 ### To wire the remaining eight products
 1. Create the product in Shopify admin, note the variant IDs.
-2. Add to the entry in `deploy/catalog.js`:
-   ```js
-   shopify: { handle: "garmin-venu-4", variants: { … } }
-   ```
-   (Products with no colour/size options can use a flat handle-only block — `goToCheckout` falls back to the product page when no variant matches.)
+2. Add `shopify: { handle: "...", variants: { … } }` to the entry in `deploy/catalog.js`.
 3. Run `node build/gen-products.js`.
 
 No other file needs touching — the button label, the note under it, and the JSON-LD all derive from the catalogue.
 
 ## 8. The goal assistant
 
-Three goals in `catalog.js`, each with `id`, `label`, `icon`, `image`, `lede`, `pick` (recommended handle), `also` (complements), and `why` (the sentence shown as justification).
+Three goals in `catalog.js`, each with `id`, `label`, `icon`, `image`, `lede`, `pick`, `also` and `why`.
 
 | Goal | Image | Recommends | Complements |
 |------|-------|-----------|-------------|
-| `dormir` — Dormir mejor | `goal-dormir.jpg` | cirqa | creatina |
-| `rendimiento` — Performance | `goal-rendimiento.jpg` | venu-4 | promix-creatina |
-| `salud` — Cuidar mi salud diaria | `goal-salud.jpg` | cirqa | womens-multivitamin, synbiotic, creatina |
+| `dormir` — Dormir mejor | `landing/objetivos/goal-dormir.jpg` | cirqa | absorption-sleep, promix-relax |
+| `rendimiento` — Performance | `landing/objetivos/goal-rendimiento.jpg` | venu-4 | promix-creatina, creatina |
+| `salud` — Cuidar mi salud diaria | `landing/objetivos/goal-salud.jpg` | cirqa | promix-debloat, promix-relax, creatina |
 
-Three entries, as in the Canva reference: the grid lays them out 3 × 1 above 760px and 2 columns below. The `icon` field is still in the data but no longer rendered — the cards show a photo, a label and a "Ver selección" pill, nothing else. `goal-energia.jpg`, `goal-recuperacion.jpg` and `goal-longevidad.jpg` are the leftovers of the cut goals.
+The `icon` field is still in the data but no longer rendered. Nothing is stored or sent — a pure client-side lookup. The result block stays out of the DOM until a goal is chosen, then receives focus on click (but not on arrow-key navigation).
 
-Nothing is stored or sent — it is a pure client-side lookup. The result block stays out of the DOM until a goal is chosen, then receives focus on click (but not on arrow-key navigation, so keyboard users can keep browsing the group).
+Below 760px the three cards become a **horizontal carousel**: one full-width card per screen, `min-height:clamp(340px,52vh,520px)` — the closing banner's size — with scroll-snap and the same `.card-dots` indicator. The radiogroup and its roving tabindex are untouched; only the rendering changes.
 
-**Known imbalance**: `dormir` and `rendimiento` still lean on a single complement each. Rebalance `also` when the real supplement copy lands.
+## 9. `app.js` — 13 modules
 
-## 9. `app.js` — 12 modules
-
-Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not decorative: `.rv` elements start at `opacity: 0`, so before the wrapper existed one uncaught error could leave **the entire page invisible**. The reveal module also has a 4-second failsafe that reveals everything if the observer never fires.
+Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not decorative: `.rv` elements start at `opacity: 0`, so before the wrapper existed one uncaught error could leave **the entire page invisible**. The reveal module also has a 4-second failsafe.
 
 | Module | Role |
 |--------|------|
-| `catalog` | Renders the framed grids from `productCard()` (`data-exclude` / `data-handles`) **and** the floating tracks from `flyCard()` (`.fcards[data-handles]`) |
-| `shop` | Builds `/tienda` aisles — one carousel per category, arrows in the head, anchors slugged from the category name |
+| `catalog` | Renders the framed grids from `productCard()` **and** the floating tracks from `flyCard()` (`.fcards[data-handles]`) |
+| `shop` | Builds `/tienda` aisles — one carousel per category |
 | `goals` | The assistant: radiogroup, roving tabindex, recommendation rendering |
 | `reveal` | `.rv` scroll reveal + failsafes |
-| `hero-video` | Autoplay/pause logic — **currently inert on all pages**, the hero is a still image now. Kept for when a hero video returns. |
+| `hero-video` | Autoplay/pause logic — **currently inert**, the hero is a still image |
 | `section-loops` | `data-autoloop` videos: play in view, pause out of view and on tab hide |
 | `past-hero` | Toggles `body.past-hero` |
 | `dock-height` | Measures `--dock-h` and `--nav-h` |
 | `selection` | Product page colour/size radiogroups |
 | `checkout` | Shopify redirect or mailto fallback |
-| `read-more` | Below 720px, clamps long paragraphs to 3 lines with a `Ver más` toggle. Only appears when the text actually overflows; without JS the text stays whole rather than truncated. |
-| `carousel` | Arrows of **every** floating track — each `.card-arrows` walks up to its own `<section>` and drives the `.cards` it finds there, so the home carousels and each Tienda aisle scroll independently. The step is measured from the real gap between the first two items, not hardcoded. |
+| `read-more` | Below 720px, clamps long paragraphs to 3 lines with a `Ver más` toggle |
+| `carousel` | Arrows of every floating track; the step is measured from the real gap between the first two items |
+| `carousel-dots` | Fills every `.card-dots` with one dot per page. The page count comes from the **real step between two cards** and the track's **content box** (padding excluded) — not from `scrollWidth/clientWidth`, which counts gutters and invents a page. Rebuilds on resize and on `load`; also drives the goals track |
 
 ## 10. Media
 
-`deploy/media/` (57 MB, 55 files, committed):
+### `deploy/media/` (66 MB, 60 files, committed)
 
-| File | Use |
-|------|-----|
-| `hero-runners.jpg` / `hero-runners-mobile.jpg` | Hero, two crops (section 6) |
-| `hero-cirqa.mp4` + poster | CIRQA product page band |
-| `loop-wearables.mp4` | Homepage Wearables band, watch product pages |
-| `loop-capsulas.mp4` + poster | Homepage Suplementos band |
-| `loop-brand.mp4` | Creatine product page band |
-| `loop-vertical.mp4` | Portrait loop inside the Garmin Connect chapter |
-| `cymbiotika-shot.mp4` + poster | "Wellness, in one shot." chapter |
-| `promix-loop.mp4` + poster | "Clean nutrition. Real performance." chapter **and** the Debloat card in every carousel |
-| `sup-creatina.mp4`, `sup-womens.mp4` (+ `sup-womens.jpg` poster) | Supplement loops in the carousels and their PDP stages |
-| `sup-womens-cut.png`, `cirqa-packshot.png` | Cut-outs for the floating cards |
-| `promix-creatine.png`, `promix-debloat.png` | Promix packshots, copied from `promixnutrition.com` |
-| `ritual-hand.png` | Cut-out for the Ritual banner (from `assets/69e4597b-….webp`) |
-| `ritual-essential.png` | Bottle packshot — the `synbiotic` card and PDP |
-| `goal-dormir.jpg`, `goal-rendimiento.jpg`, `goal-salud.jpg` | The three assistant cards, all ≥940px |
-| `venu-4.png`, `venu-3s.png`, `vivoactive-6.png`, `creatina.png` | Packshots, displayed with `mix-blend-mode: multiply` so their white background dissolves |
+```
+deploy/media/
+├── productos/<handle>/     one folder per catalogue handle
+│   ├── cirqa/              cirqa-packshot.png, hero-cirqa.mp4 + poster
+│   ├── venu-4/  venu-3s/  vivoactive-6/     packshots (mix-blend-mode: multiply)
+│   ├── creatina/           creatina.png, sup-creatina.mp4 + poster
+│   ├── promix-creatina/    promix-creatine-sticks.png
+│   ├── promix-debloat/     promix-debloat.png, debloat-loop.mp4 + poster
+│   ├── promix-relax/       promix-relax.png
+│   └── absorption-sleep/   absorption-sleep.png
+├── landing/
+│   ├── hero/               hero-runners.jpg + hero-runners-mobile.jpg
+│   ├── objetivos/          goal-dormir / -rendimiento / -salud .jpg
+│   ├── bandas/             loop-wearables, loop-capsulas, loop-brand (+ posters)
+│   └── capitulos/          loop-vertical, cymbiotika-shot (+ posters)
+└── archivo/                30 files kept but referenced by nothing
+    ├── cirqa/              app screens, rock/tan/sensor shots, wrist-negra
+    ├── objetivos/          goal-energia, -longevidad, -recuperacion
+    ├── suplementos/        capsules-*, loop-suplementos, promix-loop, sup-prenatal/
+    │                       -synbiotic/-womens sets, promix-creatine.png (180-serving bag)
+    └── ritual/             ritual-hand.png, ritual-essential.png
+```
 
-**Orphans as of 2026-08-07** — kept in the repo, referenced by nothing: `app-actividades.jpg`, `app-body-battery.jpg`, `app-phone-rock.jpg`, `capsules-falling.jpg`, `capsules-texture.jpg`, `cirqa-rock.jpg`, `cirqa-sensor-negra.jpg`, `cirqa-tan-gradient.jpg`, `cirqa-tan-orange.jpg`, `cirqa-tan-wide.jpg`, `wrist-negra.jpg`, `goal-energia.jpg`, `goal-longevidad.jpg`, `goal-recuperacion.jpg`, `loop-suplementos.mp4` + poster, and the whole `sup-prenatal.*` / `sup-synbiotic.*` set (Prenatal deleted, Synbiotic switched to the Ritual visual). Delete them only if you are sure no future section wants them back.
+**Conventions**
+- A loop's poster is the **neighbouring file prefixed `poster-`**. `gen-products.js` rebuilds band posters from that rule (`posterOf()`), so `BAND_VIDEO` values carry the folder: `cirqa: "productos/cirqa/hero-cirqa"`.
+- `archivo/` holds the visuals of removed sections. Do not delete without asking — they are the only copies of the Ritual banner and the dropped Cymbiotika supplements.
+- CIRQA photography still comes from the **Shopify CDN**; `assets-hd/cdn-urls.json` is the source of truth for those URLs.
 
-CIRQA colour swatches and lifestyle photography still come from the Shopify CDN; `assets-hd/cdn-urls.json` remains the source of truth for those URLs.
+### `assets/` (150 MB, sources, never served)
+
+One folder per product handle, mirroring `deploy/media/productos/`:
+
+```
+assets/
+├── cirqa/{producto,lifestyle,app,video,documentos}   the whole Garmin CIRQA pack
+├── venu-4/  venu-3s/  vivoactive-6/                  official Garmin packshots
+├── creatina/  promix-creatina/  promix-debloat/  promix-relax/  absorption-sleep/
+├── landing/            hero render, logo, capsule renders, loop rushes
+├── archivo/ritual/     removed product, sources kept
+└── fotosyvideos2/      original dump, untouched
+```
+
+Rushes were renamed after the loop they produce (`landing/loop-wearables.mp4` → `deploy/media/landing/bandas/loop-wearables.mp4`). Rushes that are byte-for-byte duplicates of a committed `deploy/media` file are deliberately **left untracked**, as are the newest raw sources.
 
 > ### ⚠️ `assets/` and `assets-hd/` are in a PUBLIC GitHub repo
 >
-> `origin` is `github.com/megevanderwan2004-maker/lowbasemx`, which is public. 126 files under `assets/` and `assets-hd/` are tracked — including `assets/83713503-*.pdf`, the official Garmin product sheet that `CLAUDE.md` describes as containing **confidential reseller pricing**, and `assets-hd/garmin-video.mp4`, Garmin-copyrighted footage.
+> `origin` is `github.com/megevanderwan2004-maker/lowbasemx`, which is public. Tracked files include `assets/cirqa/documentos/83713503-*.pdf`, the official Garmin product sheet that `CLAUDE.md` describes as containing **confidential reseller pricing**, and `assets-hd/garmin-video.mp4`, Garmin-copyrighted footage.
 >
-> This predates the rewrites. `vercel.json` pins `outputDirectory: "deploy"` so these files are at least never served from the website — **do not remove that setting.**
+> This predates the rewrites. `vercel.json` pins `outputDirectory: "deploy"` so these files are never served from the website — **do not remove that setting.**
 >
-> Remediation needs an owner decision, because both routes are disruptive: make the repo private, or `git rm --cached` + `.gitignore` + history rewrite (which invalidates every existing clone). Untracking alone does not help — the files stay reachable in past commits.
->
-> The newest source files (ChatGPT renders, raw videos, official packshots) are deliberately left **untracked**; only their optimised copies in `deploy/media/` are committed.
+> Remediation needs an owner decision: make the repo private, or `git rm --cached` + `.gitignore` + history rewrite (which invalidates every existing clone). Untracking alone does not help — the files stay reachable in past commits.
 
 ## 11. How to run locally
 
@@ -342,17 +352,15 @@ CIRQA colour swatches and lifestyle photography still come from the Shopify CDN;
 node build/serve.js 4175
 ```
 
-Serves `deploy/` at `http://localhost:4175` and emulates Vercel's `cleanUrls`, so `/tienda` and `/productos/cirqa` resolve exactly as in production. `.claude/launch.json` points at this script.
+Serves `deploy/` at `http://localhost:4175` and emulates Vercel's `cleanUrls`. `.claude/launch.json` points at this script.
 
-`.claude/serve.py` is the older Python equivalent and **does not work here**: macOS blocks the CommandLineTools `python3` from reading this Documents folder (`Operation not permitted`). Use the Node server.
+`.claude/serve.py` is the older Python equivalent and **does not work here**: macOS blocks the CommandLineTools `python3` from reading this Documents folder. Use the Node server.
 
-Most images are local now, but CIRQA photography still loads from the Shopify CDN, so full rendering needs an internet connection.
+Most images are local, but CIRQA photography still loads from the Shopify CDN, so full rendering needs an internet connection.
 
 ## 12. Deployment
 
 `vercel.json`: `outputDirectory: "deploy"`, `cleanUrls: true`, `buildCommand: null`, plus `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` headers and a no-cache rule on `styles.css` / `app.js`.
-
-**Nothing is deployed yet.** Two routes:
 
 ```bash
 vercel login
@@ -361,58 +369,56 @@ vercel login
 vercel --prod
 ```
 
-`vercel login` opens a browser and cannot be run headlessly. Alternatively, import `lowbasemx` from the Vercel dashboard — it reads `vercel.json` as-is and redeploys on every push to `main`, which is the more practical option given the iteration pace.
+`vercel login` opens a browser and cannot be run headlessly. Importing `lowbasemx` from the Vercel dashboard is the more practical option: it reads `vercel.json` as-is and redeploys on every push to `main`.
 
 ## 13. Open questions
 
-1. **Prices for the eight non-CIRQA products** — provisional, need owner confirmation.
-2. **Shopify for those eight** — not created. Section 7 has the procedure.
-3. **`synbiotic` identity** — Cymbiotika name, Ritual visual. Decide which product it actually is, then fix name, brand, price, specs and the banner's link.
-4. **Image rights** — Promix packshots pulled from their site; Ritual shots supplied by the owner. Unconfirmed.
-5. **Supplement copy** — taglines, highlights and spec tables are all placeholders written in the brand tone.
+1. **Supplement prices** — converted from US one-time prices at ≈ ×20.6; need owner confirmation.
+2. **Cymbiotika 12-sachet pack** — the format is listed but the price is still the 24-pack's. Cymbiotika sells no 12-pack.
+3. **Shopify for the eight non-CIRQA products** — not created. Section 7 has the procedure.
+4. **Image rights** — Promix, Absorption and Cymbiotika packshots pulled from the brands' CDNs. Unconfirmed.
+5. **Supplement copy** — taglines, highlights and spec tables are adapted from the source pages; the editorial voice is ours and unreviewed.
 6. **Custom domain** — none.
-7. **Vercel** — no project exists.
+7. **Vercel** — no project linked from this machine.
 8. **`site/` and `shopify-theme/`** — abandoned. Delete, or regenerate from `deploy/`?
-9. **No analytics, no cookie banner, no dedicated shipping/returns page.** The footer's "Garantía y devoluciones" points at `/#faq`.
+9. **No analytics, no cookie banner, no dedicated shipping/returns page.** The footer's "Garantía y devoluciones" points at `mailto:`.
 10. **`assets-hd/resource_urls.json`** holds expired Shopify staged-upload URLs; historical record only.
 
 ## 14. Files to understand before making changes
 
-1. **`CLAUDE.md`** — product specs, brand, competition. Read first.
-2. **`deploy/catalog.js`** — everything about products and goals. Most content changes start and end here.
-3. **`deploy/index.html`** — homepage structure and section order.
-4. **`deploy/app.js`** — the 12 modules.
-5. **`deploy/styles.css`** — the design system; the liquid-glass and backdrop-filter comments are load-bearing.
-6. **`build/gen-products.js`** — the page templates for `/productos/*` (nav, footer, band, spec table).
+1. **`README.md`** — structure, media conventions, commands.
+2. **`CLAUDE.md`** — product specs, brand, competition.
+3. **`deploy/catalog.js`** — everything about products and goals. Most content changes start and end here.
+4. **`deploy/index.html`** — homepage structure and section order.
+5. **`deploy/app.js`** — the 13 modules.
+6. **`deploy/styles.css`** — the design system; the liquid-glass and backdrop-filter comments are load-bearing.
+7. **`build/gen-products.js`** — the page templates for `/productos/*`.
 
 ## 15. Instructions for a future Claude session
 
 ### Before changing anything
-1. Read `CLAUDE.md`, then this file.
+1. Read `README.md` and `CLAUDE.md`, then this file.
 2. Assume `deploy/` unless told otherwise. `site/` and `shopify-theme/` are stale.
 3. Preview with `node build/serve.js 4175`.
 
 ### Rules that will bite you if ignored
-- **Run `node build/gen-products.js`** after editing `catalog.js` or the templates inside the generator. Nothing warns you if you forget.
+- **Run `node build/gen-products.js`** after editing `catalog.js` or the generator templates. Nothing warns you if you forget.
 - **Never hand-edit `deploy/productos/*.html`** — regenerated, your changes vanish.
+- **Keep media paths in sync with their folder** — `productos/<handle>/`, `landing/<partie>/`, and a poster next to its loop. `gen-products.js` depends on the poster rule.
 - **Do not change Shopify variant IDs** without confirming against the live store.
 - **Do not change prices** without explicit confirmation.
 - **Do not reintroduce green.** The `--teal-*` names are historical; their values are grey.
-- **Do not unscope the `#lg-refract` backdrop filter** from the Firefox guard — doing so removes the glass blur in Chromium and Safari.
-- **Do not lower the `--lg-fill` floor opacity** below `.64` — it is what keeps ink text readable on photos.
-- **Do not upscale `hero-runners.jpg`** — the source is 1366×768 and enlarging only blurs it.
-- **Do not remove `outputDirectory: "deploy"`** from `vercel.json` — it is what keeps `assets/` off the public site.
+- **Do not unscope the `#lg-refract` backdrop filter** from the Firefox guard.
+- **Do not lower the `--lg-fill` floor opacity** below `.64`.
+- **Do not upscale `hero-runners.jpg`** — the source is 1366×768.
+- **Do not remove `outputDirectory: "deploy"`** from `vercel.json`.
 - **Keep all customer-facing copy in Spanish** (es-MX).
 - **Preserve accessibility**: skip link, ARIA radiogroups with roving tabindex, `sr-only` price context, ≥44px tap targets, `prefers-reduced-motion` fallbacks.
 
 ### Adding a product
-1. Append an entry to `PRODUCTS` in `deploy/catalog.js` (`handle`, `name`, `short`, `brand`, `tagline`, `price`, `category`, `image`, `highlights`, `specs`; optional `badge`, `compareAt`, `colors`, `sizes`, `shopify`, and the media fields in section 7 — `packshot`, `video`, `poster`, `videoRatio`, `story`).
-2. Put its image in `deploy/media/`. For a carousel it needs a **cut-out** (`packshot`) or it will float with a visible rectangle behind it.
+1. Append an entry to `PRODUCTS` in `deploy/catalog.js` (`handle`, `name`, `short`, `brand`, `tagline`, `price`, `category`, `image`, `highlights`, `specs`; optional `badge`, `compareAt`, `colors`, `sizes`, `shopify`, `packshot`, `video`, `poster`, `videoRatio`, `story`).
+2. Put its optimised visuals in `deploy/media/productos/<handle>/` and its sources in `assets/<handle>/`. For a carousel it needs a **cut-out** (`packshot`).
 3. Run `node build/gen-products.js`.
-4. Add it to a carousel by hand: `data-handles` on `#cards` (Los más buscados) and `#sup-grid` (supplements selection) in `index.html`. The Tienda aisles pick it up automatically from its `category`.
-5. If it should get an editorial chapter on the homepage, write it by hand — chapters are hand-written, only the cards and aisles are generated.
-6. Update the counts written in `index.html` and `tienda.html`: the dock's "N productos" and, if it changes, the "Desde $X MXN" floor.
-
-### Adding images
-- Local product/editorial images → `deploy/media/`, committed.
-- Shopify CDN images → add the URL to `assets-hd/cdn-urls.json` and keep a local copy in `assets-hd/cdn/`.
+4. Add it to a carousel by hand: `data-handles` on `#cards` and `#sup-grid` in `index.html`. The Tienda aisles pick it up automatically from its `category`.
+5. Editorial chapters are hand-written — only cards and aisles are generated.
+6. Update the dock in `index.html` and `tienda.html`: "N productos" and the "Desde $X MXN" floor.
