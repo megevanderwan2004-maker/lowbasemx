@@ -133,11 +133,19 @@ ${p.sizes
    autres montres partagent la boucle tissu, les suppléments la boucle
    gélules. */
 const BAND_VIDEO = {
-  cirqa: "hero-cirqa",
-  creatina: "loop-brand",
-  "promix-relax": "loop-capsulas",
-  "absorption-sleep": "loop-capsulas",
+  cirqa: "productos/cirqa/hero-cirqa",
+  creatina: "landing/bandas/loop-brand",
+  "promix-relax": "landing/bandas/loop-capsulas",
+  "absorption-sleep": "landing/bandas/loop-capsulas",
 };
+const BAND_DEFAULT = "landing/bandas/loop-wearables";
+
+/* Les médias vivent dans des sous-dossiers ; l'affiche est le fichier
+   voisin de la boucle, préfixé `poster-`. */
+function posterOf(stem) {
+  const i = stem.lastIndexOf("/");
+  return i < 0 ? `poster-${stem}` : `${stem.slice(0, i)}/poster-${stem.slice(i + 1)}`;
+}
 
 /* Visuel principal : une boucle si la fiche en déclare une, la photo
    sinon. L'affiche est toujours posée dessous — si la lecture est refusée
@@ -191,12 +199,12 @@ ${media}
 }
 
 function band(p) {
-  const src = BAND_VIDEO[p.handle] || "loop-wearables";
+  const src = BAND_VIDEO[p.handle] || BAND_DEFAULT;
   return `
     <div class="band rv">
       <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
              disablepictureinpicture disableremoteplayback
-             poster="/media/poster-${src}.jpg"
+             poster="/media/${posterOf(src)}.jpg"
              width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
         <source src="/media/${src}.mp4" type="video/mp4">
       </video>
