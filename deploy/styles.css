@@ -1051,19 +1051,30 @@ footer a{color:var(--ink)}
   position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;object-position:center 46%;z-index:1;
 }
-/* Le cadrage mobile est un 1:2 exact, wordmark incrusté compris. Une
-   hauteur plein écran donne au bloc un ratio plus étroit que l'image :
-   `cover` rogne alors les côtés et ampute le wordmark. On donne donc au
-   hero le ratio de son image, plafonné à la hauteur disponible — la
-   composition entière reste visible, sans recadrage. Le desktop, lui,
-   garde sa hauteur calculée. */
+/* Mobile : la boucle vidéo remplace l'image. Elle reste hors du DOM
+   visible au-dessus de 760px — display:none suffit, l'observateur de
+   `section-loops` ne la croise alors jamais et son `preload=none` évite
+   tout téléchargement sur desktop. */
+.hero-loop{display:none}
+/* Le hero prend le ratio de son média plutôt qu'une hauteur plein écran :
+   un bloc plein écran est plus étroit qu'un 9/16, et `cover` rognerait
+   les côtés de la composition. Plafonné à la hauteur disponible. Le
+   desktop, lui, garde sa hauteur calculée. */
 @media(max-width:759px){
   .hero-full{
-    height:auto;aspect-ratio:1/2;
+    height:auto;aspect-ratio:9/16;
     max-height:calc(100vh - var(--topbar-h) - var(--gutter));
     max-height:calc(100svh - var(--topbar-h) - var(--gutter));
   }
-  .hero-still{object-position:center}
+  .hero-still{display:none}
+  .hero-loop{
+    display:block;position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;object-position:center;z-index:1;
+    /* L'affiche est un fond CSS et non un attribut `poster` : déclarée
+       ici, elle n'est demandée que par les écrans qui voient la boucle.
+       Elle tient aussi lieu de visuel quand le mouvement est réduit. */
+    background:#111214 url("/media/landing/hero/poster-hero-mobile.jpg") center/cover no-repeat;
+  }
 }
 /* Deux planchers de contraste : en haut pour la nav en verre transparent,
    en bas pour les actions. Le milieu du visuel reste intact. */

@@ -20,7 +20,7 @@
 <!-- Typographie verrouillée : Outfit (titres) + DM Sans (texte courant). Aucune autre famille sur le site. -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="/media/landing/hero/hero-runners.jpg" media="(min-width: 760px)" fetchpriority="high">
-<link rel="preload" as="image" href="/media/landing/hero/hero-runners-mobile.jpg" media="(max-width: 759px)" fetchpriority="high">
+<link rel="preload" as="image" href="/media/landing/hero/poster-hero-mobile.jpg" media="(max-width: 759px)" fetchpriority="high">
 <script>
 document.documentElement.className += " js";
 try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.className += " rm"; }catch(e){}
@@ -104,16 +104,27 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
   <!-- ===== Hero pleine largeur ===== -->
   <header class="hero-full" id="hero">
-    <!-- Deux cadrages du même visuel. La variante mobile est amputée de sa
-         bande basse : en recadrage portrait, la baseline incrustée n'y
-         apparaîtrait qu'à moitié. Elle est alors reprise en HTML
-         (.hero-tagline), qui reste masquée dès que la version large
-         l'affiche déjà. -->
+    <!-- Desktop : le visuel d'origine, wordmark incrusté. Il est porté par
+         un <source> plutôt que par le src : `display:none` n'empêche pas
+         une image de se télécharger, et le mobile paierait 172 ko pour un
+         visuel qu'il n'affiche jamais. Sous 760px aucune source ne
+         correspond, le src de repli (1 px transparent) est donc le seul
+         octet chargé. -->
     <picture>
-      <source media="(max-width: 759px)" srcset="/media/landing/hero/hero-runners-mobile.jpg">
-      <img class="hero-still" src="/media/landing/hero/hero-runners.jpg" alt="" aria-hidden="true"
-           width="1366" height="768" fetchpriority="high">
+      <source media="(min-width: 760px)" srcset="/media/landing/hero/hero-runners.jpg">
+      <img class="hero-still" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+           alt="" aria-hidden="true" width="1366" height="768" fetchpriority="high">
     </picture>
+    <!-- Mobile : boucle vidéo à la place de l'image. Ni `autoplay` ni
+         `poster` ici — les deux déclenchent le téléchargement même quand
+         l'élément est en display:none. C'est `section-loops` qui lance la
+         lecture quand la boucle entre dans le cadre, donc jamais sur
+         desktop, et l'affiche est posée en fond CSS sous 760px. -->
+    <video class="hero-loop" muted loop playsinline webkit-playsinline preload="none"
+           disablepictureinpicture disableremoteplayback
+           width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
+      <source src="/media/landing/hero/hero-mobile.mp4" type="video/mp4">
+    </video>
     <!-- Le wordmark est incrusté dans l'image : le répéter en HTML le
          dédoublerait. Le titre reste accessible via le h1 hors écran. -->
     <h1 class="sr-only">lowlabs — curated wellness and technology</h1>
