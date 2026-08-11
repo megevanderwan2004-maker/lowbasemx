@@ -1765,9 +1765,43 @@ footer a{color:var(--ink)}
   .pdp-buy h1{font-size:clamp(1.5rem,6vw,2rem)}
   .pdp-lede{font-size:.95rem}
   .pdp-price b{font-size:1.7rem}
-  .rail-track{grid-template-columns:1fr 1fr;gap:8px}
-  .rail-item{padding:8px}
+  /* Les options passent en rangée de pastilles : la photo dit la couleur,
+     le nom la nomme, l'anneau dit laquelle est prise. En deux colonnes,
+     « Gris Francés » et « Azul Capitán » sortaient de leur carte. */
+  .opt{display:grid;gap:8px}
+  .opt-head{display:flex;align-items:baseline;gap:8px;font-size:.78rem;color:var(--teal-700)}
+  .opt-head b{font-family:var(--font-display);font-size:.92rem;color:var(--ink);font-weight:600}
+  .rail-track{
+    display:flex;grid-template-columns:none;gap:8px;
+    overflow-x:auto;scroll-snap-type:x proximity;
+    scrollbar-width:none;-ms-overflow-style:none;padding:2px 0 4px;
+  }
+  .rail-track::-webkit-scrollbar{display:none}
+  .rail-item{
+    position:relative;flex:0 0 auto;width:clamp(60px,17.5vw,76px);min-height:0;
+    flex-direction:column;align-items:center;gap:7px;
+    padding:9px 5px 11px;text-align:center;scroll-snap-align:start;
+  }
+  .rail-thumb{width:clamp(42px,12vw,54px);height:clamp(42px,12vw,54px)}
+  .rail-txt{justify-items:center}
+  .rail-txt b{font-size:.72rem;line-height:1.2;white-space:normal}
   .rail-txt span{display:none}
+  /* La pastille de couleur ferait doublon avec la photo ; la coche
+     revient en badge, seule marque nécessaire sur une vignette. */
+  .rail-dot{display:none}
+  .rail-check{
+    position:absolute;top:5px;right:5px;width:17px;height:17px;padding:3px;
+    border-radius:50%;background:var(--ink);color:#fff;box-shadow:0 2px 6px rgba(23,25,27,.3);
+  }
+  .rail-item.active{box-shadow:var(--glass-edge),var(--glass-drop),inset 0 0 0 2px var(--ink)}
+
+  /* Tailles : une ligne par option, note à droite, cible confortable. */
+  .rail-sizes{grid-template-columns:1fr 1fr;gap:8px}
+  .size-btn{min-height:56px;padding:10px 12px;display:grid;gap:1px;align-content:center}
+  .size-btn b{font-size:.95rem}
+  .size-btn small{font-size:.72rem;line-height:1.25}
+
+  .pdp-cta .btn-lg{font-size:.95rem;padding-inline:16px}
   .trust li{font-size:.82rem}
 }
 .pdp-note{font-size:.8rem;color:var(--teal-700);text-align:center;line-height:1.5}

@@ -566,6 +566,13 @@
       b.tabIndex = on ? 0 : -1;
     });
 
+    /* La valeur choisie s'écrit à côté de son intitulé : une pastille
+       entourée ne dit pas son nom. */
+    each(document.querySelectorAll("[data-opt]"), function(el){
+      var v = el.getAttribute("data-opt") === "color" ? state.color : state.size;
+      if (v) el.textContent = v;
+    });
+
     /* La galerie suit la couleur : le cadre qui la porte devient l'actif.
        Rien à précharger ni à faire fondre — les cadres sont déjà dans la
        piste, on ne fait que la faire glisser. */
@@ -608,6 +615,22 @@
     try { galStage.scrollTo({ left: x, behavior: reduceMotion ? "auto" : "smooth" }); }
     catch(e){ galStage.scrollLeft = x; }
     galMark(i);
+  }
+
+  /* Ramène la galerie sous les yeux après un changement de variante.
+     Réservé aux formats où le sélecteur passe SOUS le visuel : au-dessus
+     de 980px les deux colonnes sont côte à côte, la galerie est déjà
+     visible et faire défiler la page serait gratuit. */
+  function revealGallery(){
+    if (!galStage) return;
+    if (!window.matchMedia || !matchMedia("(max-width: 979px)").matches) return;
+    var box = galStage.getBoundingClientRect();
+    var navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 64;
+    var top = navH + 22;
+    if (box.top >= top && box.bottom <= window.innerHeight) return;
+    var y = (window.pageYOffset || document.documentElement.scrollTop) + box.top - top;
+    try { window.scrollTo({ top: y, behavior: reduceMotion ? "auto" : "smooth" }); }
+    catch(e){ window.scrollTo(0, y); }
   }
 
   function showFrameByColor(color){
@@ -682,7 +705,18 @@
     pendingSrc = imageFor(state.color);
 
     each(document.querySelectorAll(".rail-item"), function(b){
-      b.addEventListener("click", function(){ state.color = b.getAttribute("data-color"); syncSelection(); }, false);
+      b.addEventListener("click", function(){
+        var next = b.getAttribute("data-color");
+        var changed = next !== state.color;
+        state.color = next;
+        syncSelection();
+        /* Le sélecteur est sous le visuel sur mobile : sans ce retour,
+           on choisit une couleur sans jamais voir le produit changer.
+           Uniquement quand la couleur change vraiment, et uniquement si
+           la galerie n'est pas déjà en vue — sinon la page sauterait à
+           chaque appui. */
+        if (changed) revealGallery();
+      }, false);
     });
     each(document.querySelectorAll(".size-btn"), function(b){
       b.addEventListener("click", function(){ state.size = b.getAttribute("data-size"); syncSelection(); }, false);

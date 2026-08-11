@@ -81,6 +81,11 @@ ${products.map((p) => `        <p><a href="/productos/${p.handle}">${esc(p.name)
 function colorRail(p) {
   if (!p.colors) return "";
   return `
+            <div class="opt">
+              <!-- La valeur choisie est écrite en toutes lettres : sur une
+                   rangée de pastilles, l'anneau seul ne suffit pas à dire
+                   laquelle est prise. app.js la tient à jour. -->
+              <p class="opt-head"><span>Color</span><b data-opt="color">${esc(p.colors[0].name)}</b></p>
             <div class="rail-track" role="radiogroup" aria-label="Color de la banda">
 ${p.colors
   .map(
@@ -92,18 +97,22 @@ ${p.colors
               </button>`
   )
   .join("\n")}
+            </div>
             </div>`;
 }
 
 function sizeRow(p) {
   if (!p.sizes) return "";
   return `
+            <div class="opt">
+              <p class="opt-head"><span>Talla</span><b data-opt="size">${esc(p.sizes[0].name)}</b></p>
             <div class="rail-sizes" role="radiogroup" aria-label="Talla">
 ${p.sizes
   .map(
     (s, i) => `              <button class="size-btn glass-light${i === 0 ? " active" : ""}" type="button" role="radio" aria-checked="${i === 0}" data-size="${esc(s.name)}"><b>${esc(s.name)}</b><small>${esc(s.note)}</small></button>`
   )
   .join("\n")}
+            </div>
             </div>`;
 }
 

@@ -178,6 +178,11 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               <span class="sr-only">Precio anterior: $4,199 pesos. Precio actual: $3,999 pesos mexicanos.</span>
             </div>
 
+            <div class="opt">
+              <!-- La valeur choisie est écrite en toutes lettres : sur une
+                   rangée de pastilles, l'anneau seul ne suffit pas à dire
+                   laquelle est prise. app.js la tient à jour. -->
+              <p class="opt-head"><span>Color</span><b data-opt="color">Negra</b></p>
             <div class="rail-track" role="radiogroup" aria-label="Color de la banda">
               <button class="rail-item glass-light active" type="button" role="radio" aria-checked="true" data-color="Negra">
                 <span class="rail-thumb"><img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra.jpg?v=1785272697&amp;width=160" alt="" width="80" height="80"></span>
@@ -204,9 +209,13 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
                 <span class="rail-dot" style="background:#2e3f63" aria-hidden="true"></span>
               </button>
             </div>
+            </div>
+            <div class="opt">
+              <p class="opt-head"><span>Talla</span><b data-opt="size">S–M</b></p>
             <div class="rail-sizes" role="radiogroup" aria-label="Talla">
               <button class="size-btn glass-light active" type="button" role="radio" aria-checked="true" data-size="S–M"><b>S–M</b><small>muñeca 120–200 mm</small></button>
               <button class="size-btn glass-light" type="button" role="radio" aria-checked="false" data-size="L–XL"><b>L–XL</b><small>muñeca 145–240 mm</small></button>
+            </div>
             </div>
             <div class="pdp-cta">
               <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button">Comprar ahora — $3,999 MXN</button>
