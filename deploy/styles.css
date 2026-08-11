@@ -1632,6 +1632,83 @@ footer a{color:var(--ink)}
    ========================================================================= */
 /* La réserve haute ne sert qu'à dégager la nav flottante : sous 1024px la
    carte commence déjà sous la pilule, la doubler creuserait un vide. */
+/* =========================================================================
+   Fiche produit — pensée pour le pouce d'abord : visuel maîtrisé, nom,
+   prix, options et bouton tiennent au-dessus de la ligne de flottaison,
+   le texte long vient après.
+   ========================================================================= */
+/* Galerie : les cadres coexistent dans une piste qui se fait glisser. Rien
+   n'est échangé au changement de couleur — on défile, donc le geste natif
+   garde son inertie et aucune image ne clignote. */
+.gal{display:grid;gap:10px;min-width:0}
+/* min-width:0 partout dans la grille : sans lui, la colonne prend la
+   largeur mini du contenu de la piste et déborde le conteneur, que la
+   carte clippe ensuite en silence. */
+.pdp-grid>*{min-width:0}
+.gal-stage{
+  display:flex;min-width:0;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+  aspect-ratio:1;border-radius:var(--radius-lg);background:var(--surface-teal);
+}
+.gal-stage::-webkit-scrollbar{display:none}
+.gal-frame{flex:0 0 100%;scroll-snap-align:center;margin:0;min-width:0}
+.gal-frame img{width:100%;height:100%;object-fit:cover;display:block}
+/* Les packshots détourés respirent ; les photos remplissent le cadre. */
+.gal-frame img[src$=".png"]{object-fit:contain;padding:clamp(14px,4vw,34px);mix-blend-mode:multiply}
+.gal-dots{display:flex;justify-content:center;gap:7px}
+.gal-dots:empty{display:none}
+.gal-dots i{
+  width:6px;height:6px;border-radius:50%;background:rgba(23,25,27,.16);
+  transition:background .25s ease-out,transform .25s ease-out;
+}
+.gal-dots i.on{background:rgba(23,25,27,.42);transform:scale(1.3)}
+.gal-thumbs{
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+  padding-bottom:2px;
+}
+.gal-thumbs::-webkit-scrollbar{display:none}
+.gal-thumb{
+  flex:0 0 clamp(58px,17vw,74px);aspect-ratio:1;padding:0;border:none;cursor:pointer;
+  border-radius:var(--radius-sm);overflow:hidden;background:var(--surface-teal);
+  box-shadow:inset 0 0 0 1px rgba(23,25,27,.08);
+  transition:box-shadow .2s ease-out,transform .2s ease-out;
+}
+.gal-thumb:hover{transform:translateY(-2px)}
+.gal-thumb.on{box-shadow:inset 0 0 0 2px var(--ink)}
+.gal-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-thumb img[src$=".png"]{object-fit:contain;padding:6px;mix-blend-mode:multiply}
+/* Au-dessus de 980px le visuel reste en vue pendant qu'on lit la colonne
+   d'achat : la galerie se colle sous la nav. */
+@media(min-width:980px){
+  .gal{position:sticky;top:calc(var(--nav-h) + 26px)}
+}
+
+.pdp-head{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.pdp-badge{
+  font-family:var(--font-display);font-size:.68rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink);
+  padding:6px 12px;border-radius:var(--radius-pill);background:var(--surface-sand);
+}
+
+/* Résumé court : ce que c'est, juste après l'achat. */
+.pdp-brief{padding-top:clamp(26px,4vw,44px);padding-bottom:0}
+.brief-card{
+  background:var(--surface-sand);border-radius:var(--radius-lg);
+  padding:clamp(20px,4vw,38px);display:grid;gap:12px;
+}
+.brief-card h2{font-size:clamp(1.25rem,3.4vw,1.8rem)}
+.brief-card p{color:var(--ink-soft);font-size:1rem;line-height:1.6;max-width:62ch}
+.brief-points{list-style:none;display:grid;gap:9px;margin-top:2px}
+.brief-points li{display:flex;gap:10px;align-items:flex-start;font-size:.93rem;color:var(--ink-soft);line-height:1.5}
+.brief-points svg{flex:none;margin-top:3px}
+.pdp-pairs{padding-top:clamp(28px,4vw,52px)}
+/* Sur une carte de complément, la raison d'être passe avant le prix. */
+.fcard-why{
+  font-size:.8rem;color:var(--teal-700);line-height:1.45;margin-top:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+
 .pdp{padding-top:clamp(96px,12vw,140px)}
 @media(max-width:1023px){.pdp{padding-top:clamp(28px,5vw,44px)}}
 /* La boutique n'a plus d'en-tête : c'est le premier rayon qui doit
@@ -1657,6 +1734,10 @@ footer a{color:var(--ink)}
    l'affiche restant posée dessous si la lecture est refusée. */
 .pdp-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .pdp-buy{display:grid;gap:14px}
+/* Les enfants d'une grille refusent de descendre sous leur largeur
+   mini : sans min-width:0 la phrase et la ligne de prix débordent la
+   nacelle sur les petits écrans. */
+.pdp-buy>*{min-width:0}
 .pdp-buy .eyebrow{display:block}
 .pdp-buy h1{font-size:clamp(1.9rem,4vw,3rem);max-width:16ch}
 .pdp-lede{color:var(--ink-soft);font-size:1.04rem;max-width:46ch}
@@ -1668,6 +1749,27 @@ footer a{color:var(--ink)}
 .pdp-list li{display:flex;gap:10px;align-items:flex-start;font-size:.94rem;color:var(--ink-soft);line-height:1.55}
 .pdp-list svg{flex:none;margin-top:4px}
 .pdp-cta{display:grid;gap:10px;margin-top:6px}
+/* Sous 980px la nacelle se resserre : le bouton doit rester visible sans
+   avoir à faire défiler la moitié de la fiche. */
+@media(max-width:979px){
+  .pdp{padding-top:clamp(14px,3vw,26px)}
+  /* Le visuel est plafonné en hauteur d'écran, pas en ratio : c'est la
+     seule façon de garantir que le nom, le prix et le bouton restent
+     au-dessus de la ligne de flottaison sur un téléphone. */
+  .gal-stage{aspect-ratio:auto;height:min(34svh,290px)}
+  .gal{gap:8px}
+  .gal-frame img[src$=".png"]{padding:10px}
+  .gal-thumb{flex:0 0 48px}
+  .crumbs{margin-bottom:10px}
+  .pdp-buy{padding:clamp(16px,4vw,22px);gap:11px}
+  .pdp-buy h1{font-size:clamp(1.5rem,6vw,2rem)}
+  .pdp-lede{font-size:.95rem}
+  .pdp-price b{font-size:1.7rem}
+  .rail-track{grid-template-columns:1fr 1fr;gap:8px}
+  .rail-item{padding:8px}
+  .rail-txt span{display:none}
+  .trust li{font-size:.82rem}
+}
 .pdp-note{font-size:.8rem;color:var(--teal-700);text-align:center;line-height:1.5}
 
 /* Fiche technique */

@@ -90,45 +90,47 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <div class="shell">
   <main id="contenido">
 
-    <!-- ===== Achat ===== -->
+    <!-- ===== Achat — visuel, sélection et CTA au-dessus de la ligne de
+         flottaison, sur mobile comme sur desktop. ===== -->
     <section class="pdp" id="comprar" aria-labelledby="pdp-t">
       <div class="container">
         <nav class="crumbs rv" aria-label="Migas de pan">
           <a href="/">Inicio</a>
           <span aria-hidden="true">/</span>
-          <a href="/#catalogo">Wearables</a>
+          <a href="/tienda">Wearables</a>
           <span aria-hidden="true">/</span>
           <span>Vívoactive® 6</span>
         </nav>
 
         <div class="pdp-grid">
-          <div class="stage rv">
-            <div class="pdp-media">
-              <img id="stage-img" src="/media/productos/vivoactive-6/vivoactive-6.png" alt="Garmin Vívoactive® 6" width="900" height="900" fetchpriority="high">
+          <!-- Galerie : une piste qui se fait glisser au doigt, des
+               vignettes au clic, et la couleur choisie qui la pilote. -->
+          <div class="gal" id="gal">
+            <div class="gal-stage" id="gal-stage">
+              <figure class="gal-frame on">
+                <img id="stage-img" fetchpriority="high" src="/media/productos/vivoactive-6/vivoactive-6.png" alt="Garmin Vívoactive® 6" width="900" height="900">
+              </figure>
             </div>
+            <div class="gal-dots" id="gal-dots" aria-hidden="true"></div>
+
           </div>
 
           <!-- La nacelle ne porte pas .rv : animer l'opacité d'une surface
                à flou réel tue le flou pendant toute la transition. -->
           <div class="rail glass-light blurred pdp-buy">
-            <span class="eyebrow">Garmin</span>
+            <div class="pdp-head">
+              <span class="eyebrow">Garmin</span>
+              
+            </div>
             <h1 id="pdp-t">Garmin Vívoactive® 6</h1>
             <p class="pdp-lede">Lo esencial del entrenamiento, sin nada de más.</p>
 
             <div class="pdp-price price-num">
-              <b>$5,999</b>
+              <b id="pdp-price">$5,999</b>
               <s aria-hidden="true">$6,299</s>
               <span>MXN · Envío gratis</span>
               <span class="sr-only">Precio anterior: $6,299 pesos. Precio actual: $5,999 pesos mexicanos.</span>
             </div>
-
-            <ul class="pdp-list">
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Más de 80 aplicaciones deportivas integradas</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Entrenador de sueño y puntuación del sueño</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Rutinas guiadas de fuerza, yoga y pilates</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Hasta 11 días de batería en modo smartwatch</li>
-            </ul>
-
 
             <div class="pdp-cta">
               <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button">Comprar ahora — $5,999 MXN</button>
@@ -136,13 +138,42 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             </div>
 
             <ul class="trust">
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Producto 100% original con garantía oficial en México</li>
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Envío gratis a todo México</li>
+              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Producto original con garantía oficial</li>
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Sin suscripción — sin cargos recurrentes</li>
             </ul>
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ===== Résumé court : ce que c'est, en une phrase et trois points ===== -->
+    <section class="pdp-brief" aria-labelledby="brief-t">
+      <div class="container">
+        <div class="brief-card rv">
+          <h2 id="brief-t">¿Qué hace por ti?</h2>
+          <p>Lo esencial del entrenamiento, sin nada de más.</p>
+          <ul class="brief-points">
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Más de 80 aplicaciones deportivas integradas</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Entrenador de sueño y puntuación del sueño</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Rutinas guiadas de fuerza, yoga y pilates</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Compléments : rempli par app.js depuis le champ pairs. ===== -->
+    <section class="best pdp-pairs" aria-labelledby="pairs-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">Se lleva bien con</span>
+            <h2 id="pairs-t">Completa tu rutina</h2>
+          </div>
+        </div>
+      </div>
+      <div class="cards fcards rv" id="pair-cards" data-handles="promix-creatina,promix-debloat,absorption-sleep"></div>
+      <div class="card-dots" aria-hidden="true"></div>
     </section>
 
     <!-- ===== Bannière produit ===== -->
@@ -170,6 +201,12 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <h2 id="specs-t">Todo lo que necesitas saber</h2>
           </div>
         </div>
+        <ul class="pdp-list rv">
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Más de 80 aplicaciones deportivas integradas</li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Entrenador de sueño y puntuación del sueño</li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Rutinas guiadas de fuerza, yoga y pilates</li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Hasta 11 días de batería en modo smartwatch</li>
+        </ul>
         <div class="spec-table rv">
           <dl>
             <dt>Pantalla</dt><dd>AMOLED táctil</dd>

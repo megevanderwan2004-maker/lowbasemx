@@ -90,50 +90,47 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <div class="shell">
   <main id="contenido">
 
-    <!-- ===== Achat ===== -->
+    <!-- ===== Achat — visuel, sélection et CTA au-dessus de la ligne de
+         flottaison, sur mobile comme sur desktop. ===== -->
     <section class="pdp" id="comprar" aria-labelledby="pdp-t">
       <div class="container">
         <nav class="crumbs rv" aria-label="Migas de pan">
           <a href="/">Inicio</a>
           <span aria-hidden="true">/</span>
-          <a href="/#catalogo">Suplementos</a>
+          <a href="/tienda">Suplementos</a>
           <span aria-hidden="true">/</span>
           <span>Advanced Creatine</span>
         </nav>
 
         <div class="pdp-grid">
-          <div class="stage rv">
-            <div class="pdp-media">
-              <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
-                     disablepictureinpicture disableremoteplayback
-                     poster="/media/productos/creatina/poster-sup-creatina.jpg"
-                     width="900" height="900" aria-label="Cymbiotika Liposomal Advanced Creatine" tabindex="-1" data-autoloop>
-                <source src="/media/productos/creatina/sup-creatina.mp4" type="video/mp4">
-              </video>
+          <!-- Galerie : une piste qui se fait glisser au doigt, des
+               vignettes au clic, et la couleur choisie qui la pilote. -->
+          <div class="gal" id="gal">
+            <div class="gal-stage" id="gal-stage">
+              <figure class="gal-frame on">
+                <img id="stage-img" fetchpriority="high" src="/media/productos/creatina/creatina.png" alt="Cymbiotika Liposomal Advanced Creatine" width="900" height="900">
+              </figure>
             </div>
+            <div class="gal-dots" id="gal-dots" aria-hidden="true"></div>
+
           </div>
 
           <!-- La nacelle ne porte pas .rv : animer l'opacité d'une surface
                à flou réel tue le flou pendant toute la transition. -->
           <div class="rail glass-light blurred pdp-buy">
-            <span class="eyebrow">Cymbiotika</span>
+            <div class="pdp-head">
+              <span class="eyebrow">Cymbiotika</span>
+              <span class="pdp-badge">Suplementos</span>
+            </div>
             <h1 id="pdp-t">Cymbiotika Liposomal Advanced Creatine</h1>
             <p class="pdp-lede">5 g de creatina liposomal. Tono muscular y recuperación.</p>
 
             <div class="pdp-price price-num">
-              <b>$1,349</b>
+              <b id="pdp-price">$1,349</b>
               <s aria-hidden="true">$1,499</s>
               <span>MXN · Envío gratis</span>
               <span class="sr-only">Precio anterior: $1,499 pesos. Precio actual: $1,349 pesos mexicanos.</span>
             </div>
-
-            <ul class="pdp-list">
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>5 g de creatina por sobre, sabor Tangerine Vanilla</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Tecnología liposomal para una absorción mejorada</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Apoya el rendimiento, la recuperación muscular y la salud cerebral*</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>24 sobres líquidos listos para tomar — sin mezclar, sin grumos</li>
-            </ul>
-
 
             <div class="pdp-cta">
               <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button">Comprar ahora — $1,349 MXN</button>
@@ -141,13 +138,42 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             </div>
 
             <ul class="trust">
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Producto 100% original con garantía oficial en México</li>
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Envío gratis a todo México</li>
+              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Producto original con garantía oficial</li>
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Sin suscripción — sin cargos recurrentes</li>
             </ul>
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ===== Résumé court : ce que c'est, en une phrase et trois points ===== -->
+    <section class="pdp-brief" aria-labelledby="brief-t">
+      <div class="container">
+        <div class="brief-card rv">
+          <h2 id="brief-t">¿Qué es y para qué sirve?</h2>
+          <p>5 g de creatina liposomal. Tono muscular y recuperación.</p>
+          <ul class="brief-points">
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>5 g de creatina por sobre, sabor Tangerine Vanilla</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Tecnología liposomal para una absorción mejorada</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Apoya el rendimiento, la recuperación muscular y la salud cerebral*</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Compléments : rempli par app.js depuis le champ pairs. ===== -->
+    <section class="best pdp-pairs" aria-labelledby="pairs-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">Se lleva bien con</span>
+            <h2 id="pairs-t">Completa tu rutina</h2>
+          </div>
+        </div>
+      </div>
+      <div class="cards fcards rv" id="pair-cards" data-handles="venu-4,cirqa,promix-relax"></div>
+      <div class="card-dots" aria-hidden="true"></div>
     </section>
 
     <!-- ===== Bannière produit ===== -->
@@ -175,6 +201,12 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <h2 id="specs-t">Todo lo que necesitas saber</h2>
           </div>
         </div>
+        <ul class="pdp-list rv">
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>5 g de creatina por sobre, sabor Tangerine Vanilla</li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Tecnología liposomal para una absorción mejorada</li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Apoya el rendimiento, la recuperación muscular y la salud cerebral*</li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>24 sobres líquidos listos para tomar — sin mezclar, sin grumos</li>
+        </ul>
         <div class="spec-table rv">
           <dl>
             <dt>Formato</dt><dd>24 sobres líquidos — un mes</dd>

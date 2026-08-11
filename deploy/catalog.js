@@ -12,6 +12,13 @@
   var PRODUCTS = [
     {
       handle: "cirqa",
+      pairs: ["absorption-sleep", "promix-relax", "creatina"],
+      gallery: [
+        "/media/archivo/cirqa/cirqa-rock.jpg",
+        "/media/archivo/cirqa/wrist-negra.jpg",
+        "/media/archivo/cirqa/cirqa-sensor-negra.jpg",
+        "/media/archivo/cirqa/app-body-battery.jpg"
+      ],
       name: "Garmin CIRQA™ Smart Band",
       short: "CIRQA™ Smart Band",
       brand: "Garmin",
@@ -60,6 +67,7 @@
     },
     {
       handle: "venu-4",
+      pairs: ["promix-creatina", "creatina", "absorption-sleep"],
       shopify: { handle: "garmin-venu-4" },
       name: "Garmin Venu® 4",
       short: "Venu® 4",
@@ -88,6 +96,7 @@
     },
     {
       handle: "venu-3s",
+      pairs: ["promix-relax", "absorption-sleep", "creatina"],
       shopify: { handle: "garmin-venu-3s" },
       name: "Garmin Venu® 3S",
       short: "Venu® 3S",
@@ -115,6 +124,7 @@
     },
     {
       handle: "vivoactive-6",
+      pairs: ["promix-creatina", "promix-debloat", "absorption-sleep"],
       shopify: { handle: "garmin-vivoactive-6" },
       name: "Garmin Vívoactive® 6",
       short: "Vívoactive® 6",
@@ -142,6 +152,7 @@
     },
     {
       handle: "creatina",
+      pairs: ["venu-4", "cirqa", "promix-relax"],
       shopify: { handle: "cymbiotika-liposomal-advanced-creatine" },
       name: "Cymbiotika Liposomal Advanced Creatine",
       short: "Advanced Creatine",
@@ -180,6 +191,7 @@
        --------------------------------------------------------------------- */
     {
       handle: "promix-relax",
+      pairs: ["cirqa", "absorption-sleep", "venu-3s"],
       shopify: { handle: "promix-relax-magnesium-complex" },
       name: "Promix Relax: Magnesium Complex",
       short: "Relax",
@@ -213,6 +225,7 @@
     },
     {
       handle: "absorption-sleep",
+      pairs: ["cirqa", "promix-relax", "venu-3s"],
       shopify: { handle: "the-absorption-company-sleep" },
       name: "The Absorption Company Sleep",
       short: "Sleep",
@@ -251,6 +264,7 @@
        --------------------------------------------------------------------- */
     {
       handle: "promix-creatina",
+      pairs: ["venu-4", "vivoactive-6", "creatina"],
       shopify: { handle: "promix-non-gmo-creatine" },
       name: "Promix Non-GMO Creatine",
       short: "Non-GMO Creatine",
@@ -283,6 +297,7 @@
     },
     {
       handle: "promix-debloat",
+      pairs: ["cirqa", "promix-relax", "vivoactive-6"],
       shopify: { handle: "promix-debloat-prebiotic-probiotic" },
       name: "Promix Debloat Prebiotic + Probiotic",
       short: "Debloat",

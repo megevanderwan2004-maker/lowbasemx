@@ -90,49 +90,93 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <div class="shell">
   <main id="contenido">
 
-    <!-- ===== Achat ===== -->
+    <!-- ===== Achat — visuel, sélection et CTA au-dessus de la ligne de
+         flottaison, sur mobile comme sur desktop. ===== -->
     <section class="pdp" id="comprar" aria-labelledby="pdp-t">
       <div class="container">
         <nav class="crumbs rv" aria-label="Migas de pan">
           <a href="/">Inicio</a>
           <span aria-hidden="true">/</span>
-          <a href="/#catalogo">Wearables</a>
+          <a href="/tienda">Wearables</a>
           <span aria-hidden="true">/</span>
           <span>CIRQA™ Smart Band</span>
         </nav>
 
         <div class="pdp-grid">
-          <div class="stage rv">
-            <div class="pdp-media">
-              <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
-                     disablepictureinpicture disableremoteplayback
-                     poster="/media/productos/cirqa/poster-hero-cirqa.jpg"
-                     width="900" height="900" aria-label="Garmin CIRQA™ Smart Band" tabindex="-1" data-autoloop>
-                <source src="/media/productos/cirqa/hero-cirqa.mp4" type="video/mp4">
-              </video>
+          <!-- Galerie : une piste qui se fait glisser au doigt, des
+               vignettes au clic, et la couleur choisie qui la pilote. -->
+          <div class="gal" id="gal">
+            <div class="gal-stage" id="gal-stage">
+              <figure class="gal-frame on" data-color="Negra">
+                <img id="stage-img" fetchpriority="high" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra.jpg?v=1785272697" alt="Garmin CIRQA™ Smart Band — Negra" width="900" height="900">
+              </figure>
+              <figure class="gal-frame" data-color="Gris Francés">
+                <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-gris-frances.jpg?v=1785272697" alt="Garmin CIRQA™ Smart Band — Gris Francés" width="900" height="900">
+              </figure>
+              <figure class="gal-frame" data-color="Malva">
+                <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-malva.jpg?v=1785272697" alt="Garmin CIRQA™ Smart Band — Malva" width="900" height="900">
+              </figure>
+              <figure class="gal-frame" data-color="Azul Capitán">
+                <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-azul-capitan.jpg?v=1785272696" alt="Garmin CIRQA™ Smart Band — Azul Capitán" width="900" height="900">
+              </figure>
+              <figure class="gal-frame">
+                <img loading="lazy" src="/media/archivo/cirqa/cirqa-rock.jpg" alt="Garmin CIRQA™ Smart Band" width="900" height="900">
+              </figure>
+              <figure class="gal-frame">
+                <img loading="lazy" src="/media/archivo/cirqa/wrist-negra.jpg" alt="Garmin CIRQA™ Smart Band" width="900" height="900">
+              </figure>
+              <figure class="gal-frame">
+                <img loading="lazy" src="/media/archivo/cirqa/cirqa-sensor-negra.jpg" alt="Garmin CIRQA™ Smart Band" width="900" height="900">
+              </figure>
+              <figure class="gal-frame">
+                <img loading="lazy" src="/media/archivo/cirqa/app-body-battery.jpg" alt="Garmin CIRQA™ Smart Band" width="900" height="900">
+              </figure>
+            </div>
+            <div class="gal-dots" id="gal-dots" aria-hidden="true"></div>
+            <div class="gal-thumbs" role="tablist" aria-label="Vistas del producto">
+              <button class="gal-thumb on" type="button" role="tab" aria-selected="true" data-i="0" data-color="Negra">
+                <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-negra.jpg?v=1785272697" alt="Garmin CIRQA™ Smart Band — Negra" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="1" data-color="Gris Francés">
+                <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-gris-frances.jpg?v=1785272697" alt="Garmin CIRQA™ Smart Band — Gris Francés" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="2" data-color="Malva">
+                <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-malva.jpg?v=1785272697" alt="Garmin CIRQA™ Smart Band — Malva" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="3" data-color="Azul Capitán">
+                <img loading="lazy" src="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-azul-capitan.jpg?v=1785272696" alt="Garmin CIRQA™ Smart Band — Azul Capitán" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="4">
+                <img loading="lazy" src="/media/archivo/cirqa/cirqa-rock.jpg" alt="Garmin CIRQA™ Smart Band" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="5">
+                <img loading="lazy" src="/media/archivo/cirqa/wrist-negra.jpg" alt="Garmin CIRQA™ Smart Band" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="6">
+                <img loading="lazy" src="/media/archivo/cirqa/cirqa-sensor-negra.jpg" alt="Garmin CIRQA™ Smart Band" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="7">
+                <img loading="lazy" src="/media/archivo/cirqa/app-body-battery.jpg" alt="Garmin CIRQA™ Smart Band" width="120" height="120">
+              </button>
             </div>
           </div>
 
           <!-- La nacelle ne porte pas .rv : animer l'opacité d'une surface
                à flou réel tue le flou pendant toute la transition. -->
           <div class="rail glass-light blurred pdp-buy">
-            <span class="eyebrow">Garmin</span>
+            <div class="pdp-head">
+              <span class="eyebrow">Garmin</span>
+              <span class="pdp-badge">Más vendido</span>
+            </div>
             <h1 id="pdp-t">Garmin CIRQA™ Smart Band</h1>
             <p class="pdp-lede">Monitor de salud y ejercicio. Sin suscripción requerida.</p>
 
             <div class="pdp-price price-num">
-              <b>$3,999</b>
+              <b id="pdp-price">$3,999</b>
               <s aria-hidden="true">$4,199</s>
               <span>MXN · Envío gratis</span>
               <span class="sr-only">Precio anterior: $4,199 pesos. Precio actual: $3,999 pesos mexicanos.</span>
             </div>
-
-            <ul class="pdp-list">
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Monitoreo de salud las 24 horas</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Seguimiento avanzado del sueño, puntuación y coaching personalizado</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Hasta 10 días de duración de batería entre cargas</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Detección automática de más de 80 actividades</li>
-            </ul>
 
             <div class="rail-track" role="radiogroup" aria-label="Color de la banda">
               <button class="rail-item glass-light active" type="button" role="radio" aria-checked="true" data-color="Negra">
@@ -164,20 +208,48 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               <button class="size-btn glass-light active" type="button" role="radio" aria-checked="true" data-size="S–M"><b>S–M</b><small>muñeca 120–200 mm</small></button>
               <button class="size-btn glass-light" type="button" role="radio" aria-checked="false" data-size="L–XL"><b>L–XL</b><small>muñeca 145–240 mm</small></button>
             </div>
-
             <div class="pdp-cta">
               <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button">Comprar ahora — $3,999 MXN</button>
               <p class="pdp-note">Pago seguro con tarjeta vía Shopify Checkout</p>
             </div>
 
             <ul class="trust">
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Producto 100% original con garantía oficial en México</li>
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Envío gratis a todo México</li>
+              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Producto original con garantía oficial</li>
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Sin suscripción — sin cargos recurrentes</li>
             </ul>
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ===== Résumé court : ce que c'est, en une phrase et trois points ===== -->
+    <section class="pdp-brief" aria-labelledby="brief-t">
+      <div class="container">
+        <div class="brief-card rv">
+          <h2 id="brief-t">¿Qué hace por ti?</h2>
+          <p>Monitor de salud y ejercicio. Sin suscripción requerida.</p>
+          <ul class="brief-points">
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Monitoreo de salud las 24 horas</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Seguimiento avanzado del sueño, puntuación y coaching personalizado</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Hasta 10 días de duración de batería entre cargas</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Compléments : rempli par app.js depuis le champ pairs. ===== -->
+    <section class="best pdp-pairs" aria-labelledby="pairs-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">Se lleva bien con</span>
+            <h2 id="pairs-t">Completa tu rutina</h2>
+          </div>
+        </div>
+      </div>
+      <div class="cards fcards rv" id="pair-cards" data-handles="absorption-sleep,promix-relax,creatina"></div>
+      <div class="card-dots" aria-hidden="true"></div>
     </section>
 
     <!-- ===== Bannière produit ===== -->
@@ -205,6 +277,12 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <h2 id="specs-t">Todo lo que necesitas saber</h2>
           </div>
         </div>
+        <ul class="pdp-list rv">
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Monitoreo de salud las 24 horas</li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Seguimiento avanzado del sueño, puntuación y coaching personalizado</li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Hasta 10 días de duración de batería entre cargas</li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Detección automática de más de 80 actividades</li>
+        </ul>
         <div class="spec-table rv">
           <dl>
             <dt>Pantalla</dt><dd>Sin pantalla — todo en Garmin Connect™</dd>

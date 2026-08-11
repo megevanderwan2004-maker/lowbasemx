@@ -194,6 +194,46 @@ function band(p) {
     </div>`;
 }
 
+
+/* Galerie : les couleurs quand il y en a, sinon la photo principale, puis
+   les vues supplémentaires du catalogue. Chaque cadre porte sa couleur :
+   c'est ce qui permet au sélecteur de faire défiler la piste. */
+function galleryShots(p) {
+  const shots = [];
+  if (p.colors) p.colors.forEach((c) => shots.push({ src: c.image, alt: `${p.name} — ${c.name}`, color: c.name }));
+  else shots.push({ src: p.image, alt: p.name, color: "" });
+  (p.gallery || []).forEach((g) => shots.push({ src: g, alt: p.name, color: "" }));
+  return shots;
+}
+
+function galleryFrames(p) {
+  return galleryShots(p)
+    .map(
+      (sh, i) => `              <figure class="gal-frame${i === 0 ? " on" : ""}"${sh.color ? ` data-color="${esc(sh.color)}"` : ""}>
+                <img ${i === 0 ? 'id="stage-img" fetchpriority="high"' : 'loading="lazy"'} src="${esc(sh.src)}" alt="${esc(sh.alt)}" width="900" height="900">
+              </figure>`
+    )
+    .join("\n");
+}
+
+function galleryThumbs(p) {
+  const shots = galleryShots(p);
+  if (shots.length < 2) return "";
+  return `            <div class="gal-thumbs" role="tablist" aria-label="Vistas del producto">
+${shots
+  .map(
+    (sh, i) => `              <button class="gal-thumb${i === 0 ? " on" : ""}" type="button" role="tab" aria-selected="${i === 0}" data-i="${i}"${sh.color ? ` data-color="${esc(sh.color)}"` : ""}>
+                <img loading="lazy" src="${esc(sh.src)}" alt="${esc(sh.alt)}" width="120" height="120">
+              </button>`
+  )
+  .join("\n")}
+            </div>`;
+}
+
+function briefTitle(p) {
+  return p.category === "Wearables" ? "¿Qué hace por ti?" : "¿Qué es y para qué sirve?";
+}
+
 function page(p) {
   const buyLabel = `Comprar ahora — ${money(p.price)} MXN`;
   const hasShopify = !!(p.shopify && p.shopify.handle);
@@ -265,56 +305,86 @@ ${nav()}
 <div class="shell">
   <main id="contenido">
 
-    <!-- ===== Achat ===== -->
+    <!-- ===== Achat — visuel, sélection et CTA au-dessus de la ligne de
+         flottaison, sur mobile comme sur desktop. ===== -->
     <section class="pdp" id="comprar" aria-labelledby="pdp-t">
       <div class="container">
         <nav class="crumbs rv" aria-label="Migas de pan">
           <a href="/">Inicio</a>
           <span aria-hidden="true">/</span>
-          <a href="/#catalogo">${esc(p.category)}</a>
+          <a href="/tienda">${esc(p.category)}</a>
           <span aria-hidden="true">/</span>
           <span>${esc(p.short)}</span>
         </nav>
 
         <div class="pdp-grid">
-          <div class="stage rv">
-            <div class="pdp-media">
-${stageMedia(p)}
+          <!-- Galerie : une piste qui se fait glisser au doigt, des
+               vignettes au clic, et la couleur choisie qui la pilote. -->
+          <div class="gal" id="gal">
+            <div class="gal-stage" id="gal-stage">
+${galleryFrames(p)}
             </div>
+            <div class="gal-dots" id="gal-dots" aria-hidden="true"></div>
+${galleryThumbs(p)}
           </div>
 
           <!-- La nacelle ne porte pas .rv : animer l'opacité d'une surface
                à flou réel tue le flou pendant toute la transition. -->
           <div class="rail glass-light blurred pdp-buy">
-            <span class="eyebrow">${esc(p.brand)}</span>
+            <div class="pdp-head">
+              <span class="eyebrow">${esc(p.brand)}</span>
+              ${p.badge ? `<span class="pdp-badge">${esc(p.badge)}</span>` : ""}
+            </div>
             <h1 id="pdp-t">${esc(p.name)}</h1>
             <p class="pdp-lede">${esc(p.tagline)}</p>
 
             <div class="pdp-price price-num">
-              <b>${money(p.price)}</b>
+              <b id="pdp-price">${money(p.price)}</b>
               ${p.compareAt ? `<s aria-hidden="true">${money(p.compareAt)}</s>` : ""}
               <span>MXN · Envío gratis</span>
               ${p.compareAt ? `<span class="sr-only">Precio anterior: ${money(p.compareAt)} pesos. Precio actual: ${money(p.price)} pesos mexicanos.</span>` : ""}
             </div>
-
-            <ul class="pdp-list">
-${p.highlights.map((h) => `              <li>${CHECK}${esc(h)}</li>`).join("\n")}
-            </ul>
 ${colorRail(p)}${sizeRow(p)}
-
             <div class="pdp-cta">
               <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button">${esc(buyLabel)}</button>
               <p class="pdp-note">${hasShopify ? "Pago seguro con tarjeta vía Shopify Checkout" : "Disponible bajo pedido — te contactamos para confirmar tu compra"}</p>
             </div>
 
             <ul class="trust">
-              <li>${CHECK}Producto 100% original con garantía oficial en México</li>
               <li>${CHECK}Envío gratis a todo México</li>
+              <li>${CHECK}Producto original con garantía oficial</li>
               <li>${CHECK}Sin suscripción — sin cargos recurrentes</li>
             </ul>
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ===== Résumé court : ce que c'est, en une phrase et trois points ===== -->
+    <section class="pdp-brief" aria-labelledby="brief-t">
+      <div class="container">
+        <div class="brief-card rv">
+          <h2 id="brief-t">${esc(briefTitle(p))}</h2>
+          <p>${esc(p.story ? p.story.text : p.tagline)}</p>
+          <ul class="brief-points">
+${p.highlights.slice(0, 3).map((h) => `            <li>${CHECK}${esc(h)}</li>`).join("\n")}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Compléments : rempli par app.js depuis le champ pairs. ===== -->
+    <section class="best pdp-pairs" aria-labelledby="pairs-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">Se lleva bien con</span>
+            <h2 id="pairs-t">Completa tu rutina</h2>
+          </div>
+        </div>
+      </div>
+      <div class="cards fcards rv" id="pair-cards" data-handles="${p.pairs ? p.pairs.join(",") : ""}"></div>
+      <div class="card-dots" aria-hidden="true"></div>
     </section>
 
     <!-- ===== Bannière produit ===== -->
@@ -329,6 +399,9 @@ ${story(p)}
             <h2 id="specs-t">Todo lo que necesitas saber</h2>
           </div>
         </div>
+        <ul class="pdp-list rv">
+${p.highlights.map((h) => `          <li>${CHECK}${esc(h)}</li>`).join("\n")}
+        </ul>
         <div class="spec-table rv">
           <dl>
 ${p.specs.map(([k, v]) => `            <dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("\n")}

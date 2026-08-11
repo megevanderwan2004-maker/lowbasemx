@@ -566,29 +566,116 @@
       b.tabIndex = on ? 0 : -1;
     });
 
-    /* On compare à la cible en attente, pas au src affiché : sinon un
-       aller-retour rapide (A vers B vers A) trouve le src encore à « A »,
-       n'ordonne aucun nouveau fondu, et le minuteur déjà en vol installe
-       « B » alors que « A » est sélectionné — l'image reste sur la
-       mauvaise photo, et parfois à opacité nulle. */
-    var img = $("stage-img");
-    var src = imageFor(state.color);
-    if (img && src && pendingSrc !== src){
-      pendingSrc = src;
-      if (swapTimer) clearTimeout(swapTimer);
-      var alt = PRODUCT.name + (state.color ? " color " + state.color : "");
-      img.style.opacity = 0;
-      swapTimer = setTimeout(function(){
-        swapTimer = null;
-        img.src = pendingSrc;
-        img.alt = alt;
-        img.style.opacity = 1;
-      }, 150);
-    }
+    /* La galerie suit la couleur : le cadre qui la porte devient l'actif.
+       Rien à précharger ni à faire fondre — les cadres sont déjà dans la
+       piste, on ne fait que la faire glisser. */
+    if (state.color) showFrameByColor(state.color);
 
     var label = $("dock-variant");
     if (label) label.textContent = variantLabel();
   }
+
+  /* =====================================================================
+     Galerie produit — une piste horizontale qui se fait glisser, des
+     vignettes qui la commandent, et le sélecteur de couleur qui l'amène
+     sur le bon cadre. Aucune image n'est échangée : elles coexistent,
+     c'est le défilement qui choisit. Le geste natif garde donc son
+     inertie et rien ne clignote au changement.
+     ===================================================================== */
+  var galStage, galFrames, galThumbs, galDots;
+
+  function galIndex(){
+    if (!galStage || !galStage.clientWidth) return 0;
+    return Math.round(galStage.scrollLeft / galStage.clientWidth);
+  }
+
+  function galMark(i){
+    each(galFrames, function(f, k){
+      f.className = k === i ? "gal-frame on" : "gal-frame";
+    });
+    each(galThumbs, function(t, k){
+      t.className = k === i ? "gal-thumb on" : "gal-thumb";
+      t.setAttribute("aria-selected", k === i ? "true" : "false");
+    });
+    each(galDots ? galDots.children : [], function(d, k){
+      d.className = k === i ? "on" : "";
+    });
+  }
+
+  function galGo(i){
+    if (!galStage) return;
+    var x = i * galStage.clientWidth;
+    try { galStage.scrollTo({ left: x, behavior: reduceMotion ? "auto" : "smooth" }); }
+    catch(e){ galStage.scrollLeft = x; }
+    galMark(i);
+  }
+
+  function showFrameByColor(color){
+    if (!galFrames) return;
+    for (var i = 0; i < galFrames.length; i++){
+      if (galFrames[i].getAttribute("data-color") === color){ galGo(i); return; }
+    }
+  }
+
+  module("gallery", function(){
+    galStage = $("gal-stage");
+    if (!galStage) return;
+    galFrames = galStage.querySelectorAll(".gal-frame");
+    galThumbs = document.querySelectorAll(".gal-thumb");
+    galDots = $("gal-dots");
+
+    if (galDots && galFrames.length > 1){
+      for (var i = 0; i < galFrames.length; i++) galDots.appendChild(document.createElement("i"));
+    }
+
+    each(galThumbs, function(t){
+      t.addEventListener("click", function(){
+        var i = Number(t.getAttribute("data-i")) || 0;
+        /* Une vignette de couleur vaut choix de couleur : sans ça la
+           galerie et le prix parleraient de deux produits différents. */
+        var c = t.getAttribute("data-color");
+        if (c && c !== state.color){ state.color = c; syncSelection(); }
+        galGo(i);
+      }, false);
+    });
+
+    var ticking = false;
+    galStage.addEventListener("scroll", function(){
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function(){ ticking = false; galMark(galIndex()); });
+    }, false);
+
+    galMark(0);
+  });
+
+  /* =====================================================================
+     Compléments — la piste est remplie par le module `catalog` depuis
+     data-handles ; il ne reste qu'à retirer la section si la fiche n'a
+     pas de compléments déclarés, plutôt que d'afficher un titre seul.
+     ===================================================================== */
+  module("pairs", function(){
+    var track = $("pair-cards");
+    if (!track) return;
+    if (!track.children.length){
+      var sec = ownerSection(track);
+      if (sec && sec.parentNode) sec.parentNode.removeChild(sec);
+      return;
+    }
+    /* Une carte de complément dit aussi POURQUOI elle est là : la ligne
+       est ajoutée ici et non dans flyCard(), qui sert aussi aux
+       carrousels de la home où elle n'aurait rien à faire. */
+    each(track.children, function(card){
+      var handle = (card.getAttribute("href") || "").split("/").pop();
+      var p = CATALOG.byHandle(handle);
+      if (!p) return;
+      var why = document.createElement("span");
+      why.className = "fcard-why";
+      why.textContent = p.tagline;
+      var price = card.querySelector(".fcard-buy");
+      if (price) card.insertBefore(why, price);
+    });
+  });
 
   module("selection", function(){
     if (!PRODUCT) return;
