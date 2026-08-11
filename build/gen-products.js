@@ -33,28 +33,6 @@ const nav = () => `
      deux bandeaux retirés, en une seule barre fixe au-dessus de la nav.
      La seconde liste est un doublon masqué : c'est elle qui rend la
      boucle continue, la translation de -50% la ramenant pile en place. -->
-<div class="topbar glass-light blurred" role="region" aria-label="Garantías y estándares">
-  <div class="topbar-track">
-    <ul>
-      <li>Sin suscripción, para siempre</li>
-      <li>Pago seguro vía Shopify</li>
-      <li>Marcas seleccionadas</li>
-      <li>Vegan &amp; Non-GMO</li>
-      <li>100% Ingredients Made Traceable</li>
-      <li>Clean Label Project Certified</li>
-      <li>Formulated by Dietitians &amp; Scientists</li>
-    </ul>
-    <ul aria-hidden="true">
-      <li>Sin suscripción, para siempre</li>
-      <li>Pago seguro vía Shopify</li>
-      <li>Marcas seleccionadas</li>
-      <li>Vegan &amp; Non-GMO</li>
-      <li>100% Ingredients Made Traceable</li>
-      <li>Clean Label Project Certified</li>
-      <li>Formulated by Dietitians &amp; Scientists</li>
-    </ul>
-  </div>
-</div>
 
 <nav class="nav" aria-label="Principal">
   <div class="nav-pill">

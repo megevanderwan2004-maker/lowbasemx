@@ -87,7 +87,9 @@
   /* Hauteur du dock d'achat, mesurée en JS */
   --dock-h:72px;
   /* Hauteur du bandeau défilant fixé en haut : la nav s'y accroche. */
-  --topbar-h:34px;
+  /* Le bandeau défilant a été retiré : la réserve tombe à zéro et tous
+     les calculs qui s'y adossent (nav, shell, ancres) restent valides. */
+  --topbar-h:0px;
   /* Hauteur de la pilule de navigation, mesurée en JS : elle double de
      hauteur sous 1024px, où elle passe sur deux rangs. */
   --nav-h:64px;
@@ -417,7 +419,7 @@ body:not(.has-hero) .shell{
    surfaces de verre gardent --lg-fill tel quel. */
 .nav-pill{
   position:relative;
-  background:linear-gradient(180deg,rgba(255,255,255,.52) 0%,rgba(255,255,255,.38) 100%);
+  background:linear-gradient(180deg,rgba(255,255,255,.17) 0%,rgba(255,255,255,.12) 100%);
   box-shadow:var(--lg-depth);
 }
 @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
@@ -447,7 +449,9 @@ body:not(.has-hero) .shell{
 }
 .nav-links::-webkit-scrollbar{display:none}
 .nav-links a{
-  color:var(--ink-soft);text-decoration:none;font-size:.86rem;white-space:nowrap;
+  /* Encre pleine, et non le gris secondaire : la pilule n'ayant plus de
+     surface, c'est la seule densité qui tienne sur le visuel du hero. */
+  color:var(--ink);text-decoration:none;font-size:.86rem;font-weight:500;white-space:nowrap;
   padding:12px 11px;border-radius:var(--radius-pill);
   display:inline-flex;align-items:center;min-height:44px;transition:color .2s;
 }
@@ -490,9 +494,9 @@ body:not(.has-hero) .shell{
     font-size:1.2rem;padding:0;
   }
   .nav-end{grid-row:1;grid-column:3;justify-self:end}
-  /* Alignée à gauche : centrée, la rangée démarrerait au milieu de la
-     liste et « Tienda » serait déjà sorti du cadre. */
-  .nav-links{width:100%;justify-content:flex-start}
+  /* Centrée : à trois entrées la rangée tient sur la largeur de la
+     pilule, plus besoin de la caler à gauche pour éviter le rognage. */
+  .nav-links{width:100%;justify-content:center}
 }
 
 /* =========================================================================
@@ -1088,10 +1092,11 @@ footer a{color:var(--ink)}
 .hero-full::before{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
   background:
-    /* Voile haut allégé : la nav est passée en verre très transparent et
-       son texte est encre — l'assombrir sous elle jouait contre sa
-       lisibilité, en plus de masquer le visuel. */
-    linear-gradient(180deg,rgba(12,13,14,.16) 0%,rgba(12,13,14,.04) 22%,rgba(12,13,14,0) 38%),
+    /* Voile haut inversé : la nav n'a plus de surface propre et son texte
+       est encre. C'est donc un dégradé CLAIR qui lui rend sa lisibilité —
+       assombrir jouerait contre elle. Il reste assez léger pour laisser
+       voir la vidéo. */
+    linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.14) 16%,rgba(255,255,255,0) 30%),
     linear-gradient(180deg,rgba(12,13,14,0) 56%,rgba(12,13,14,.46) 100%);
 }
 .hero-full::after{
@@ -1390,8 +1395,10 @@ footer a{color:var(--ink)}
    ========================================================================= */
 .band{
   position:relative;isolation:isolate;overflow:hidden;padding:0;
-  border-radius:var(--radius-lg);
-  margin:0 clamp(14px,2.4vw,26px);
+  /* Pleine largeur : le bandeau sort de la gouttière de la carte et
+     touche les deux bords de l'écran. */
+  border-radius:0;
+  margin-inline:calc(-1 * var(--gutter));
 }
 .band>video,.band>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 .band::after{

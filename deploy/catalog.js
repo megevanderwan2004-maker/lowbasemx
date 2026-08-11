@@ -60,6 +60,7 @@
     },
     {
       handle: "venu-4",
+      shopify: { handle: "garmin-venu-4" },
       name: "Garmin Venu® 4",
       short: "Venu® 4",
       brand: "Garmin",
@@ -87,6 +88,7 @@
     },
     {
       handle: "venu-3s",
+      shopify: { handle: "garmin-venu-3s" },
       name: "Garmin Venu® 3S",
       short: "Venu® 3S",
       brand: "Garmin",
@@ -113,6 +115,7 @@
     },
     {
       handle: "vivoactive-6",
+      shopify: { handle: "garmin-vivoactive-6" },
       name: "Garmin Vívoactive® 6",
       short: "Vívoactive® 6",
       brand: "Garmin",
@@ -139,6 +142,7 @@
     },
     {
       handle: "creatina",
+      shopify: { handle: "cymbiotika-liposomal-advanced-creatine" },
       name: "Cymbiotika Liposomal Advanced Creatine",
       short: "Advanced Creatine",
       brand: "Cymbiotika",
@@ -153,10 +157,10 @@
         "5 g de creatina por sobre, sabor Tangerine Vanilla",
         "Tecnología liposomal para una absorción mejorada",
         "Apoya el rendimiento, la recuperación muscular y la salud cerebral*",
-        "12 sobres líquidos listos para tomar — sin mezclar, sin grumos"
+        "24 sobres líquidos listos para tomar — sin mezclar, sin grumos"
       ],
       specs: [
-        ["Formato", "12 sobres líquidos"],
+        ["Formato", "24 sobres líquidos — un mes"],
         ["Creatina", "5 g por porción"],
         ["Sabor", "Tangerine Vanilla"],
         ["Tecnología", "Liposomal — absorción mejorada"],
@@ -176,6 +180,7 @@
        --------------------------------------------------------------------- */
     {
       handle: "promix-relax",
+      shopify: { handle: "promix-relax-magnesium-complex" },
       name: "Promix Relax: Magnesium Complex",
       short: "Relax",
       brand: "Promix",
@@ -208,6 +213,7 @@
     },
     {
       handle: "absorption-sleep",
+      shopify: { handle: "the-absorption-company-sleep" },
       name: "The Absorption Company Sleep",
       short: "Sleep",
       brand: "The Absorption Company",
@@ -245,6 +251,7 @@
        --------------------------------------------------------------------- */
     {
       handle: "promix-creatina",
+      shopify: { handle: "promix-non-gmo-creatine" },
       name: "Promix Non-GMO Creatine",
       short: "Non-GMO Creatine",
       brand: "Promix",
@@ -276,6 +283,7 @@
     },
     {
       handle: "promix-debloat",
+      shopify: { handle: "promix-debloat-prebiotic-probiotic" },
       name: "Promix Debloat Prebiotic + Probiotic",
       short: "Debloat",
       brand: "Promix",
