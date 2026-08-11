@@ -410,15 +410,22 @@ body:not(.has-hero) .shell{
   padding:8px 12px;
   border-radius:var(--radius-pill);
 }
-/* Même pastille que les boutons : remplissage presque noir, liseré
-   lumineux, halo. Le contenu passe donc en blanc. */
+/* La nav est la seule surface à descendre sous le plancher de .64 : elle
+   flotte sur le visuel d'ouverture et doit le laisser voir. La lisibilité
+   passe alors au flou, monté en conséquence, et au voile haut du hero
+   (.hero-full::before) qui pose déjà un fond sous elle. Les autres
+   surfaces de verre gardent --lg-fill tel quel. */
 .nav-pill{
   position:relative;
-  background:var(--lg-fill);
+  background:linear-gradient(180deg,rgba(255,255,255,.52) 0%,rgba(255,255,255,.38) 100%);
   box-shadow:var(--lg-depth);
 }
 @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
-  .nav-pill,.dock-shell{
+  .nav-pill{
+    -webkit-backdrop-filter:saturate(170%) blur(30px);
+    backdrop-filter:saturate(170%) blur(30px);
+  }
+  .dock-shell{
     -webkit-backdrop-filter:saturate(160%) blur(22px);
     backdrop-filter:saturate(160%) blur(22px);
   }
@@ -1081,7 +1088,10 @@ footer a{color:var(--ink)}
 .hero-full::before{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
   background:
-    linear-gradient(180deg,rgba(12,13,14,.3) 0%,rgba(12,13,14,.08) 22%,rgba(12,13,14,0) 38%),
+    /* Voile haut allégé : la nav est passée en verre très transparent et
+       son texte est encre — l'assombrir sous elle jouait contre sa
+       lisibilité, en plus de masquer le visuel. */
+    linear-gradient(180deg,rgba(12,13,14,.16) 0%,rgba(12,13,14,.04) 22%,rgba(12,13,14,0) 38%),
     linear-gradient(180deg,rgba(12,13,14,0) 56%,rgba(12,13,14,.46) 100%);
 }
 .hero-full::after{
