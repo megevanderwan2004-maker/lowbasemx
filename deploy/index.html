@@ -161,9 +161,36 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           <span class="eyebrow">Garmin CIRQA™ Smart Band</span>
           <h2>Monitor de salud y ejercicio. Sin suscripción requerida.</h2>
           <p>Salud 24/7, sueño avanzado y más de 80 actividades — en 18 gramos de tela, sin una sola pantalla.</p>
-          <a class="btn btn-smoke btn-lg" href="/productos/cirqa">Ver la CIRQA — $3,999 MXN</a>
+          <!-- Porte d'entrée du rayon Wearables, pas du checkout : la
+               bannière ouvre la boutique, la fiche produit reste au bout
+               de chaque carte du carrousel juste en dessous. -->
+          <a class="btn btn-smoke btn-lg" href="/tienda#wearables">Explorar los wearables</a>
         </div>
       </div>
+    </section>
+
+    <!-- ===== Les wearables — même carrousel compact que « Los más
+         buscados », posé entre la bannière CIRQA et le chapitre Garmin
+         Connect. Le contenu vient de catalog.js : aucune fiche n'est
+         écrite en dur ici. ===== -->
+    <section class="best" aria-labelledby="wear-cards-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">La selección de wearables</span>
+            <h2 id="wear-cards-t">Cuatro Garmin, una sola app</h2>
+          </div>
+          <div class="head-aside">
+            <div class="card-arrows">
+              <button class="btn btn-quiet btn-sm" type="button" data-dir="-1" aria-label="Ver los anteriores">←</button>
+              <button class="btn btn-quiet btn-sm" type="button" data-dir="1" aria-label="Ver los siguientes">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cards fcards rv" id="wear-grid"
+           data-handles="cirqa,venu-4,venu-3s,vivoactive-6"></div>
+      <div class="card-dots" aria-hidden="true"></div>
     </section>
 
     <!-- Même composition que les chapitres suppléments : la boucle à
@@ -214,7 +241,9 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           <span class="eyebrow">Cymbiotika</span>
           <h2>Formulados por dietistas y científicos</h2>
           <p>Creatina liposomal de absorción mejorada, en sobres líquidos listos para tomar. Vegan, Non-GMO y con trazabilidad total de ingredientes.</p>
-          <a class="btn btn-smoke btn-lg" href="/productos/creatina">Ver Advanced Creatine — $1,349 MXN</a>
+          <!-- Même règle que la bannière wearables : on ouvre le rayon
+               Suplementos de la boutique, pas une fiche produit. -->
+          <a class="btn btn-smoke btn-lg" href="/tienda#suplementos">Explorar los suplementos</a>
         </div>
       </div>
     </section>

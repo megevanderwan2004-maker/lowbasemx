@@ -185,6 +185,59 @@
         '</section>';
     });
     host.innerHTML = html;
+
+    /* Les rayons naissent ici, donc après que le navigateur a traité le
+       fragment de l'URL : arriver sur /tienda#wearables laissait la page
+       calée n'importe où, l'ancre n'existant pas encore au moment du
+       saut. On rejoue le saut une fois les sections posées. */
+    var target = location.hash && document.getElementById(location.hash.slice(1));
+    if (!target) return;
+
+    function land(){
+      /* `html` porte scroll-behavior:smooth : « auto » s'y résout en
+         glissement animé, qu'un autre défilement annule en cours de
+         route. « instant » est le seul mot-clé qui passe outre.
+         La marge d'ancrage n'étant honorée que par scrollIntoView, on la
+         relit pour la déduire nous-mêmes : c'est elle qui dégage la nav
+         flottante au-dessus du titre du rayon. */
+      var y = target.getBoundingClientRect().top + window.pageYOffset
+            - (parseFloat(window.getComputedStyle(target).scrollMarginTop) || 0);
+      y = Math.max(0, Math.round(y));
+      try { window.scrollTo({ top: y, behavior: "instant" }); }
+      catch(e){ window.scrollTo(0, y); }
+    }
+
+    /* Se poser une seule fois ne tient pas : le navigateur exécute son
+       propre saut vers le fragment APRÈS ce script — sur une ancre qui
+       n'existait pas quand il a lu l'URL, donc au mauvais endroit — et
+       la mise en page bouge encore ensuite (images des rayons au-dessus,
+       métriques des deux webfonts, repli des flèches d'un carrousel qui
+       tient à l'écran). On repose donc à chaque secousse, jusqu'à ce que
+       tout se stabilise.
+
+       La garde n'est pas la position — le saut du navigateur en ferait
+       une fausse « intervention du lecteur » et nous ferait renoncer —
+       mais un vrai geste : au premier doigt, molette ou touche, on ne
+       touche plus à rien. */
+    var touched = false;
+    function markTouched(){ touched = true; }
+    var GESTURES = ["wheel", "touchstart", "keydown", "pointerdown"];
+    for (var gi = 0; gi < GESTURES.length; gi++){
+      window.addEventListener(GESTURES[gi], markTouched, { passive: true });
+    }
+    function reland(){ if (!touched) land(); }
+
+    land();
+    /* Après la mise en page suivante, donc après le saut du navigateur. */
+    if (window.requestAnimationFrame) requestAnimationFrame(reland);
+    window.addEventListener("load", reland, false);
+    if (window.ResizeObserver){
+      var ro = new ResizeObserver(reland);
+      ro.observe(document.body);
+      /* Deux secondes : au-delà, plus rien ne bouge de lui-même, et
+         continuer à observer ferait sauter la page sous un lecteur. */
+      setTimeout(function(){ ro.disconnect(); }, 2000);
+    }
   });
 
   /* =====================================================================
@@ -1038,6 +1091,29 @@
           catch(e){ cards.scrollLeft += dx; }
         }, false);
       });
+
+      /* Même règle que les pastilles : une piste qui tient déjà à l'écran
+         n'a rien à faire défiler. Les flèches y seraient deux boutons
+         morts, et surtout une rangée de vide entre le titre et les
+         cartes — exactement ce que le resserrement doit supprimer. */
+      function sync(){
+        /* 2px de marge : les largeurs sous-pixel d'une piste centrée
+           suffisent à faire déborder scrollWidth d'une fraction. */
+        var scrolls = cards.scrollWidth - cards.clientWidth > 2;
+        arrows.hidden = !scrolls;
+        /* L'aparté qui ne portait que ces flèches deviendrait une ligne
+           de grille vide sous le titre. Celui de la boutique garde son
+           compte de produits : on ne le replie que s'il est seul. */
+        var aside = arrows.parentNode;
+        if (aside && aside.className === "head-aside" && aside.children.length === 1){
+          aside.hidden = !scrolls;
+        }
+      }
+      window.addEventListener("resize", sync, false);
+      /* Les images des cartes arrivent après le premier calcul : la piste
+         peut encore changer de largeur. */
+      window.addEventListener("load", sync, false);
+      sync();
     });
   });
 

@@ -149,9 +149,9 @@ avertissement.
    `packshot`, `video`, `poster`, `videoRatio`, `story`.
 2. Déposer ses visuels dans `deploy/media/productos/<handle>/`.
 3. `node build/gen-products.js`.
-4. L'ajouter à la main aux carrousels de la home (`data-handles` sur `#cards` et
-   `#sup-grid` dans `index.html`). Les rayons de `/tienda` le prennent tout seuls
-   depuis sa `category`.
+4. L'ajouter à la main aux carrousels de la home (`data-handles` sur `#cards`,
+   `#wear-grid` et `#sup-grid` dans `index.html`). Les rayons de `/tienda` le
+   prennent tout seuls depuis sa `category`.
 5. Mettre à jour le dock : nombre de produits et prix plancher.
 
 ### Règles qui font mal si on les ignore
@@ -168,9 +168,14 @@ avertissement.
   (`text-shadow`) derrière l'encre du logo, des liens et de l'icône panier —
   retirer le halo rend la nav illisible sur le feuillage.
 - Ne pas rallonger le rythme vertical sans demander : `section` est à
-  `clamp(30px,4.4vw,56px)`, les têtes de section à `clamp(16px,2.2vw,26px)`, et
-  les chapitres éditoriaux ne réservent plus de hauteur d'écran. C'est un
-  réglage demandé deux fois par le propriétaire.
+  `clamp(22px,3.2vw,40px)`, les têtes de section à `clamp(12px,1.7vw,20px)`, les
+  chapitres éditoriaux à `clamp(22px,2.9vw,40px)` sans réserver de hauteur
+  d'écran. C'est un réglage demandé trois fois par le propriétaire.
+- Ne pas regrossir les cartes de carrousel : `.fcard` est à `min(34vw,152px)` au
+  large et `min(33vw,126px)` sous 720px. La boîte média est en `aspect-ratio:1`,
+  donc c'est cette base de flex — et elle seule — qui commande la hauteur de la
+  carte. La toucher sans retoucher les marges des sections voisines rouvre
+  exactement le vide que ce réglage a fermé.
 - Toute copie client est en espagnol (es-MX).
 - Accessibilité : skip link, radiogroups ARIA, cibles tactiles ≥ 44 px,
   `prefers-reduced-motion`.
