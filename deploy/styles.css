@@ -588,8 +588,10 @@ body:not(.has-hero) .shell{
 /* =========================================================================
    Ossature des sections
    ========================================================================= */
-section{padding:clamp(56px,8vw,104px) 0}
-.section-head{display:grid;gap:18px;margin-bottom:clamp(28px,4vw,44px);align-items:end}
+/* Rythme vertical resserré : les sections se suivent de près, sur
+   téléphone comme sur écran large. */
+section{padding:clamp(30px,4.4vw,56px) 0}
+.section-head{display:grid;gap:12px;margin-bottom:clamp(16px,2.2vw,26px);align-items:end}
 .section-head h2{max-width:18ch}
 .section-head p{color:var(--ink-soft);font-size:1.02rem;max-width:46ch}
 .section-head .eyebrow{display:block;margin-bottom:10px}
@@ -709,7 +711,7 @@ section{padding:clamp(56px,8vw,104px) 0}
   transition:background .25s ease-out,transform .25s ease-out;
 }
 .card-dots i.on{background:rgba(23,25,27,.42);transform:scale(1.3)}
-.best{padding-bottom:clamp(40px,6vw,72px)}
+.best{padding-bottom:clamp(22px,3vw,40px)}
 .best .section-head{margin-bottom:clamp(20px,3vw,32px)}
 @media(min-width:900px){
   /* Les flèches reviennent à droite du titre centré sans le décaler. */
@@ -1181,7 +1183,7 @@ footer a{color:var(--ink)}
   position:relative;overflow:hidden;
   background:
     linear-gradient(168deg,#ffffff 0%,var(--surface-sand) 52%,#f2e8da 100%);
-  padding:clamp(56px,8vw,104px) 0;
+  padding:clamp(30px,4.4vw,56px) 0;
 }
 /* Trois objectifs sur une rangée à partir de 760px, deux colonnes en
    dessous. auto-fit laisserait un orphelin. */
@@ -1507,8 +1509,8 @@ footer a{color:var(--ink)}
    Chapitre éditorial : média + texte court, alternés.
    Remplace l'ancien carrousel de cartes — une seule idée par écran.
    ========================================================================= */
-.chapter{padding:clamp(48px,6vw,88px) 0}
-.chapter-grid{display:grid;gap:clamp(22px,3.4vw,54px);align-items:center}
+.chapter{padding:clamp(28px,3.6vw,52px) 0}
+.chapter-grid{display:grid;gap:clamp(16px,2.4vw,40px);align-items:center}
 @media(min-width:900px){
   .chapter-grid{grid-template-columns:1fr 1fr}
   /* Alternance : un chapitre sur deux inverse média et texte. */
@@ -1532,7 +1534,7 @@ footer a{color:var(--ink)}
 .chapter-copy .eyebrow{display:block;margin-bottom:12px}
 .chapter-copy h2{max-width:16ch;margin-bottom:14px}
 .chapter-copy p{color:var(--ink-soft);font-size:1.04rem;max-width:44ch;line-height:1.65}
-.chapter-copy .btn{margin-top:22px}
+.chapter-copy .btn{margin-top:16px}
 .chapter-stats{
   display:flex;gap:clamp(18px,3vw,38px);flex-wrap:wrap;margin-top:24px;
   padding-top:22px;border-top:1px solid var(--border);
@@ -1555,11 +1557,15 @@ footer a{color:var(--ink)}
 @media(min-width:900px){
   .chapter.editorial{
     display:flex;align-items:center;
-    min-height:100svh;padding-block:clamp(48px,6vw,88px);
+    /* Plus de hauteur d'écran réservée : la composition reste en deux
+       colonnes, mais la section ne fait que la taille de son contenu. */
+    min-height:0;padding-block:clamp(30px,3.6vw,52px);
   }
   .chapter.editorial>.container{width:100%}
   .chapter.editorial .chapter-grid{gap:clamp(40px,7vw,110px);align-items:center}
-  .chapter.editorial .chapter-media.portrait{max-width:280px}
+  /* Visuel resserré : à 280px de large le portrait faisait 500px de haut
+     et c'est lui, pas le texte, qui creusait le chapitre. */
+  .chapter.editorial .chapter-media.portrait{max-width:230px}
   .chapter.editorial .chapter-copy h2{max-width:14ch}
 }
 @supports not (height:100svh){
@@ -1712,7 +1718,7 @@ footer a{color:var(--ink)}
 }
 
 /* Résumé court : ce que c'est, juste après l'achat. */
-.pdp-brief{padding-top:clamp(26px,4vw,44px);padding-bottom:0}
+.pdp-brief{padding-top:clamp(18px,2.4vw,28px);padding-bottom:0}
 .brief-card{
   background:var(--surface-sand);border-radius:var(--radius-lg);
   padding:clamp(20px,4vw,38px);display:grid;gap:12px;
@@ -1722,14 +1728,14 @@ footer a{color:var(--ink)}
 .brief-points{list-style:none;display:grid;gap:9px;margin-top:2px}
 .brief-points li{display:flex;gap:10px;align-items:flex-start;font-size:.93rem;color:var(--ink-soft);line-height:1.5}
 .brief-points svg{flex:none;margin-top:3px}
-.pdp-pairs{padding-top:clamp(28px,4vw,52px)}
+.pdp-pairs{padding-top:clamp(18px,2.4vw,30px)}
 /* Sur une carte de complément, la raison d'être passe avant le prix. */
 .fcard-why{
   font-size:.8rem;color:var(--teal-700);line-height:1.45;margin-top:4px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
 
-.pdp{padding-top:clamp(96px,12vw,140px)}
+.pdp{padding-top:clamp(88px,10vw,120px)}
 @media(max-width:1023px){.pdp{padding-top:clamp(28px,5vw,44px)}}
 /* La boutique n'a plus d'en-tête : c'est le premier rayon qui doit
    dégager la nav flottante. */
@@ -1987,7 +1993,7 @@ body.cart-open .dock{display:none}
 /* =========================================================================
    Bundle — le produit vu + deux compléments, remise affichée, un seul geste
    ========================================================================= */
-.bundle{padding-top:clamp(28px,4vw,52px)}
+.bundle{padding-top:clamp(18px,2.4vw,30px)}
 .bundle-card{
   background:var(--surface-sand);border-radius:var(--radius-lg);
   padding:clamp(18px,3.4vw,40px);display:grid;gap:clamp(16px,2.6vw,26px);
