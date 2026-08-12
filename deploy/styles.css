@@ -419,13 +419,17 @@ body:not(.has-hero) .shell{
    surfaces de verre gardent --lg-fill tel quel. */
 .nav-pill{
   position:relative;
-  background:linear-gradient(180deg,rgba(255,255,255,.17) 0%,rgba(255,255,255,.12) 100%);
-  box-shadow:var(--lg-depth);
+  background:linear-gradient(180deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.05) 100%);
+  /* À ce niveau de transparence, c'est l'ombre portée et le liseré qui
+     donnaient encore l'impression d'une plaque posée : allégés d'autant.
+     Le contraste du texte est repris par son halo (voir .nav-links a). */
+  box-shadow:0 10px 30px rgba(23,25,27,.07);
 }
+.nav-pill::after{opacity:.4}
 @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
   .nav-pill{
-    -webkit-backdrop-filter:saturate(170%) blur(30px);
-    backdrop-filter:saturate(170%) blur(30px);
+    -webkit-backdrop-filter:saturate(140%) blur(14px);
+    backdrop-filter:saturate(140%) blur(14px);
   }
   .dock-shell{
     -webkit-backdrop-filter:saturate(160%) blur(22px);
@@ -452,6 +456,9 @@ body:not(.has-hero) .shell{
   /* Encre pleine, et non le gris secondaire : la pilule n'ayant plus de
      surface, c'est la seule densité qui tienne sur le visuel du hero. */
   color:var(--ink);text-decoration:none;font-size:.86rem;font-weight:500;white-space:nowrap;
+  /* Le halo clair derrière les lettres remplace le fond blanc qu'on a
+     retiré : c'est lui qui porte le contraste sur la vidéo. */
+  text-shadow:0 0 10px rgba(255,255,255,.75),0 0 3px rgba(255,255,255,.9);
   padding:12px 11px;border-radius:var(--radius-pill);
   display:inline-flex;align-items:center;min-height:44px;transition:color .2s;
 }
@@ -467,6 +474,7 @@ body:not(.has-hero) .shell{
   grid-column:2;justify-self:center;
   font-family:var(--font-display);font-weight:600;font-size:1.34rem;
   color:var(--ink);text-decoration:none;letter-spacing:-.022em;line-height:1;
+  text-shadow:0 0 12px rgba(255,255,255,.8),0 0 3px rgba(255,255,255,.95);
   /* min-height : la cible tactile doit rester à 44px même si le mot est court. */
   display:inline-flex;align-items:center;justify-content:center;
   min-height:44px;padding:0 8px;white-space:nowrap;
@@ -1072,10 +1080,22 @@ footer a{color:var(--ink)}
    les côtés de la composition. Plafonné à la hauteur disponible. Le
    desktop, lui, garde sa hauteur calculée. */
 @media(max-width:759px){
-  .hero-full{
-    height:auto;aspect-ratio:9/16;
-    max-height:calc(100vh - var(--topbar-h) - var(--gutter));
-    max-height:calc(100svh - var(--topbar-h) - var(--gutter));
+  /* Plein écran : la carte perd sa gouttière et sa marge haute, le hero
+     monte jusqu'au bord et remplit la hauteur visible. `dvh` suit la barre
+     d'adresse des téléphones récents, `svh` sert de repli. La vidéo est en
+     9/16 : un écran plus étroit la rogne un peu sur les côtés, mais le
+     wordmark est centré et survit au recadrage. */
+  /* Seul le hero sort du cadre : la carte garde sa gouttière et ses coins
+     pour tout ce qui suit, mais renonce à son coin haut et à son clipping
+     le temps de laisser passer la vidéo. */
+  body.has-hero .shell{
+    margin-top:0;overflow:visible;
+    border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  }
+  body.has-hero .hero-full{
+    height:100svh;height:100dvh;
+    aspect-ratio:auto;max-height:none;min-height:0;border-radius:0;
+    margin-inline:calc(-1 * var(--gutter));
   }
   .hero-still{display:none}
   .hero-loop{
@@ -1941,7 +1961,7 @@ body.cart-open .dock{display:none}
   display:grid;place-content:center;border-radius:50%;
   transition:transform .18s ease-out,background .2s ease-out;
 }
-.cart-icon svg{width:22px;height:22px;display:block}
+.cart-icon svg{width:22px;height:22px;display:block;filter:drop-shadow(0 0 6px rgba(255,255,255,.85))}
 .cart-icon:hover{background:rgba(23,25,27,.06)}
 .cart-icon:active{transform:scale(.94)}
 .cart-icon[data-has]::after{
