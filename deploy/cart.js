@@ -58,6 +58,51 @@
     return bits.join(" · ");
   }
 
+  /* Le client corrige sa couleur ou sa taille sans repasser par la fiche :
+     un menu par option, et la variante Shopify est recalculée derrière. */
+  function variantFor(p, color, size){
+    var shop = p.shopify;
+    if (!shop) return null;
+    if (shop.variants && color){
+      var byColor = shop.variants[color];
+      if (byColor && size && byColor[size]) return byColor[size];
+    }
+    return shop.variant || null;
+  }
+
+  function pickers(p, l, i){
+    if (!p.colors && !p.sizes) return "";
+    var html = '<span class="cart-vars">';
+    if (p.colors){
+      html += '<select data-var="color" data-i="' + i + '" aria-label="Color">';
+      for (var c = 0; c < p.colors.length; c++){
+        var name = p.colors[c].name;
+        html += '<option value="' + esc(name) + '"' + (name === l.color ? " selected" : "") + '>' + esc(name) + '</option>';
+      }
+      html += "</select>";
+    }
+    if (p.sizes){
+      html += '<select data-var="size" data-i="' + i + '" aria-label="Talla">';
+      for (var z = 0; z < p.sizes.length; z++){
+        var sname = p.sizes[z].name;
+        html += '<option value="' + esc(sname) + '"' + (sname === l.size ? " selected" : "") + '>Talla ' + esc(sname) + '</option>';
+      }
+      html += "</select>";
+    }
+    return html + "</span>";
+  }
+
+  function setVariant(i, which, value){
+    var l = lines[i];
+    if (!l) return;
+    var p = product(l);
+    if (!p) return;
+    if (which === "color") l.color = value; else l.size = value;
+    var v = variantFor(p, l.color, l.size);
+    if (v) l.variant = String(v);
+    write(); render();
+  }
+
   function count(){
     var n = 0;
     for (var i = 0; i < lines.length; i++) n += lines[i].qty;
@@ -135,6 +180,12 @@
       '</aside>';
     document.body.appendChild(root);
 
+    root.addEventListener("change", function(e){
+      var t = e.target;
+      var which = t.getAttribute && t.getAttribute("data-var");
+      if (which) setVariant(Number(t.getAttribute("data-i")), which, t.value);
+    }, false);
+
     root.addEventListener("click", function(e){
       var t = e.target;
       if (t.hasAttribute && t.hasAttribute("data-close")) { close(); return; }
@@ -170,7 +221,8 @@
             '</a>' +
             '<div class="cart-body">' +
               '<a class="cart-name" href="' + esc(CATALOG.url(p.handle)) + '">' + esc(p.short) + '</a>' +
-              (opts ? '<span class="cart-opts">' + esc(opts) + '</span>' : "") +
+              (opts && !(p.colors || p.sizes) ? '<span class="cart-opts">' + esc(opts) + '</span>' : "") +
+              pickers(p, l, i) +
               '<div class="cart-qty">' +
                 '<button type="button" data-act="less" data-i="' + i + '" aria-label="Quitar uno">−</button>' +
                 '<span>' + l.qty + '</span>' +

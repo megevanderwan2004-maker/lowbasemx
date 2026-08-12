@@ -683,9 +683,36 @@
      ceux de la boutique ; la remise n'est qu'affichée ici, c'est Shopify
      qui l'applique au checkout via son code.
      ===================================================================== */
-  function bundleMedia(p){
-    var src = p.packshot || p.image;
-    return '<span class="bundle-media"><img loading="lazy" src="' + esc(src) + '" alt="" width="300" height="300"></span>';
+  /* Un article de bundle montre par défaut son packshot ; s'il a des
+     couleurs, c'est la photo de la couleur choisie qui s'affiche, et les
+     pastilles la changent. */
+  function bundleShot(p, color){
+    if (p.colors){
+      for (var i = 0; i < p.colors.length; i++){
+        if (p.colors[i].name === color) return p.colors[i].image;
+      }
+      return p.colors[0].image;
+    }
+    return p.packshot || p.image;
+  }
+
+  function bundleMedia(p, color){
+    return '<span class="bundle-media"><img loading="lazy" src="' + esc(bundleShot(p, color)) +
+           '" alt="" width="300" height="300"></span>';
+  }
+
+  function bundleSwatches(p, color, i){
+    if (!p.colors) return "";
+    var html = '<span class="bundle-colors" role="radiogroup" aria-label="Color de ' + esc(p.short) + '">';
+    each(p.colors, function(c){
+      var on = c.name === color;
+      html += '<button class="bundle-swatch' + (on ? " on" : "") + '" type="button" role="radio" ' +
+              'aria-checked="' + (on ? "true" : "false") + '" tabindex="' + (on ? "0" : "-1") + '" ' +
+              'data-bi="' + i + '" data-color="' + esc(c.name) + '" ' +
+              'style="background:' + esc(c.dot) + '" aria-label="' + esc(c.name) + '"></button>';
+    });
+    html += "</span><span class=\"bundle-color-name\">" + esc(color || "") + "</span>";
+    return html;
   }
 
   module("bundle", function(){
@@ -699,26 +726,36 @@
 
     var items = [PRODUCT].concat(extras);
     var picked = items.map(function(){ return true; });
+    /* Chaque article garde SA couleur : celle de la fiche pour le produit
+       consulté, la première du catalogue pour les autres. */
+    var colors = items.map(function(p, i){
+      if (!p.colors) return null;
+      return i === 0 && state.color ? state.color : p.colors[0].name;
+    });
 
-    var html = "";
-    each(items, function(p, i){
-      if (i) html += '<span class="bundle-plus" aria-hidden="true">+</span>';
-      html +=
+    function itemHtml(p, i){
+      return (i ? '<span class="bundle-plus" aria-hidden="true">+</span>' : "") +
         '<div class="bundle-item on" data-i="' + i + '">' +
-          bundleMedia(p) +
-          (i === 0
-            ? '<span class="bundle-this">Este producto</span>'
-            : "") +
+          bundleMedia(p, colors[i]) +
+          (i === 0 ? '<span class="bundle-this">Este producto</span>' : "") +
           '<a class="bundle-name" href="' + esc(CATALOG.url(p.handle)) + '">' + esc(p.short) + '</a>' +
           '<span class="bundle-price price-num">' + CATALOG.money(p.price) + '</span>' +
+          bundleSwatches(p, colors[i], i) +
           (i === 0
             ? '<span class="bundle-fixed" aria-hidden="true">' +
                 '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' +
               '</span>'
             : '<input class="bundle-pick" type="checkbox" checked data-i="' + i + '" aria-label="Incluir ' + esc(p.short) + ' en el bundle">') +
         '</div>';
-    });
-    row.innerHTML = html;
+    }
+
+    function draw(){
+      var html = "";
+      each(items, function(p, i){ html += itemHtml(p, i); });
+      row.innerHTML = html;
+      bindRow();
+      paint();
+    }
 
     function totals(){
       var full = 0;
@@ -738,42 +775,64 @@
       $("bundle-total").textContent = CATALOG.money(t.net);
     }
 
-    each(row.querySelectorAll(".bundle-pick"), function(box){
-      box.addEventListener("change", function(){
-        picked[Number(box.getAttribute("data-i"))] = box.checked;
-        paint();
-      }, false);
-    });
+    function bindRow(){
+      each(row.querySelectorAll(".bundle-pick"), function(box){
+        box.addEventListener("change", function(){
+          picked[Number(box.getAttribute("data-i"))] = box.checked;
+          paint();
+        }, false);
+      });
+      /* Une pastille change la photo de son article. Pour le produit
+         consulté, elle vaut choix de couleur tout court : la galerie du
+         haut, le prix et le dock suivent, sinon le bundle et la fiche
+         parleraient de deux montres différentes. */
+      each(row.querySelectorAll(".bundle-swatch"), function(sw){
+        sw.addEventListener("click", function(){
+          var i = Number(sw.getAttribute("data-bi"));
+          var c = sw.getAttribute("data-color");
+          if (colors[i] === c) return;
+          colors[i] = c;
+          if (i === 0 && items[0].colors){ state.color = c; syncSelection(); }
+          draw();
+        }, false);
+      });
+    }
 
     /* Chaque article part avec SA variante : la couleur et la taille
        choisies plus haut pour le produit consulté, la variante unique
        pour les compléments. */
-    function lineFor(p, isCurrent){
+    function lineFor(p, i){
       var shop = p.shopify;
       if (!shop) return null;
+      var color = colors[i];
+      var size = i === 0 ? state.size : null;
       var variant = shop.variant || null;
-      if (isCurrent && shop.variants && state.color && state.size){
-        var byColor = shop.variants[state.color];
-        variant = (byColor && byColor[state.size]) || variant;
+      if (shop.variants && color){
+        var byColor = shop.variants[color];
+        /* Pas de taille choisie pour un article recommandé : on prend la
+           première du catalogue plutôt que d'abandonner la variante. */
+        if (byColor){
+          if (!size && p.sizes) size = p.sizes[0].name;
+          variant = (size && byColor[size]) || variant;
+        }
       }
       if (!variant) return null;
-      return { variant: variant, handle: p.handle,
-               color: isCurrent ? state.color : null,
-               size: isCurrent ? state.size : null, qty: 1 };
+      return { variant: variant, handle: p.handle, color: color || null,
+               size: size || null, qty: 1 };
     }
+
+    draw();
 
     $("bundle-add").addEventListener("click", function(){
       if (!window.LOWCART) return;
       var picks = [];
       each(items, function(p, i){
         if (!picked[i]) return;
-        var line = lineFor(p, i === 0);
+        var line = lineFor(p, i);
         if (line) picks.push(line);
       });
       if (picks.length) LOWCART.add(picks, picks.length > 1);
     }, false);
-
-    paint();
   });
 
   module("selection", function(){

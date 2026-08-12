@@ -152,7 +152,7 @@
     },
     {
       handle: "creatina",
-      pairs: ["venu-4", "cirqa", "promix-relax"],
+      pairs: ["cirqa", "promix-relax", "venu-4"],
       shopify: { handle: "cymbiotika-liposomal-advanced-creatine", variant: "64212132823417" },
       name: "Cymbiotika Liposomal Advanced Creatine",
       short: "Advanced Creatine",
@@ -264,7 +264,7 @@
        --------------------------------------------------------------------- */
     {
       handle: "promix-creatina",
-      pairs: ["venu-4", "vivoactive-6", "creatina"],
+      pairs: ["cirqa", "creatina", "venu-4"],
       shopify: { handle: "promix-non-gmo-creatine", variant: "64212133347705" },
       name: "Promix Non-GMO Creatine",
       short: "Non-GMO Creatine",
