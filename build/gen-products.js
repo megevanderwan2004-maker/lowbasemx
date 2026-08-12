@@ -45,7 +45,7 @@ const nav = () => `
     </div>
     <a class="logo" href="/">lowlabs</a>
     <div class="nav-end">
-      <a class="btn btn-ink btn-sm" href="#comprar">Comprar</a>
+      <button class="btn btn-ink btn-sm cart-btn" type="button" data-cart-open data-cart-count aria-label="Abrir el carrito">Carrito</button>
     </div>
   </div>
 </nav>`;
@@ -244,7 +244,7 @@ function briefTitle(p) {
 }
 
 function page(p) {
-  const buyLabel = `Comprar ahora — ${money(p.price)} MXN`;
+  const buyLabel = `Añadir al carrito — ${money(p.price)} MXN`;
   const hasShopify = !!(p.shopify && p.shopify.handle);
   const jsonld = {
     "@context": "https://schema.org",
@@ -382,18 +382,28 @@ ${p.highlights.slice(0, 3).map((h) => `            <li>${CHECK}${esc(h)}</li>`).
       </div>
     </section>
 
-    <!-- ===== Compléments : rempli par app.js depuis le champ pairs. ===== -->
-    <section class="best pdp-pairs" aria-labelledby="pairs-t">
+    <!-- ===== Bundle : le produit vu + deux compléments, remise de 10%.
+         Les articles viennent du champ pairs du catalogue ; app.js
+         calcule les totaux et pousse la sélection dans le panier. ===== -->
+    <section class="bundle" aria-labelledby="bundle-t" id="bundle" data-handles="${p.pairs ? p.pairs.slice(0, 2).join(",") : ""}">
       <div class="container">
-        <div class="section-head center rv">
-          <div>
-            <span class="eyebrow">Se lleva bien con</span>
-            <h2 id="pairs-t">Completa tu rutina</h2>
+        <div class="bundle-card rv">
+          <div class="bundle-head">
+            <h2 id="bundle-t">Ahorra 10%, arma tu bundle</h2>
+            <p>Añade los complementos que van con ${esc(p.short)} y llévate 10% de descuento.</p>
           </div>
+          <div class="bundle-row" id="bundle-row"></div>
+          <div class="bundle-sum">
+            <dl>
+              <div class="bundle-line"><dt>Precio regular</dt><dd><s id="bundle-regular"></s></dd></div>
+              <div class="bundle-line"><dt>Descuento bundle</dt><dd class="bundle-off" id="bundle-save"></dd></div>
+            </dl>
+            <p class="bundle-total"><b id="bundle-total"></b><span>MXN</span></p>
+          </div>
+          <button class="btn btn-ink btn-lg bundle-cta" type="button" id="bundle-add">Añadir bundle al carrito</button>
+          <p class="bundle-fine">El 10% se aplica en el checkout de Shopify con el código ${esc("BUNDLE10")}. Envío gratis a todo México.</p>
         </div>
       </div>
-      <div class="cards fcards rv" id="pair-cards" data-handles="${p.pairs ? p.pairs.join(",") : ""}"></div>
-      <div class="card-dots" aria-hidden="true"></div>
     </section>
 
     <!-- ===== Bannière produit ===== -->
@@ -446,11 +456,12 @@ ${footer()}
       <b class="price-num">${money(p.price)} MXN</b>
       <span id="dock-variant">${esc(p.short)} · Envío gratis</span>
     </div>
-    <button class="btn btn-ink" id="dock-btn" type="button">Comprar ahora</button>
+    <button class="btn btn-ink" id="dock-btn" type="button">Añadir al carrito</button>
   </div>
 </div>
 
 <script src="/catalog.js" defer></script>
+<script src="/cart.js" defer></script>
 <script src="/app.js" defer></script>
 </body>
 </html>

@@ -677,27 +677,103 @@
      data-handles ; il ne reste qu'à retirer la section si la fiche n'a
      pas de compléments déclarés, plutôt que d'afficher un titre seul.
      ===================================================================== */
-  module("pairs", function(){
-    var track = $("pair-cards");
-    if (!track) return;
-    if (!track.children.length){
-      var sec = ownerSection(track);
-      if (sec && sec.parentNode) sec.parentNode.removeChild(sec);
-      return;
-    }
-    /* Une carte de complément dit aussi POURQUOI elle est là : la ligne
-       est ajoutée ici et non dans flyCard(), qui sert aussi aux
-       carrousels de la home où elle n'aurait rien à faire. */
-    each(track.children, function(card){
-      var handle = (card.getAttribute("href") || "").split("/").pop();
-      var p = CATALOG.byHandle(handle);
-      if (!p) return;
-      var why = document.createElement("span");
-      why.className = "fcard-why";
-      why.textContent = p.tagline;
-      var price = card.querySelector(".fcard-buy");
-      if (price) card.insertBefore(why, price);
+  /* =====================================================================
+     Bundle — le produit consulté, non décochable, plus les compléments
+     déclarés dans `pairs`. Les prix sont ceux du catalogue, c'est-à-dire
+     ceux de la boutique ; la remise n'est qu'affichée ici, c'est Shopify
+     qui l'applique au checkout via son code.
+     ===================================================================== */
+  function bundleMedia(p){
+    var src = p.packshot || p.image;
+    return '<span class="bundle-media"><img loading="lazy" src="' + esc(src) + '" alt="" width="300" height="300"></span>';
+  }
+
+  module("bundle", function(){
+    var sec = $("bundle"), row = $("bundle-row");
+    if (!sec || !row || !PRODUCT) return;
+
+    var extras = (sec.getAttribute("data-handles") || "").split(",")
+      .map(function(h){ return CATALOG.byHandle(h.replace(/^\s+|\s+$/g, "")); })
+      .filter(Boolean);
+    if (!extras.length){ sec.parentNode.removeChild(sec); return; }
+
+    var items = [PRODUCT].concat(extras);
+    var picked = items.map(function(){ return true; });
+
+    var html = "";
+    each(items, function(p, i){
+      if (i) html += '<span class="bundle-plus" aria-hidden="true">+</span>';
+      html +=
+        '<div class="bundle-item on" data-i="' + i + '">' +
+          bundleMedia(p) +
+          (i === 0
+            ? '<span class="bundle-this">Este producto</span>'
+            : "") +
+          '<a class="bundle-name" href="' + esc(CATALOG.url(p.handle)) + '">' + esc(p.short) + '</a>' +
+          '<span class="bundle-price price-num">' + CATALOG.money(p.price) + '</span>' +
+          (i === 0
+            ? '<span class="bundle-fixed" aria-hidden="true">' +
+                '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' +
+              '</span>'
+            : '<input class="bundle-pick" type="checkbox" checked data-i="' + i + '" aria-label="Incluir ' + esc(p.short) + ' en el bundle">') +
+        '</div>';
     });
+    row.innerHTML = html;
+
+    function totals(){
+      var full = 0;
+      each(items, function(p, i){ if (picked[i]) full += p.price; });
+      var off = picked.filter(Boolean).length > 1 ? Math.round(full * (window.LOWCART ? LOWCART.BUNDLE_OFF : 0.1)) : 0;
+      return { full: full, off: off, net: full - off };
+    }
+
+    function paint(){
+      var t = totals();
+      each(row.querySelectorAll(".bundle-item"), function(el){
+        var i = Number(el.getAttribute("data-i"));
+        el.className = "bundle-item " + (picked[i] ? "on" : "off");
+      });
+      $("bundle-regular").textContent = CATALOG.money(t.full);
+      $("bundle-save").textContent = t.off ? "−" + CATALOG.money(t.off) : "—";
+      $("bundle-total").textContent = CATALOG.money(t.net);
+    }
+
+    each(row.querySelectorAll(".bundle-pick"), function(box){
+      box.addEventListener("change", function(){
+        picked[Number(box.getAttribute("data-i"))] = box.checked;
+        paint();
+      }, false);
+    });
+
+    /* Chaque article part avec SA variante : la couleur et la taille
+       choisies plus haut pour le produit consulté, la variante unique
+       pour les compléments. */
+    function lineFor(p, isCurrent){
+      var shop = p.shopify;
+      if (!shop) return null;
+      var variant = shop.variant || null;
+      if (isCurrent && shop.variants && state.color && state.size){
+        var byColor = shop.variants[state.color];
+        variant = (byColor && byColor[state.size]) || variant;
+      }
+      if (!variant) return null;
+      return { variant: variant, handle: p.handle,
+               color: isCurrent ? state.color : null,
+               size: isCurrent ? state.size : null, qty: 1 };
+    }
+
+    $("bundle-add").addEventListener("click", function(){
+      if (!window.LOWCART) return;
+      var picks = [];
+      each(items, function(p, i){
+        if (!picked[i]) return;
+        var line = lineFor(p, i === 0);
+        if (line) picks.push(line);
+      });
+      if (picks.length) LOWCART.add(picks, picks.length > 1);
+    }, false);
+
+    paint();
   });
 
   module("selection", function(){
@@ -759,6 +835,22 @@
       window.location.href = "mailto:lowlabsmx@gmail.com?subject=" +
         encodeURIComponent("Pedido: " + PRODUCT.name);
       return;
+    }
+
+    /* La variante choisie rejoint le panier, qui ouvre son tiroir. C'est
+       lui qui reconstruira le panier Shopify au moment de payer : d'ici
+       là, rien ne quitte le site. */
+    if (window.LOWCART){
+      var variant = shop.variant || null;
+      if (shop.variants && state.color && state.size){
+        var byColor = shop.variants[state.color];
+        variant = (byColor && byColor[state.size]) || variant;
+      }
+      if (variant){
+        LOWCART.add([{ variant: variant, handle: PRODUCT.handle,
+                       color: state.color, size: state.size, qty: 1 }]);
+        return;
+      }
     }
     /* La référence est résolue AVANT de désactiver le bouton : une
        combinaison inconnue ne doit pas laisser un bouton mort. */

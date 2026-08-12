@@ -68,7 +68,7 @@
     {
       handle: "venu-4",
       pairs: ["promix-creatina", "creatina", "absorption-sleep"],
-      shopify: { handle: "garmin-venu-4" },
+      shopify: { handle: "garmin-venu-4", variant: "64212128956793" },
       name: "Garmin Venu® 4",
       short: "Venu® 4",
       brand: "Garmin",
@@ -97,7 +97,7 @@
     {
       handle: "venu-3s",
       pairs: ["promix-relax", "absorption-sleep", "creatina"],
-      shopify: { handle: "garmin-venu-3s" },
+      shopify: { handle: "garmin-venu-3s", variant: "64212129743225" },
       name: "Garmin Venu® 3S",
       short: "Venu® 3S",
       brand: "Garmin",
@@ -125,7 +125,7 @@
     {
       handle: "vivoactive-6",
       pairs: ["promix-creatina", "promix-debloat", "absorption-sleep"],
-      shopify: { handle: "garmin-vivoactive-6" },
+      shopify: { handle: "garmin-vivoactive-6", variant: "64212131119481" },
       name: "Garmin Vívoactive® 6",
       short: "Vívoactive® 6",
       brand: "Garmin",
@@ -153,7 +153,7 @@
     {
       handle: "creatina",
       pairs: ["venu-4", "cirqa", "promix-relax"],
-      shopify: { handle: "cymbiotika-liposomal-advanced-creatine" },
+      shopify: { handle: "cymbiotika-liposomal-advanced-creatine", variant: "64212132823417" },
       name: "Cymbiotika Liposomal Advanced Creatine",
       short: "Advanced Creatine",
       brand: "Cymbiotika",
@@ -192,7 +192,7 @@
     {
       handle: "promix-relax",
       pairs: ["cirqa", "absorption-sleep", "venu-3s"],
-      shopify: { handle: "promix-relax-magnesium-complex" },
+      shopify: { handle: "promix-relax-magnesium-complex", variant: "64212134855033" },
       name: "Promix Relax: Magnesium Complex",
       short: "Relax",
       brand: "Promix",
@@ -226,7 +226,7 @@
     {
       handle: "absorption-sleep",
       pairs: ["cirqa", "promix-relax", "venu-3s"],
-      shopify: { handle: "the-absorption-company-sleep" },
+      shopify: { handle: "the-absorption-company-sleep", variant: "64212136624505" },
       name: "The Absorption Company Sleep",
       short: "Sleep",
       brand: "The Absorption Company",
@@ -265,7 +265,7 @@
     {
       handle: "promix-creatina",
       pairs: ["venu-4", "vivoactive-6", "creatina"],
-      shopify: { handle: "promix-non-gmo-creatine" },
+      shopify: { handle: "promix-non-gmo-creatine", variant: "64212133347705" },
       name: "Promix Non-GMO Creatine",
       short: "Non-GMO Creatine",
       brand: "Promix",
@@ -298,7 +298,7 @@
     {
       handle: "promix-debloat",
       pairs: ["cirqa", "promix-relax", "vivoactive-6"],
-      shopify: { handle: "promix-debloat-prebiotic-probiotic" },
+      shopify: { handle: "promix-debloat-prebiotic-probiotic", variant: "64212135903609" },
       name: "Promix Debloat Prebiotic + Probiotic",
       short: "Debloat",
       brand: "Promix",

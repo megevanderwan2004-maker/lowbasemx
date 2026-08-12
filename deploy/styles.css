@@ -1860,3 +1860,150 @@ footer a{color:var(--ink)}
    déclenche une lecture invisible derrière l'affiche. */
 .rm .hero.motion-ok .hero-video{opacity:1}
 .rm .hero.motion-ok.is-playing .hero-poster{opacity:0}
+
+/* =========================================================================
+   Panier — tiroir latéral. Il ne contient que des références de variantes
+   Shopify ; le paiement part chez Shopify via un lien de panier.
+   ========================================================================= */
+.cart{position:fixed;inset:0;z-index:120;pointer-events:none}
+.cart[hidden]{display:none}
+.cart-veil{
+  position:absolute;inset:0;background:rgba(12,13,14,.42);
+  opacity:0;transition:opacity .26s ease-out;
+}
+.cart-panel{
+  position:absolute;top:0;right:0;bottom:0;width:min(420px,100%);
+  display:flex;flex-direction:column;background:var(--surface);
+  box-shadow:-18px 0 60px rgba(23,25,27,.18);
+  transform:translateX(100%);transition:transform .28s cubic-bezier(.22,.61,.36,1);
+}
+.cart.on{pointer-events:auto}
+.cart.on .cart-veil{opacity:1}
+.cart.on .cart-panel{transform:none}
+.cart-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:18px 18px 14px;border-bottom:1px solid rgba(23,25,27,.08);
+}
+.cart-head b{font-family:var(--font-display);font-size:1.1rem;font-weight:600}
+.cart-x{padding:0;width:40px;height:40px;min-height:40px;border-radius:50%}
+.cart-lines{flex:1;overflow-y:auto;padding:14px 18px;display:grid;gap:14px;align-content:start}
+.cart-empty{
+  display:grid;gap:6px;padding:34px 0;text-align:center;color:var(--ink-soft);font-size:.95rem;
+}
+.cart-empty span{font-size:.85rem;color:var(--teal-700)}
+.cart-line{display:grid;grid-template-columns:74px 1fr auto;gap:12px;align-items:start}
+.cart-thumb{
+  width:74px;height:74px;border-radius:var(--radius-sm);overflow:hidden;
+  background:var(--surface-teal);display:block;
+}
+.cart-thumb img{width:100%;height:100%;object-fit:contain;padding:6px;mix-blend-mode:multiply}
+.cart-body{display:grid;gap:4px;min-width:0}
+.cart-name{
+  font-family:var(--font-display);font-weight:600;font-size:.95rem;color:var(--ink);
+  text-decoration:none;line-height:1.25;
+}
+.cart-opts{font-size:.78rem;color:var(--teal-700)}
+.cart-qty{display:flex;align-items:center;gap:6px;margin-top:4px}
+.cart-qty button{
+  width:32px;height:32px;border:none;border-radius:50%;cursor:pointer;
+  background:var(--surface-teal);color:var(--ink);font-size:1rem;line-height:1;
+}
+.cart-qty span{min-width:22px;text-align:center;font-size:.9rem}
+.cart-rm{
+  width:auto!important;height:auto!important;border-radius:var(--radius-pill)!important;
+  background:none!important;color:var(--teal-700)!important;
+  font-size:.78rem!important;text-decoration:underline;padding:6px 4px!important;margin-left:2px;
+}
+.cart-price{font-family:var(--font-display);font-weight:600;font-size:.95rem;white-space:nowrap}
+.cart-foot{
+  display:grid;gap:10px;padding:16px 18px calc(16px + env(safe-area-inset-bottom));
+  border-top:1px solid rgba(23,25,27,.08);background:var(--surface);
+}
+.cart-sum{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.cart-sum span{font-size:.9rem;color:var(--ink-soft)}
+.cart-sum b{font-family:var(--font-display);font-size:1.3rem;font-weight:600;letter-spacing:-.02em}
+.cart-note{font-size:.76rem;color:var(--teal-700);line-height:1.5}
+.cart-go[aria-disabled="true"]{opacity:.5;pointer-events:none}
+@media(max-width:520px){
+  .cart-panel{width:100%;border-radius:var(--radius-lg) var(--radius-lg) 0 0;top:auto;height:92svh}
+  .cart-panel{transform:translateY(100%)}
+  .cart.on .cart-panel{transform:none}
+}
+
+/* Bouton panier de la nav : la pastille ne s'affiche que s'il y a quelque
+   chose dedans, via l'attribut posé par cart.js. */
+body.cart-open .dock{display:none}
+.cart-btn{position:relative}
+.cart-btn[data-has]::after{
+  content:attr(data-count);position:absolute;top:-5px;right:-5px;
+  min-width:19px;height:19px;padding:0 5px;border-radius:var(--radius-pill);
+  background:var(--ink);color:#fff;font-size:.68rem;font-weight:600;
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-display);
+}
+
+/* =========================================================================
+   Bundle — le produit vu + deux compléments, remise affichée, un seul geste
+   ========================================================================= */
+.bundle{padding-top:clamp(28px,4vw,52px)}
+.bundle-card{
+  background:var(--surface-sand);border-radius:var(--radius-lg);
+  padding:clamp(18px,3.4vw,40px);display:grid;gap:clamp(16px,2.6vw,26px);
+}
+.bundle-head{text-align:center;display:grid;gap:6px}
+.bundle-head h2{font-size:clamp(1.35rem,3.6vw,2.1rem)}
+.bundle-head p{color:var(--ink-soft);font-size:.95rem}
+/* Les articles s'alignent avec un « + » entre eux ; sous 720px la rangée
+   se fait glisser plutôt que de s'empiler sur trois écrans. */
+.bundle-row{
+  display:flex;align-items:stretch;gap:clamp(6px,1.4vw,14px);
+  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px;
+}
+.bundle-row::-webkit-scrollbar{display:none}
+.bundle-plus{
+  align-self:center;flex:none;font-family:var(--font-display);font-size:1.3rem;
+  color:var(--teal-700);font-weight:500;
+}
+.bundle-item{
+  flex:1 1 0;min-width:clamp(126px,30vw,180px);
+  display:grid;gap:6px;justify-items:center;text-align:center;
+  background:var(--surface);border-radius:var(--radius-md);
+  padding:clamp(10px,1.8vw,16px);position:relative;
+  box-shadow:inset 0 0 0 1px rgba(23,25,27,.07);
+  transition:box-shadow .2s ease-out,opacity .2s ease-out;
+}
+.bundle-item.off{opacity:.5;box-shadow:inset 0 0 0 1px rgba(23,25,27,.06)}
+.bundle-item.on{box-shadow:inset 0 0 0 2px var(--ink)}
+.bundle-media{width:100%;aspect-ratio:1;display:block}
+.bundle-media img,.bundle-media video{
+  width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;display:block;
+}
+.bundle-name{
+  font-family:var(--font-display);font-weight:600;font-size:.86rem;line-height:1.25;
+  color:var(--ink);text-decoration:none;
+}
+.bundle-price{font-family:var(--font-display);font-weight:600;font-size:.92rem}
+.bundle-this{
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--teal-700);font-weight:600;
+}
+/* La case est la commande : cible large, état lisible d'un coup d'œil. */
+.bundle-pick{
+  appearance:none;-webkit-appearance:none;width:26px;height:26px;flex:none;
+  border-radius:50%;border:2px solid rgba(23,25,27,.22);background:var(--surface);
+  cursor:pointer;display:grid;place-content:center;margin:2px 0 0;
+}
+.bundle-pick:checked{background:var(--ink);border-color:var(--ink)}
+.bundle-pick:checked::after{content:"";width:11px;height:6px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-2px)}
+.bundle-fixed{width:26px;height:26px;display:grid;place-content:center;color:var(--teal-700)}
+.bundle-sum{display:grid;gap:6px;justify-items:center;text-align:center}
+.bundle-sum dl{display:grid;gap:4px;justify-items:center;margin:0}
+.bundle-line{display:flex;gap:10px;align-items:baseline;font-size:.9rem;color:var(--ink-soft)}
+.bundle-line s{color:var(--teal-700)}
+.bundle-off{color:var(--ink);font-weight:600}
+.bundle-total{
+  font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2.1rem);font-weight:600;
+  letter-spacing:-.03em;display:flex;align-items:baseline;gap:10px;
+}
+.bundle-total s{font-size:.9rem;font-weight:500;color:var(--teal-700);letter-spacing:0}
+.bundle-cta{justify-self:center;width:min(420px,100%)}
+.bundle-fine{font-size:.74rem;color:var(--teal-700);text-align:center;line-height:1.5}
