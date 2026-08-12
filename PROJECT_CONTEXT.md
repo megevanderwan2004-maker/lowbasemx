@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-08-12 (cart + bundle, prices confirmed, BUNDLE10 created)
+> Last updated: 2026-08-12 (full-screen mobile hero, near-invisible nav, tighter vertical rhythm)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -22,7 +22,8 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 - Home opens on the two carousels, then the goal assistant, then the video bands and the editorial chapters.
 - Carousel cards carry a **price button** in the same glass language as "Comprar", and discreet **dots** signal that a track scrolls.
 - Editorial chapters (Garmin Connect, Cymbiotika, Absorption, Promix): reduced visual on one side, copy on the other, full viewport height on desktop, **side by side on mobile too**.
-- **Cart on every page**: drawer with image, name, chosen options, quantity, remove, subtotal; a nav cart icon next to "Comprar" carries the count. Lines are Shopify variant references; checkout is a Shopify cart permalink.
+- **Cart on every page**: drawer with image, name, chosen options, quantity, remove, subtotal; a cart icon in the nav carries the count. Lines are Shopify variant references; checkout is a Shopify cart permalink.
+- **Nav**: links, centred wordmark, cart icon. Nothing else — "Comprar" was removed on 2026-08-12.
 - **Bundle on every PDP**: viewed product + its two first `pairs`, −10% shown, colour swatches on the watch, added as individual variants with the `BUNDLE10` code attached.
 - All nine products check out on Shopify — colour/size drive the exact variant.
 - Liquid-glass design system: white translucent surfaces, ink text, a masked gradient rim shared by buttons, both bars, and the footer.
@@ -38,7 +39,10 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 **Recent history** (`git log`, newest first)
 | Commit | Date | What changed |
 |--------|------|--------------|
-| `add2af7` | 08-12 | Cart icon + "Comprar" restored, BUNDLE10 created |
+| `a7eaf5a` | 08-12 | Vertical rhythm tightened site-wide |
+| `c36e31b` | 08-12 | Full-screen mobile hero, near-invisible nav, "Comprar" removed |
+| `a2371ba` | 08-12 | Docs + checkout logo prepared |
+| `add2af7` | 08-12 | Cart icon + "Comprar", BUNDLE10 created |
 | `f40297e` | 08-12 | Bundle colour swatches, cart variant pickers, 3 tiles fit on mobile |
 | `3a1d82c` | 08-12 | Cart drawer + bundle replace "Completa tu rutina" |
 | `74cf8d7` | 08-11 | Mobile colour selector reworked |
@@ -150,7 +154,7 @@ The teal palette was removed on 2026-07-30. The `--teal-*` variable **names** we
 ### Liquid glass — the current implementation
 Three custom properties plus one pseudo-element carry the whole look:
 
-- `--lg-fill` / `--lg-fill-hi` — white translucent gradient. **The floor opacity (`.64`) is load-bearing**: it is what keeps ink text legible over any backdrop.
+- `--lg-fill` / `--lg-fill-hi` — white translucent gradient. **The floor opacity (`.64`) is load-bearing**: it is what keeps ink text legible over any backdrop. **One deliberate exception**: `.nav-pill` sits at `.08 → .05` with a reduced shadow, rim and blur — the bar had to disappear over the hero video. Its contrast comes from a light `text-shadow` halo behind the ink of the wordmark, the links and the cart icon; remove the halo and the nav becomes unreadable on foliage.
 - `--lg-depth` — dark hairline for silhouette, soft drop shadow, inner white glow.
 - **The rim** — a 1px ring whose intensity varies top-to-bottom. A `border` cannot do this, so it is a gradient clipped with `mask-composite: exclude`. Shared by `.btn::after`, `.nav-pill::after`, `.dock-shell::after`, `footer::after`.
 
@@ -181,9 +185,20 @@ A supplement that declares a `video` plays it inside `.fcard`; a radial mask dis
 - Above 900px the two **home** carousels are bounded and centred: `width:min(1080px, 100% - clamp(80px,10vw,170px))`, `margin-inline:auto`. The Tienda aisles keep the full-bleed track whose `--cards-inset` aligns the first card with the aisle title — do not merge the two behaviours.
 
 ### Editorial chapters — `.chapter.editorial`
-- ≥900px: `display:flex`, `min-height:100svh`, media capped at `280px`, copy facing it.
+- ≥900px: `display:flex`, media capped at `230px`, copy facing it. **No reserved height** — the section is as tall as its content. It used to claim a full `100svh`, which was the single biggest source of empty space on the page (removed 2026-08-12).
 - ≤899px: **still side by side** — narrow column for the visual (38%), wide one for the copy, and the column template flips with `.flip` so the alternation survives on mobile.
 - `.chapter.on-white` (Promix): white section, no plate or radius behind the video, `object-fit:contain` + `mix-blend-mode:multiply`, and two crossed linear masks (`mask-composite:intersect`) that dissolve the loop's near-white studio edge (253,251,249) into the page.
+
+### Vertical rhythm (tightened 2026-08-12)
+| Rule | Value |
+|------|-------|
+| `section` | `padding: clamp(30px,4.4vw,56px) 0` |
+| `.section-head` | `gap:12px`, `margin-bottom: clamp(16px,2.2vw,26px)` |
+| `.chapter` | `padding: clamp(28px,3.6vw,52px) 0` |
+| `.best` | `padding-bottom: clamp(22px,3vw,40px)` |
+| `.pdp-brief` / `.pdp-pairs` / `.bundle` | `padding-top: clamp(18px,2.4vw,30px)` |
+
+The home went from 8 437 to 7 481px on desktop and to 6 686px on mobile. Do not restore the old values without asking — the owner asked twice for sections to sit closer.
 
 ### Measured layout variables
 - `--dock-h` — buy dock height; `body { padding-bottom }` reserves it.
@@ -195,8 +210,9 @@ A supplement that declares a `video` plays it inside `.fcard`; a radial mask dis
 ### Hero
 Full-bleed, `object-fit: cover`. The wordmark and tagline are **baked into the image**:
 - Source is `1366×768` — do not upscale it.
-- `hero-runners-mobile.jpg` is a `384×768` (1:2) crop served under 760px; `.hero-tagline` supplies the missing baseline in HTML there.
-- **Below 760px the hero takes its image's ratio** (`aspect-ratio:1/2; height:auto; max-height:calc(100svh - topbar - gutter)`) instead of filling the screen — a full-height box is narrower than 1:2, so `cover` used to crop the sides and cut the wordmark.
+- **Below 760px the hero is a full-screen video**, not the image: `hero-mobile.mp4` (720×1280, wordmark baked in by the owner), `height:100dvh` with `100svh` as fallback so it follows the address bar on recent phones. It escapes the card's gutter with `margin-inline:-gutter`, and `body.has-hero .shell` drops its top margin, its top radius and its clipping to let it through — the rest of the card keeps its gutter and corners. The 9/16 video is wider than a phone screen, so `cover` trims the sides; the wordmark is centred and survives.
+- `hero-runners-mobile.jpg` (384×768) is the previous mobile crop, now unused but kept.
+- The desktop image is carried by a `<source>` inside `<picture>` with a 1×1 transparent `src` fallback: `display:none` does not stop an `<img>` from loading, and mobile was paying 172 kB for a visual it never shows. Symmetrically the video has neither `autoplay` nor `poster` — both trigger a download even when hidden — so `section-loops` starts it and the poster is a CSS background inside the media query.
 - Above 760px the two CTAs are **centred** (`.hero-full-inner{align-items:center}`).
 
 ### Responsive breakpoints
@@ -204,7 +220,7 @@ Full-bleed, `object-fit: cover`. The wordmark and tagline are **baked into the i
 |-------|--------------|
 | `640px` | Top bar text shrinks to stay on one line |
 | `719/720px` | Media caps kick in; grids go 2-per-row; `Ver más` clamping activates |
-| `759/760px` | Hero switches image variant **and drops its full-height rule**; goal cards become a **full-width carousel** (one card per screen, sized like the closing banner, with dots); hero CTAs stop being centred |
+| `759/760px` | Hero switches from the desktop image to the **full-screen video**; goal cards become a **full-width carousel** (one card per screen, sized like the closing banner, with dots); hero CTAs stop being centred |
 | `899/900px` | Chapters and floating grids go multi-column; carousel arrows appear; editorial chapters take their full-height desktop form; home carousels get their bounded track |
 | `980px` | Product page splits into gallery + buy rail |
 | `1023/1024px` | Nav collapses to two rows; the first Tienda aisle takes its tall `padding-top` |

@@ -59,7 +59,8 @@ deploy/media/
 │   └── absorption-sleep/       packshot 7 sticks
 │
 ├── landing/
-│   ├── hero/                   hero-runners.jpg (desktop) + -mobile.jpg (1:2)
+│   ├── hero/                   hero-runners.jpg (desktop), hero-mobile.mp4
+│   │                           + son affiche (plein écran sous 760px)
 │   ├── objetivos/              les 3 visuels de l'assistant « Tu objetivo »
 │   ├── bandas/                 boucles des bandeaux pleine largeur + affiches
 │   └── capitulos/              boucles des chapitres éditoriaux + affiches
@@ -162,11 +163,38 @@ avertissement.
   valeurs sont des gris.
 - Ne pas descendre le plancher d'opacité `--lg-fill` sous `.64` (lisibilité du
   texte sur photo), ni sortir le filtre `#lg-refract` de son garde Firefox.
+  **Une exception assumée** : la pilule de nav est à `.08` de blanc pour
+  disparaître sur la vidéo du hero. Son contraste tient au halo clair
+  (`text-shadow`) derrière l'encre du logo, des liens et de l'icône panier —
+  retirer le halo rend la nav illisible sur le feuillage.
+- Ne pas rallonger le rythme vertical sans demander : `section` est à
+  `clamp(30px,4.4vw,56px)`, les têtes de section à `clamp(16px,2.2vw,26px)`, et
+  les chapitres éditoriaux ne réservent plus de hauteur d'écran. C'est un
+  réglage demandé deux fois par le propriétaire.
 - Toute copie client est en espagnol (es-MX).
 - Accessibilité : skip link, radiogroups ARIA, cibles tactiles ≥ 44 px,
   `prefers-reduced-motion`.
 
 ---
+
+## Le hero
+
+Deux visuels, deux comportements :
+
+- **Desktop** — `hero-runners.jpg`, wordmark et baseline incrustés, dans la
+  carte à coins arrondis. L'image est portée par un `<source>` : sous 760px
+  aucune source ne correspond et seul un GIF transparent d'un pixel est chargé,
+  le mobile ne paie donc pas ses 172 ko.
+- **Mobile (< 760px)** — `hero-mobile.mp4` en **plein écran** : `100dvh` avec
+  `100svh` en repli pour suivre la barre d'adresse, bord à bord grâce à
+  `margin-inline:-gutter`, la carte renonçant à sa marge haute, à son coin et à
+  son clipping le temps de le laisser passer. La vidéo est en 9/16 : un écran
+  plus étroit la rogne sur les côtés, le wordmark est centré et y survit.
+
+La boucle n'a **ni `autoplay` ni `poster`** : les deux déclenchent le
+téléchargement même quand l'élément est masqué, et le desktop paierait la
+vidéo pour rien. C'est `section-loops` qui lance la lecture à l'entrée dans le
+cadre, et l'affiche est un fond CSS déclaré dans la requête média.
 
 ## Déploiement
 
