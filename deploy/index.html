@@ -146,7 +146,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         <div class="section-head center rv">
           <div>
             <span class="eyebrow">Wearables</span>
-            <h2 id="wearables-t">Garmin CIRQA™</h2>
+            <h2 id="wearables-t">Elige tu Garmin</h2>
           </div>
         </div>
       </div>
@@ -158,9 +158,11 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           <source src="/media/landing/bandas/loop-wearables.mp4" type="video/mp4">
         </video>
         <div class="band-inner">
-          <span class="eyebrow">Garmin CIRQA™ Smart Band</span>
-          <h2>Monitor de salud y ejercicio. Sin suscripción requerida.</h2>
-          <p>Salud 24/7, sueño avanzado y más de 80 actividades — en 18 gramos de tela, sin una sola pantalla.</p>
+          <!-- La bannière ouvre le rayon Wearables entier : son texte parle
+               donc de toute la gamme Garmin, pas de la seule CIRQA. -->
+          <span class="eyebrow">Wearables Garmin</span>
+          <h2>Todos tus datos de salud. Sin suscripción.</h2>
+          <p>De la CIRQA sin pantalla a los relojes Venu® y Vívoactive®: salud 24/7, sueño avanzado y más de 80 actividades, en la app Garmin Connect™ gratuita.</p>
           <!-- Porte d'entrée du rayon Wearables, pas du checkout : la
                bannière ouvre la boutique, la fiche produit reste au bout
                de chaque carte du carrousel juste en dessous. -->
@@ -219,6 +221,30 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
     <!-- Venu® 4 et Vívoactive® 6 n'ont plus de chapitre ici : la home garde
          la CIRQA et les suppléments. Les deux montres restent au catalogue,
          donc en boutique, dans le pied de page et sur leur fiche. -->
+
+    <!-- ===== Assistant : commencer par l'objectif, pas par le produit.
+         Posé entre le rayon wearables et le rayon suppléments : il fait
+         la charnière entre les deux, plutôt que de conclure la page. ===== -->
+    <section class="goals-sec" id="objetivo" aria-labelledby="objetivo-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">02 — Compra por objetivo</span>
+            <h2 id="objetivo-t">Empieza por cómo quieres sentirte.</h2>
+            <p>Dinos qué buscas y te decimos con qué empezar. Sin cuestionarios largos, sin correo.</p>
+          </div>
+        </div>
+
+        <div class="goals rv" id="goals" role="radiogroup" aria-label="¿Qué buscas?"></div>
+        <!-- Même repère que sous les carrousels : présent seulement là où
+             la piste défile, donc sur mobile. -->
+        <div class="card-dots" aria-hidden="true"></div>
+
+        <!-- La recommandation est injectée ici : elle n'existe pas tant que
+             l'utilisateur n'a pas choisi, et le focus s'y déplace au clic. -->
+        <div class="reco" id="reco" hidden tabindex="-1" aria-live="polite"></div>
+      </div>
+    </section>
 
     <!-- ===== Suppléments — bannière vidéo dorée ===== -->
     <section id="suplementos" style="padding-bottom:0" aria-labelledby="sup-t">
@@ -335,28 +361,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <a class="btn btn-ink rv" href="/tienda#suplementos">Descubre Promix</a>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ===== Assistant : commencer par l'objectif, pas par le produit ===== -->
-    <section class="goals-sec" id="objetivo" aria-labelledby="objetivo-t">
-      <div class="container">
-        <div class="section-head center rv">
-          <div>
-            <span class="eyebrow">02 — Compra por objetivo</span>
-            <h2 id="objetivo-t">Empieza por cómo quieres sentirte.</h2>
-            <p>Dinos qué buscas y te decimos con qué empezar. Sin cuestionarios largos, sin correo.</p>
-          </div>
-        </div>
-
-        <div class="goals rv" id="goals" role="radiogroup" aria-label="¿Qué buscas?"></div>
-        <!-- Même repère que sous les carrousels : présent seulement là où
-             la piste défile, donc sur mobile. -->
-        <div class="card-dots" aria-hidden="true"></div>
-
-        <!-- La recommandation est injectée ici : elle n'existe pas tant que
-             l'utilisateur n'a pas choisi, et le focus s'y déplace au clic. -->
-        <div class="reco" id="reco" hidden tabindex="-1" aria-live="polite"></div>
       </div>
     </section>
 

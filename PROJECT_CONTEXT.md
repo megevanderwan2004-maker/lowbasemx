@@ -19,7 +19,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 
 **What works today**
 - 11 pages: home, `/tienda`, and 9 product pages, all internally linked and verified.
-- Home opens on the "Los más buscados" carousel, then alternates video band → compact carousel → editorial chapter, and ends on the goal assistant.
+- Home opens on the "Los más buscados" carousel, then alternates video band → compact carousel → editorial chapter, with the goal assistant hinging between the wearables and supplements runs.
 - Three home carousels, all on the same compact card (`#mas-buscados`, `#wear-grid`, `#sup-grid`).
 - Carousel cards carry a **price button** in the same glass language as "Comprar", and discreet **dots** signal that a track scrolls. A track that already fits drops its arrows and its whole `.head-aside` row, so nothing empty is left under the title.
 - Editorial chapters (Garmin Connect, Cymbiotika, Absorption, Promix): reduced visual on one side, copy on the other, full viewport height on desktop, **side by side on mobile too**.
@@ -127,9 +127,11 @@ node build/gen-products.js
 `cleanUrls: true` in `vercel.json` is what makes `/tienda` and `/productos/cirqa` resolve without `.html`. `build/serve.js` reproduces that locally.
 
 ### Homepage section order
-top bar (scrolling) → floating nav (Tienda / Wearables / Suplementos) → full-bleed hero, two centred CTAs **Suplementos** and **Wearables** → **Los más buscados** carousel (`#mas-buscados`, everything but the two extra watches) → Wearables video band (`#wearables`) → **wearables carousel** (`#wear-grid`, the four Garmin) → **Garmin Connect chapter** (editorial) → Suplementos video band (`#suplementos`) → **supplements carousel** (`#sup-grid`) → "Wellness, in one shot." (Cymbiotika, editorial flip) → "Duerme profundo, despierta ligero." (Absorption, editorial) → "Clean nutrition. Real performance." (Promix, editorial flip on white) → **goal assistant** (`#objetivo`) → closing banner → footer → buy dock.
+top bar (scrolling) → floating nav (Tienda / Wearables / Suplementos) → full-bleed hero, two centred CTAs **Suplementos** and **Wearables** → **Los más buscados** carousel (`#mas-buscados`, everything but the two extra watches) → Wearables video band (`#wearables`) → **wearables carousel** (`#wear-grid`, the four Garmin) → **Garmin Connect chapter** (editorial) → **goal assistant** (`#objetivo`) → Suplementos video band (`#suplementos`) → **supplements carousel** (`#sup-grid`) → "Wellness, in one shot." (Cymbiotika, editorial flip) → "Duerme profundo, despierta ligero." (Absorption, editorial) → "Clean nutrition. Real performance." (Promix, editorial flip on white) → closing banner → footer → buy dock.
 
-Both video bands are **store entrances, not checkout shortcuts**: their CTA goes to `/tienda#wearables` and `/tienda#suplementos`. The product page is reached from the carousel card underneath, never from the band.
+The goal assistant is the **hinge between the two aisles** — it closes the wearables run and opens the supplements one. It used to close the page; moved 08-12.
+
+Both video bands are **store entrances, not checkout shortcuts**: their CTA goes to `/tienda#wearables` and `/tienda#suplementos`. The product page is reached from the carousel card underneath, never from the band. Because the wearables band opens the whole aisle, its copy covers the **entire Garmin range** ("Todos tus datos de salud. Sin suscripción.", naming CIRQA, Venu® and Vívoactive®) rather than the CIRQA alone.
 
 Deliberately **removed** and not to be reinstated without asking: the comparison table, the "Menos ruido / Mejor bienestar" statement, the "Se pone una vez" band, the "Salud 24/7" chapter, the manifesto chapter, the "Cero distracciones" chapter, the Venu 3S / Venu 4 / Vívoactive 6 chapters, the **FAQ** (removed 08-08; the footer's "Garantía y devoluciones" now points at `mailto:`), the **Women's Multivitamin chapter** and the **Ritual "Made for her." banner** (both removed 08-10 with their products).
 
