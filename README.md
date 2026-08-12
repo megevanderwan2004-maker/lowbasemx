@@ -20,6 +20,7 @@ JavaScript ES5-compatible, servis tels quels par Vercel.
 │   ├── tienda.html         boutique (/tienda)
 │   ├── productos/          9 fiches produit — GÉNÉRÉES, ne pas éditer à la main
 │   ├── catalog.js          produits + objectifs : prix, textes, specs, médias
+│   ├── cart.js             panier + tiroir, hand-off vers le checkout Shopify
 │   ├── app.js              tout le comportement, en modules isolés
 │   ├── styles.css          design system complet
 │   └── media/              images et vidéos du site (voir plus bas)
@@ -177,13 +178,27 @@ avertissement.
 vercel --prod
 ```
 
-## Shopify
+## Panier et Shopify
 
-Seule la **CIRQA** est branchée sur le checkout Shopify (variantes couleur ×
-taille pré-sélectionnées). Les autres fiches retombent volontairement sur un
-`mailto:` — jamais sur une URL Shopify inexistante. Pour en brancher une :
-créer le produit, relever les IDs de variantes, ajouter un bloc `shopify` dans
-`catalog.js`, régénérer.
+**Les neuf produits sont branchés.** Chaque fiche de `catalog.js` porte un bloc
+`shopify` avec son handle et, selon le cas, sa variante unique ou sa table
+couleur × taille.
 
-> Les prix hors CIRQA sont **provisoires** : convertis des tarifs américains à un
-> taux arrondi, à confirmer avant lancement.
+Le panier (`deploy/cart.js`) ne stocke que des **références de variantes** : le
+nom, la photo et le prix sont relus du catalogue au rendu. Au moment de payer,
+la liste part dans un **lien de panier Shopify** (`/cart/ID:QTE,…`) — la
+boutique reconstruit le panier, applique ses prix, son stock et ses remises,
+puis ouvre son propre checkout. Aucune logique de paiement n'est dupliquée ici.
+
+Le bundle de chaque fiche (produit consulté + les deux premiers `pairs`) ajoute
+les articles individuellement et joint le code **`BUNDLE10`** au lien : 10 % dès
+3 articles, créé côté Shopify. La remise est donc appliquée par Shopify, jamais
+simulée à l'écran.
+
+Pour brancher un nouveau produit : le créer dans Shopify, relever le handle et
+les IDs de variantes, ajouter le bloc `shopify` dans `catalog.js`, régénérer.
+
+> **En-tête du checkout** — le nom affiché en haut du checkout est le *nom de la
+> boutique* Shopify, aujourd'hui « My Store ». Il se change dans
+> Réglages → Détails de la boutique ; un logo de checkout le remplace
+> visuellement (Réglages → Checkout → Marque).

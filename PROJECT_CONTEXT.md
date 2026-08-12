@@ -22,12 +22,13 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 - Home opens on the two carousels, then the goal assistant, then the video bands and the editorial chapters.
 - Carousel cards carry a **price button** in the same glass language as "Comprar", and discreet **dots** signal that a track scrolls.
 - Editorial chapters (Garmin Connect, Cymbiotika, Absorption, Promix): reduced visual on one side, copy on the other, full viewport height on desktop, **side by side on mobile too**.
-- Shopify checkout for the CIRQA only — colour/size selection drives a pre-selected variant redirect.
+- **Cart on every page**: drawer with image, name, chosen options, quantity, remove, subtotal; a nav cart icon next to "Comprar" carries the count. Lines are Shopify variant references; checkout is a Shopify cart permalink.
+- **Bundle on every PDP**: viewed product + its two first `pairs`, −10% shown, colour swatches on the watch, added as individual variants with the `BUNDLE10` code attached.
+- All nine products check out on Shopify — colour/size drive the exact variant.
 - Liquid-glass design system: white translucent surfaces, ink text, a masked gradient rim shared by buttons, both bars, and the footer.
 
 **What is NOT connected**
 - **Vercel: nothing is deployed from this machine.** `vercel.json` is correct and ready; someone has to run `vercel login` (browser flow) then `vercel --prod`, or import the GitHub repo from the Vercel dashboard. A preview build has been seen at `lowbasemx-1er1.vercel.app`.
-- **Shopify: only the CIRQA is wired.** The other eight products have no `shopify` block in `catalog.js`, so their buy button opens a `mailto:` order instead. A read-only check on 2026-08-10 confirmed the store still contains exactly one product. See section 7.
 - **Cart**: `deploy/cart.js` holds a list of Shopify variant references and hands off to a Shopify cart permalink (`/cart/ID:QTY,…`) at checkout — the store rebuilds the cart, applies its prices and opens its own checkout. No Storefront API token exists (creating one is blocked for AI tools), so line data is read from `catalog.js`, which mirrors the store.
 - **Bundle**: every PDP shows the viewed product + the first two `pairs` entries, −10% shown, added as individual variants. The `BUNDLE10` code (10%, minimum 3 items, all customers) exists in Shopify since 2026-08-12 and is passed on the cart link.
 - **Prices are CONFIRMED** by the owner (2026-08-12): the supplement prices converted from the US stores are the final ones.
@@ -37,6 +38,12 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 **Recent history** (`git log`, newest first)
 | Commit | Date | What changed |
 |--------|------|--------------|
+| `add2af7` | 08-12 | Cart icon + "Comprar" restored, BUNDLE10 created |
+| `f40297e` | 08-12 | Bundle colour swatches, cart variant pickers, 3 tiles fit on mobile |
+| `3a1d82c` | 08-12 | Cart drawer + bundle replace "Completa tu rutina" |
+| `74cf8d7` | 08-11 | Mobile colour selector reworked |
+| `af3a356` | 08-11 | Product pages redesigned, gallery + brief + pairs |
+| `2f7c023` | 08-11 | Top bar removed, nav stripped, Shopify wired for all nine |
 | `4709947` | 08-10 | `assets/` reorganised by product handle |
 | `e09c1a3` | 08-10 | `deploy/media/` split into `productos/`, `landing/`, `archivo/`; README rewritten |
 | `ad9b73d` | 08-10 | Supplement catalogue swapped (see below) |
@@ -246,9 +253,13 @@ Supplement prices are the brands' **one-time** (non-subscription) prices convert
 | Azul Capitán | 64093481304441 | 64093481337209 |
 
 ### Checkout behaviour
-`goToCheckout()` in `app.js` branches on whether the product has a `shopify` block:
-- **With one** → redirect to `{STORE}/products/{handle}?variant={ID}&locale=es&country=MX`.
-- **Without one** → `mailto:lowlabsmx@gmail.com` with the product name as subject. Deliberate: it must never send a customer to a Shopify URL that does not exist.
+The buy button adds the selected variant to the cart (`deploy/cart.js`) and opens the drawer. The drawer's checkout button builds a **Shopify cart permalink** — `{STORE}/cart/{variant}:{qty},…?locale=es&country=MX` plus `&discount=BUNDLE10` when the cart came from a bundle. Shopify rebuilds the cart, applies its own prices, stock and discounts, then opens its checkout.
+
+`goToCheckout()` still falls back to a `mailto:` when a product has no `shopify` block — no longer reachable today, kept so a new product can never send a customer to a URL that does not exist.
+
+**Discounts**: `BUNDLE10` (10%, minimum 3 items, all customers, no end date) created 2026-08-12, id `gid://shopify/DiscountCodeNode/2396671312249`.
+
+**Checkout header**: the store is still named "My Store", which is what the checkout header displays. Renaming happens in Settings → Store details; a checkout logo (Settings → Checkout → Branding) replaces it visually. Neither is reachable from the Admin API tools available here.
 
 ### To wire the remaining eight products
 1. Create the product in Shopify admin, note the variant IDs.
