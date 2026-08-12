@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-08-10 (supplement catalogue swap + media/assets reorganisation)
+> Last updated: 2026-08-12 (cart + bundle, prices confirmed, BUNDLE10 created)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -28,8 +28,9 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 **What is NOT connected**
 - **Vercel: nothing is deployed from this machine.** `vercel.json` is correct and ready; someone has to run `vercel login` (browser flow) then `vercel --prod`, or import the GitHub repo from the Vercel dashboard. A preview build has been seen at `lowbasemx-1er1.vercel.app`.
 - **Shopify: only the CIRQA is wired.** The other eight products have no `shopify` block in `catalog.js`, so their buy button opens a `mailto:` order instead. A read-only check on 2026-08-10 confirmed the store still contains exactly one product. See section 7.
-- **Prices are provisional for every product except the CIRQA.** The supplements are converted from their US store prices at the rounded rate the catalogue has always used (≈ ×20.6) — they are conversions of real one-time prices, not invented figures, but nobody has confirmed them.
-- **The Cymbiotika creatine is listed as a 12-sachet pack** while Cymbiotika only sells a 24-packet box at $65 US. The format was changed on request; **the price still reflects the 24-pack** and needs an owner decision.
+- **Cart**: `deploy/cart.js` holds a list of Shopify variant references and hands off to a Shopify cart permalink (`/cart/ID:QTY,…`) at checkout — the store rebuilds the cart, applies its prices and opens its own checkout. No Storefront API token exists (creating one is blocked for AI tools), so line data is read from `catalog.js`, which mirrors the store.
+- **Bundle**: every PDP shows the viewed product + the first two `pairs` entries, −10% shown, added as individual variants. The `BUNDLE10` code (10%, minimum 3 items, all customers) exists in Shopify since 2026-08-12 and is passed on the cart link.
+- **Prices are CONFIRMED** by the owner (2026-08-12): the supplement prices converted from the US stores are the final ones.
 - **Third-party imagery** — Promix and Absorption packshots come from the brands' own Shopify CDNs. Usage rights unconfirmed.
 - **Custom domain** — not configured.
 
@@ -373,9 +374,9 @@ vercel --prod
 
 ## 13. Open questions
 
-1. **Supplement prices** — converted from US one-time prices at ≈ ×20.6; need owner confirmation.
-2. **Cymbiotika 12-sachet pack** — the format is listed but the price is still the 24-pack's. Cymbiotika sells no 12-pack.
-3. **Shopify for the eight non-CIRQA products** — not created. Section 7 has the procedure.
+1. **Inventory is not tracked** on the eight products created on 2026-08-12 — they can be ordered without limit (owner's choice).
+2. **No Storefront API token** — the cart is a permalink hand-off. A token would allow a fully headless cart with live prices and stock.
+3. ~~Shopify for the eight non-CIRQA products~~ — done on 2026-08-11, all nine are wired.
 4. **Image rights** — Promix, Absorption and Cymbiotika packshots pulled from the brands' CDNs. Unconfirmed.
 5. **Supplement copy** — taglines, highlights and spec tables are adapted from the source pages; the editorial voice is ours and unreviewed.
 6. **Custom domain** — none.

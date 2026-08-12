@@ -1930,15 +1930,38 @@ footer a{color:var(--ink)}
   .cart.on .cart-panel{transform:none}
 }
 
-/* Bouton panier de la nav : la pastille ne s'affiche que s'il y a quelque
-   chose dedans, via l'attribut posé par cart.js. */
+/* Icône panier de la nav : une simple icône à côté de « Comprar », sans
+   surface de verre — deux pastilles côte à côte se lisaient comme deux
+   boutons concurrents. La pastille de compte n'apparaît que si le panier
+   contient quelque chose, via l'attribut posé par cart.js. */
 body.cart-open .dock{display:none}
-.cart-btn{position:relative}
-.cart-btn[data-has]::after{
-  content:attr(data-count);position:absolute;top:-5px;right:-5px;
-  min-width:19px;height:19px;padding:0 5px;border-radius:var(--radius-pill);
-  background:var(--ink);color:#fff;font-size:.68rem;font-weight:600;
+.cart-icon{
+  position:relative;flex:none;width:44px;height:44px;padding:0;border:none;
+  background:none;color:var(--ink);cursor:pointer;
+  display:grid;place-content:center;border-radius:50%;
+  transition:transform .18s ease-out,background .2s ease-out;
+}
+.cart-icon svg{width:22px;height:22px;display:block}
+.cart-icon:hover{background:rgba(23,25,27,.06)}
+.cart-icon:active{transform:scale(.94)}
+.cart-icon[data-has]::after{
+  content:attr(data-count);position:absolute;top:3px;right:2px;
+  min-width:17px;height:17px;padding:0 4px;border-radius:var(--radius-pill);
+  background:var(--ink);color:#fff;font-size:.64rem;font-weight:600;
   display:flex;align-items:center;justify-content:center;font-family:var(--font-display);
+  box-shadow:0 0 0 2px var(--surface);
+}
+/* Sous 1024px le logo occupe toute la rangée et se centre : le groupe de
+   droite doit rester assez étroit pour ne pas mordre dessus. */
+@media(max-width:1023px){
+  .cart-icon{width:38px;height:38px}
+  .cart-icon svg{width:20px;height:20px}
+  .nav-end{gap:2px}
+  .nav-end .btn{padding:10px 15px;font-size:.82rem;min-height:40px}
+}
+@media(max-width:400px){
+  .nav-end .btn{padding:9px 12px;font-size:.78rem}
+  .logo{font-size:1.08rem}
 }
 
 /* =========================================================================
