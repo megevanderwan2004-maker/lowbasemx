@@ -65,6 +65,7 @@ deploy/media/
 │   │                           + son affiche (plein écran sous 760px)
 │   ├── objetivos/              les 3 boucles de l'assistant + leurs affiches
 │   ├── bandas/                 boucles des bandeaux pleine largeur + affiches
+│   │                           (dont les deux en-têtes `loop-*-hero` des rayons)
 │   └── capitulos/              boucles des chapitres éditoriaux + affiches
 │
 └── archivo/                    médias conservés mais plus référencés
@@ -78,6 +79,11 @@ Conventions :
   `gen-products.js` s'appuie sur cette règle pour construire les bandeaux.
 - **`packshot`** = visuel détouré (PNG alpha) : c'est lui qui flotte dans les
   carrousels. Sans packshot, un produit y apparaît avec un rectangle blanc.
+- **Un portrait 9/16 dans un bandeau** (`.band`, trois fois plus large que haut)
+  n'est visible qu'à un cinquième, et centré ce cinquième tombe sous le sujet.
+  Les deux en-têtes de rayon corrigent le cadrage avec
+  `.cat-head .band>video{object-position:center 30%}` — à retenir avant d'y
+  poser une nouvelle source verticale.
 - **`archivo/`** ne se supprime pas à la légère : ce sont les visuels des
   sections retirées (bannière Ritual, anciens objectifs, suppléments Cymbiotika
   remplacés), gardés au cas où une section reviendrait.
@@ -179,6 +185,10 @@ avertissement.
   donc c'est cette base de flex — et elle seule — qui commande la hauteur de la
   carte. La toucher sans retoucher les marges des sections voisines rouvre
   exactement le vide que ce réglage a fermé.
+- Ne pas dissocier les cartes d'objectif de la boucle Garmin Connect : les deux
+  sont volontairement dans la même boîte (9/16 borné à 230px). C'est une
+  demande explicite du propriétaire — retoucher l'une sans l'autre casse
+  l'accord.
 - Toute copie client est en espagnol (es-MX).
 - Accessibilité : skip link, radiogroups ARIA, cibles tactiles ≥ 44 px,
   `prefers-reduced-motion`.
@@ -203,6 +213,35 @@ La boucle n'a **ni `autoplay` ni `poster`** : les deux déclenchent le
 téléchargement même quand l'élément est masqué, et le desktop paierait la
 vidéo pour rien. C'est `section-loops` qui lance la lecture à l'entrée dans le
 cadre, et l'affiche est un fond CSS déclaré dans la requête média.
+
+## Les pages de rayon — `/wearables` et `/suplementos`
+
+Deux pages autonomes, atteintes depuis la nav, qui **ne déclarent aucun
+produit** : la grille se contente de nommer une catégorie et `app.js` la
+remplit depuis `catalog.js`.
+
+```html
+<div class="cat-grid rv" id="grid-wearables" data-category="Wearables"></div>
+```
+
+Ajouter ou retirer un produit du catalogue met donc les deux pages à jour sans
+qu'on y touche — le compte affiché à côté du titre (`data-count-for`) suit lui
+aussi. Tout le reste est repris du reste du site : la carte `.prod`, les
+bandeaux `.band`, la grille de garanties, la nav, le pied de page et le dock.
+
+Deux ajouts propres à ces pages :
+
+- **La barre de tri** (`.sort-chips`, module `cat-sort`) — Destacados, Precio ↑,
+  Precio ↓. Elle **déplace** les cartes au lieu de les re-rendre : un re-rendu
+  casserait l'observateur qui met les boucles produit en pause hors écran et
+  ferait repartir chaque vidéo à zéro à chaque tri. L'état est porté par
+  `aria-pressed`, que le CSS lit directement.
+- **La passerelle de clôture** — un bandeau qui renvoie vers l'autre rayon.
+
+Chaque page a sa propre boucle d'en-tête (`bandas/loop-wearables-hero.mp4`,
+`bandas/loop-suplementos-hero.mp4`). Les bandeaux de la home et les passerelles
+gardent `loop-wearables` et `loop-capsulas` : ce sont des fichiers distincts,
+ne pas les fusionner.
 
 ## Déploiement
 

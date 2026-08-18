@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-08-18 (aisle pages; goal assistant now on video cards)
+> Last updated: 2026-08-18 (aisle pages, goal video cards, aisle hero loops)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -41,6 +41,12 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 **Recent history** (`git log`, newest first)
 | Commit | Date | What changed |
 |--------|------|--------------|
+| `b0f2669` | 08-18 | `/wearables` and `/suplementos` get their own header loop (treadmill / capsules) |
+| `b8582a6` | 08-18 | Goal assistant switched to muted 9/16 loops, sized on the Garmin Connect box, white background |
+| `1ade5a5` | 08-18 | **`/wearables` and `/suplementos` aisle pages added**; nav links become real pages |
+| `a1c268b` | 08-12 | Goal assistant moved between the two aisles; wearables band copy widened to the whole Garmin range |
+| `d164fa6` | 08-12 | Carousel cards shrunk to 152/126px, surrounding spacing tightened, `/tienda#…` deep links fixed |
+| `6a1b26d` | 08-12 | Missing video and photo sources committed |
 | `a7eaf5a` | 08-12 | Vertical rhythm tightened site-wide |
 | `c36e31b` | 08-12 | Full-screen mobile hero, near-invisible nav, "Comprar" removed |
 | `a2371ba` | 08-12 | Docs + checkout logo prepared |
@@ -59,7 +65,13 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 | `24d83c8` | 08-07 | Home tightened, 3 goal cards, Ritual banner, warm palette |
 | `7ae70db` | 08-01 | Product loops play inside the carousels |
 
-**Latest pass (2026-08-10)** — three chained changes:
+**Latest pass (2026-08-18)** — four chained changes:
+1. **Carousels shrunk** to `min(34vw,152px)` (desktop) / `min(33vw,126px)` (mobile) and every neighbouring margin tightened with them, so the reduction did not leave holes. A track that fits now drops its arrows and its whole `.head-aside` row.
+2. **Two aisle pages** — `/wearables` and `/suplementos` — reached from the nav, driven entirely by `data-category`. Product-page breadcrumbs now point at them instead of `/tienda`.
+3. **Goal assistant** moved between the two aisle runs, then re-skinned: muted 9/16 loops in the Garmin Connect box, on white.
+4. **Aisle header loops** — each aisle page got its own footage rather than re-using the home bands.
+
+**Previous pass (2026-08-10)** — three chained changes:
 1. **Supplements swapped.** Women's Multivitamin and Synbiotic deleted everywhere (cards, pages, footers, goals). The **Ritual banner went with them** — its visual and CTA pointed at the Synbiotic page — replaced by an Absorption Company chapter in the editorial template. Promix Micronized Creatine became **Promix Non-GMO Creatine** on the 30-stick variant; Cymbiotika creatine switched to a 12-sachet format.
 2. **`deploy/media/` reorganised** into `productos/<handle>/`, `landing/{hero,objetivos,bandas,capitulos}/` and `archivo/`. Every reference was rewritten; `gen-products.js` now derives a band poster from the loop's full path.
 3. **`assets/` reorganised** by product handle, mirroring `deploy/media/productos/`.
@@ -83,7 +95,7 @@ lowlabs-cirqa-context/
 │   └── serve.js               Static preview server that emulates Vercel cleanUrls
 │
 ├── deploy/                    ★ CANONICAL — the deployed site
-│   ├── index.html             Homepage (410 lines)
+│   ├── index.html             Homepage (430 lines)
 │   ├── tienda.html            Shop page; aisles rendered client-side
 │   ├── wearables.html         Wearables aisle page (/wearables)
 │   ├── suplementos.html       Supplements aisle page (/suplementos)
@@ -91,10 +103,10 @@ lowlabs-cirqa-context/
 │   │   ├── cirqa.html  venu-4.html  venu-3s.html  vivoactive-6.html
 │   │   ├── creatina.html  promix-creatina.html  promix-debloat.html
 │   │   └── promix-relax.html  absorption-sleep.html
-│   ├── catalog.js             ★ Single source of truth: products + goals (380 lines)
-│   ├── app.js                 All behaviour, 13 isolated modules (841 lines)
-│   ├── styles.css             Full design system (1698 lines)
-│   └── media/                 66 MB, 60 files — see section 10
+│   ├── catalog.js             ★ Single source of truth: products + goals (406 lines)
+│   ├── app.js                 All behaviour, 16 isolated modules (1258 lines)
+│   ├── styles.css             Full design system (2189 lines)
+│   └── media/                 83 MB, 73 files — see section 10
 │
 ├── site/                      ⚠️ ABANDONED — single-file version, many revisions behind
 ├── shopify-theme/             ⚠️ ABANDONED — Liquid theme, matches the old single-product page
@@ -125,7 +137,7 @@ node build/gen-products.js
 |-------|------|-------|
 | `/` | `deploy/index.html` | Homepage. Carries `class="has-hero"` on `<body>` — this drives the top spacing (section 6). |
 | `/tienda` | `deploy/tienda.html` | Shop. `<div id="shop-sections">` is filled by the `shop` module, one carousel aisle per category. |
-| `/wearables`, `/suplementos` | `deploy/wearables.html`, `deploy/suplementos.html` | Aisle pages, reached from the top nav. Same chrome as `/tienda`; the grid is a `.cat-grid[data-category]` filled by the `catalog` module from `catalog.js`, so **no product is written in their HTML** — adding or removing one from the catalogue updates both pages. Header and closing cross-link are `.band`s reusing the home's loops; the sort chips are the `cat-sort` module. |
+| `/wearables`, `/suplementos` | `deploy/wearables.html`, `deploy/suplementos.html` | Aisle pages, reached from the top nav. Same chrome as `/tienda`; the grid is a `.cat-grid[data-category]` filled by the `catalog` module from `catalog.js`, so **no product is written in their HTML** — adding or removing one from the catalogue updates both pages, count included (`data-count-for`). Each page opens on **its own** `.band` loop (`bandas/loop-wearables-hero.mp4`, `bandas/loop-suplementos-hero.mp4`) and closes on a cross-link band re-using the home loops. Sort chips are the `cat-sort` module. |
 | `/productos/{handle}` | generated | 9 pages. `<body data-product="{handle}">` is how `app.js` knows which catalogue entry to bind. |
 
 `cleanUrls: true` in `vercel.json` is what makes `/tienda` and `/productos/cirqa` resolve without `.html`. `build/serve.js` reproduces that locally.
@@ -185,29 +197,33 @@ Each page embeds `<filter id="lg-refract">`. **It is scoped to Firefox on purpos
 |--------|-------|-------|
 | `.prod` | `/productos/*` "Otros productos" | Framed card: media box, category, name, tagline, price, button |
 | `.fcard` inside `.cards.fcards` | both home carousels and every Tienda aisle | **Floating**: cut-out packshot or product loop, `mix-blend-mode: multiply`, drop shadow, short name, then **`.fcard-buy`** — the price as a `btn btn-ink btn-sm` pill. It is a `span` with `pointer-events:none` (the card is already the link) and `margin-top:auto`, so every button lines up whatever the name's line count |
-| `.goal` | the assistant | Full-bleed photo. **`.goal-body` is fully transparent** — the card's own gradient scrim carries legibility; only the `.goal-cta` pill keeps a glass surface |
+| `.goal` | the assistant | Full-bleed **muted loop** in a 9/16 box capped at 230px — deliberately the same box as the Garmin Connect chapter media. **`.goal-body` is fully transparent** — the card's own gradient scrim carries legibility; only the `.goal-cta` pill keeps a glass surface |
+| `.prod` inside `.cat-grid[data-category]` | `/wearables`, `/suplementos` | The same framed card, driven by category instead of a hand-written list |
 
 A supplement that declares a `video` plays it inside `.fcard`; a radial mask dissolves the studio background. Wearables always use their `packshot` — that rule is in `flyMedia()`, keyed on the category.
 
 ### Carousels
 - `.card-dots` — one dot per page of scroll, filled by the `carousel-dots` module, purely indicative (no focus, no click). Empty when the track fits, so the container takes no space.
-- Above 900px the two **home** carousels are bounded and centred: `width:min(1080px, 100% - clamp(80px,10vw,170px))`, `margin-inline:auto`. The Tienda aisles keep the full-bleed track whose `--cards-inset` aligns the first card with the aisle title — do not merge the two behaviours.
+- Above 900px the **three home** carousels are bounded and centred: `width:min(1080px, 100% - clamp(80px,10vw,170px))`, `margin-inline:auto`, plus `justify-content:safe center` so a short track (the four wearables) sits under its title instead of leaving a hole on the right. The Tienda aisles keep the full-bleed track whose `--cards-inset` aligns the first card with the aisle title — do not merge the two behaviours.
+- **Arrows hide themselves** when a track already fits (`scrollWidth - clientWidth <= 2`), and so does the `.head-aside` that only held them. Both need an explicit `[hidden]{display:none}` rule: the author-level `display:flex` would otherwise beat the browser's own.
 
 ### Editorial chapters — `.chapter.editorial`
 - ≥900px: `display:flex`, media capped at `230px`, copy facing it. **No reserved height** — the section is as tall as its content. It used to claim a full `100svh`, which was the single biggest source of empty space on the page (removed 2026-08-12).
 - ≤899px: **still side by side** — narrow column for the visual (38%), wide one for the copy, and the column template flips with `.flip` so the alternation survives on mobile.
 - `.chapter.on-white` (Promix): white section, no plate or radius behind the video, `object-fit:contain` + `mix-blend-mode:multiply`, and two crossed linear masks (`mask-composite:intersect`) that dissolve the loop's near-white studio edge (253,251,249) into the page.
 
-### Vertical rhythm (tightened 2026-08-12)
+### Vertical rhythm (tightened again 2026-08-12, second pass)
 | Rule | Value |
 |------|-------|
-| `section` | `padding: clamp(30px,4.4vw,56px) 0` |
-| `.section-head` | `gap:12px`, `margin-bottom: clamp(16px,2.2vw,26px)` |
-| `.chapter` | `padding: clamp(28px,3.6vw,52px) 0` |
-| `.best` | `padding-bottom: clamp(22px,3vw,40px)` |
-| `.pdp-brief` / `.pdp-pairs` / `.bundle` | `padding-top: clamp(18px,2.4vw,30px)` |
+| `section` | `padding: clamp(22px,3.2vw,40px) 0` |
+| `.section-head` | `gap:10px`, `margin-bottom: clamp(12px,1.7vw,20px)`; `.center` gets `row-gap:14px` above 900px |
+| `.chapter` / `.chapter.editorial` | `padding: clamp(22px,2.9vw,40px) 0` |
+| `.best` | `padding: clamp(20px,2.4vw,30px)` top / `clamp(14px,1.8vw,22px)` bottom |
+| `.goals-sec` | `padding: clamp(22px,3.2vw,40px) 0`, background plain white |
+| `.shop-sec` | `padding: clamp(26px,3.4vw,46px) 0` |
+| `.card-dots:not(:empty)` | `margin-top: clamp(10px,1.3vw,14px)` |
 
-The home went from 8 437 to 7 481px on desktop and to 6 686px on mobile. Do not restore the old values without asking — the owner asked twice for sections to sit closer.
+Ink-to-ink gaps between home sections now sit in a **74–79px band on desktop**, with no outliers. The home measures **7 225px desktop / 6 728px mobile** while carrying one section more than before. Do not restore the old values without asking — the owner has asked three times for sections to sit closer.
 
 ### Measured layout variables
 - `--dock-h` — buy dock height; `body { padding-bottom }` reserves it.
@@ -229,10 +245,10 @@ Full-bleed, `object-fit: cover`. The wordmark and tagline are **baked into the i
 |-------|--------------|
 | `640px` | Top bar text shrinks to stay on one line |
 | `719/720px` | Media caps kick in; grids go 2-per-row; `Ver más` clamping activates |
-| `759/760px` | Hero switches from the desktop image to the **full-screen video**; goal cards become a **full-width carousel** (one card per screen, sized like the closing banner, with dots); hero CTAs stop being centred |
-| `899/900px` | Chapters and floating grids go multi-column; carousel arrows appear; editorial chapters take their full-height desktop form; home carousels get their bounded track |
+| `759/760px` | Hero switches from the desktop image to the **full-screen video**; hero CTAs stop being centred |
+| `899/900px` | Chapters and floating grids go multi-column; carousel arrows appear (when the track actually scrolls); editorial chapters take their desktop form; home carousels get their bounded, centred track |
 | `980px` | Product page splits into gallery + buy rail |
-| `1023/1024px` | Nav collapses to two rows; the first Tienda aisle takes its tall `padding-top` |
+| `1023/1024px` | Nav collapses to two rows; the first Tienda aisle and the aisle-page header take their tall `padding-top` to clear the floating pill |
 
 ## 7. Catalogue and Shopify
 
@@ -295,26 +311,29 @@ No other file needs touching — the button label, the note under it, and the JS
 
 ## 8. The goal assistant
 
-Three goals in `catalog.js`, each with `id`, `label`, `icon`, `image`, `lede`, `pick`, `also` and `why`.
+Three goals in `catalog.js`, each with `id`, `label`, `icon`, `video`, `poster`, `lede`, `pick`, `also` and `why`.
 
-| Goal | Image | Recommends | Complements |
-|------|-------|-----------|-------------|
-| `dormir` — Dormir mejor | `landing/objetivos/goal-dormir.jpg` | cirqa | absorption-sleep, promix-relax |
-| `rendimiento` — Performance | `landing/objetivos/goal-rendimiento.jpg` | venu-4 | promix-creatina, creatina |
-| `salud` — Cuidar mi salud diaria | `landing/objetivos/goal-salud.jpg` | cirqa | promix-debloat, promix-relax, creatina |
+| Goal | Loop | Recommends | Complements |
+|------|------|-----------|-------------|
+| `dormir` — Dormir mejor | `landing/objetivos/goal-dormir.mp4` (bed at sunrise, 6.4 s) | cirqa | absorption-sleep, promix-relax |
+| `rendimiento` — Performance | `landing/objetivos/goal-rendimiento.mp4` (mountain runner, 12 s) | venu-4 | promix-creatina, creatina |
+| `salud` — Cuidar mi salud diaria | `landing/objetivos/goal-salud.mp4` (stretching by the water, 12 s) | cirqa | promix-debloat, promix-relax, creatina |
+
+`goalMedia()` in `app.js` renders a `<video>` when the goal declares one and falls back to `<img>` on `image` — the three old stills live on in `media/archivo/objetivos/`. The loops carry the same attributes as every other loop on the site (`autoplay muted loop playsinline data-autoloop`), so `section-loops` pauses them off-screen. They still contain an audio track — `muted` is what guarantees silence; no `ffmpeg` was available to strip it.
 
 The `icon` field is still in the data but no longer rendered. Nothing is stored or sent — a pure client-side lookup. The result block stays out of the DOM until a goal is chosen, then receives focus on click (but not on arrow-key navigation).
 
-Below 760px the three cards become a **horizontal carousel**: one full-width card per screen, `min-height:clamp(340px,52vh,520px)` — the closing banner's size — with scroll-snap and the same `.card-dots` indicator. The radiogroup and its roving tabindex are untouched; only the rendering changes.
+**The cards are deliberately the same box as the Garmin Connect chapter loop** — `aspect-ratio:9/16`, `flex:0 0 min(62vw,230px)` — and the track scrolls at **every** width, not just on mobile. Above 900px the three fit and the track centres itself; on a phone one card reads whole and the next peeks by about a third, which is what says it slides. The radiogroup and its roving tabindex are untouched; only the rendering changes.
 
-## 9. `app.js` — 13 modules
+## 9. `app.js` — 16 modules
 
 Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not decorative: `.rv` elements start at `opacity: 0`, so before the wrapper existed one uncaught error could leave **the entire page invisible**. The reveal module also has a 4-second failsafe.
 
 | Module | Role |
 |--------|------|
-| `catalog` | Renders the framed grids from `productCard()` **and** the floating tracks from `flyCard()` (`.fcards[data-handles]`) |
-| `shop` | Builds `/tienda` aisles — one carousel per category |
+| `catalog` | Renders the framed grids from `productCard()` (`[data-exclude]`, `[data-handles]`, `[data-category]`) **and** the floating tracks from `flyCard()` (`.fcards[data-handles]`) |
+| `cat-sort` | The aisle pages' sort chips. **Moves** the existing card nodes rather than re-rendering — a re-render would drop the observer that pauses product loops off-screen and restart every video |
+| `shop` | Builds `/tienda` aisles — one carousel per category, then **re-lands the URL fragment**: the aisles are born in JS, so the browser's own jump to `#wearables` fired on an anchor that did not exist yet. It re-lands on every layout shake (fonts, images, arrows folding) until a real gesture — wheel, touch, key, pointer — says the reader has taken over |
 | `goals` | The assistant: radiogroup, roving tabindex, recommendation rendering |
 | `reveal` | `.rv` scroll reveal + failsafes |
 | `hero-video` | Autoplay/pause logic — **currently inert**, the hero is a still image |
@@ -324,12 +343,12 @@ Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not de
 | `selection` | Product page colour/size radiogroups |
 | `checkout` | Shopify redirect or mailto fallback |
 | `read-more` | Below 720px, clamps long paragraphs to 3 lines with a `Ver más` toggle |
-| `carousel` | Arrows of every floating track; the step is measured from the real gap between the first two items |
+| `carousel` | Arrows of every floating track; the step is measured from the real gap between the first two items. Also **hides the arrows** — and the `.head-aside` that only held them — when the track already fits |
 | `carousel-dots` | Fills every `.card-dots` with one dot per page. The page count comes from the **real step between two cards** and the track's **content box** (padding excluded) — not from `scrollWidth/clientWidth`, which counts gutters and invents a page. Rebuilds on resize and on `load`; also drives the goals track |
 
 ## 10. Media
 
-### `deploy/media/` (66 MB, 60 files, committed)
+### `deploy/media/` (83 MB, 73 files, committed)
 
 ```
 deploy/media/
@@ -343,12 +362,14 @@ deploy/media/
 │   └── absorption-sleep/   absorption-sleep.png
 ├── landing/
 │   ├── hero/               hero-runners.jpg + hero-runners-mobile.jpg
-│   ├── objetivos/          goal-dormir / -rendimiento / -salud .jpg
-│   ├── bandas/             loop-wearables, loop-capsulas, loop-brand (+ posters)
+│   ├── objetivos/          goal-dormir / -rendimiento / -salud .mp4 (+ posters)
+│   ├── bandas/             loop-wearables, loop-capsulas, loop-brand,
+│   │                       loop-wearables-hero, loop-suplementos-hero (+ posters)
 │   └── capitulos/          loop-vertical, cymbiotika-shot (+ posters)
 └── archivo/                30 files kept but referenced by nothing
     ├── cirqa/              app screens, rock/tan/sensor shots, wrist-negra
-    ├── objetivos/          goal-energia, -longevidad, -recuperacion
+    ├── objetivos/          goal-energia, -longevidad, -recuperacion,
+    │                       + the three stills the loops replaced (08-18)
     ├── suplementos/        capsules-*, loop-suplementos, promix-loop, sup-prenatal/
     │                       -synbiotic/-womens sets, promix-creatine.png (180-serving bag)
     └── ritual/             ritual-hand.png, ritual-essential.png
@@ -427,9 +448,10 @@ vercel --prod
 2. **`CLAUDE.md`** — product specs, brand, competition.
 3. **`deploy/catalog.js`** — everything about products and goals. Most content changes start and end here.
 4. **`deploy/index.html`** — homepage structure and section order.
-5. **`deploy/app.js`** — the 13 modules.
-6. **`deploy/styles.css`** — the design system; the liquid-glass and backdrop-filter comments are load-bearing.
-7. **`build/gen-products.js`** — the page templates for `/productos/*`.
+5. **`deploy/wearables.html`** / **`deploy/suplementos.html`** — the aisle-page template; the two files are the same skeleton with different copy, media and category.
+6. **`deploy/app.js`** — the 16 modules.
+7. **`deploy/styles.css`** — the design system; the liquid-glass and backdrop-filter comments are load-bearing.
+8. **`build/gen-products.js`** — the page templates for `/productos/*`, including the nav and the category breadcrumb.
 
 ## 15. Instructions for a future Claude session
 
@@ -456,6 +478,6 @@ vercel --prod
 1. Append an entry to `PRODUCTS` in `deploy/catalog.js` (`handle`, `name`, `short`, `brand`, `tagline`, `price`, `category`, `image`, `highlights`, `specs`; optional `badge`, `compareAt`, `colors`, `sizes`, `shopify`, `packshot`, `video`, `poster`, `videoRatio`, `story`).
 2. Put its optimised visuals in `deploy/media/productos/<handle>/` and its sources in `assets/<handle>/`. For a carousel it needs a **cut-out** (`packshot`).
 3. Run `node build/gen-products.js`.
-4. Add it to a carousel by hand: `data-handles` on `#cards` and `#sup-grid` in `index.html`. The Tienda aisles pick it up automatically from its `category`.
+4. Add it to a carousel by hand: `data-handles` on `#cards`, `#wear-grid` and `#sup-grid` in `index.html`. The Tienda aisles **and both aisle pages** pick it up automatically from its `category` — nothing to touch there.
 5. Editorial chapters are hand-written — only cards and aisles are generated.
-6. Update the dock in `index.html` and `tienda.html`: "N productos" and the "Desde $X MXN" floor.
+6. Update the dock in `index.html` and `tienda.html`: "N productos" and the "Desde $X MXN" floor. (The aisle pages' dock shows shipping and warranty, not a count, so it needs nothing.)
