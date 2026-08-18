@@ -63,7 +63,7 @@ deploy/media/
 ├── landing/
 │   ├── hero/                   hero-runners.jpg (desktop), hero-mobile.mp4
 │   │                           + son affiche (plein écran sous 760px)
-│   ├── objetivos/              les 3 visuels de l'assistant « Tu objetivo »
+│   ├── objetivos/              les 3 boucles de l'assistant + leurs affiches
 │   ├── bandas/                 boucles des bandeaux pleine largeur + affiches
 │   └── capitulos/              boucles des chapitres éditoriaux + affiches
 │

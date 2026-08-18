@@ -299,6 +299,25 @@
      est une simple correspondance objectif → handle, résolue dans
      catalog.js. Le bloc reste absent du DOM tant que rien n'est choisi.
      ===================================================================== */
+  /* Le visuel d'un objectif est une boucle muette, au même gabarit que
+     celles des chapitres : mêmes attributs, même `data-autoloop`, donc
+     la même mise en pause hors écran. Une fiche qui n'a qu'une photo
+     retombe sur l'image. */
+  function goalMedia(g){
+    if (g.video){
+      return '<span class="goal-media">' +
+        '<video autoplay muted loop playsinline webkit-playsinline preload="metadata" ' +
+          'disablepictureinpicture disableremoteplayback poster="' + esc(g.poster || "") + '" ' +
+          'width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>' +
+          '<source src="' + esc(g.video) + '" type="video/mp4">' +
+        '</video></span>';
+    }
+    if (g.image){
+      return '<span class="goal-media"><img loading="lazy" src="' + esc(g.image) + '" alt="" width="720" height="1280"></span>';
+    }
+    return "";
+  }
+
   module("goals", function(){
     var host = $("goals"), out = $("reco");
     if (!host || !out || !CATALOG.goals) return;
@@ -310,9 +329,7 @@
     host.innerHTML = CATALOG.goals.map(function(g, i){
       return '<button class="goal" type="button" role="radio" aria-checked="false" ' +
           'tabindex="' + (i === 0 ? "0" : "-1") + '" data-goal="' + esc(g.id) + '">' +
-          (g.image
-            ? '<span class="goal-media"><img loading="lazy" src="' + esc(g.image) + '" alt="" width="600" height="900"></span>'
-            : "") +
+          goalMedia(g) +
           /* La nacelle est transparente : c'est le voile en dégradé de la
              carte (.goal::after) qui porte la lisibilité, et seul le
              pseudo-bouton garde sa surface de verre. */

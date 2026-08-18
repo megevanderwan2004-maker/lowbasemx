@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-08-18 (dedicated /wearables and /suplementos aisle pages)
+> Last updated: 2026-08-18 (aisle pages; goal assistant now on video cards)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -21,6 +21,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 - 13 pages: home, `/tienda`, the two aisle pages `/wearables` and `/suplementos`, and 9 product pages, all internally linked and verified.
 - Home opens on the "Los más buscados" carousel, then alternates video band → compact carousel → editorial chapter, with the goal assistant hinging between the wearables and supplements runs.
 - Three home carousels, all on the same compact card (`#mas-buscados`, `#wear-grid`, `#sup-grid`).
+- **Goal assistant**: three cards carrying a muted 9/16 loop (`deploy/media/landing/objetivos/goal-*.mp4`, declared as `video`/`poster` on `GOALS` in `catalog.js`). The cards are deliberately the **same box as the Garmin Connect chapter loop** — 9/16 capped at 230px — and the track scrolls at every width, so on a phone one card reads whole and the next peeks. Section background is plain white, not the old sand gradient.
 - Carousel cards carry a **price button** in the same glass language as "Comprar", and discreet **dots** signal that a track scrolls. A track that already fits drops its arrows and its whole `.head-aside` row, so nothing empty is left under the title.
 - Editorial chapters (Garmin Connect, Cymbiotika, Absorption, Promix): reduced visual on one side, copy on the other, full viewport height on desktop, **side by side on mobile too**.
 - **Cart on every page**: drawer with image, name, chosen options, quantity, remove, subtotal; a cart icon in the nav carries the count. Lines are Shopify variant references; checkout is a Shopify cart permalink.

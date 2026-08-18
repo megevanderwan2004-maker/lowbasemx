@@ -1205,26 +1205,38 @@ footer a{color:var(--ink)}
 /* =========================================================================
    Assistant : choisir un objectif avant un produit
    ========================================================================= */
+/* Fond blanc, celui de la carte : l'assistant se pose entre deux rayons,
+   il ne doit plus se détacher comme un encart. */
 .goals-sec{
   position:relative;overflow:hidden;
-  background:
-    linear-gradient(168deg,#ffffff 0%,var(--surface-sand) 52%,#f2e8da 100%);
+  background:var(--surface);
   padding:clamp(22px,3.2vw,40px) 0;
 }
-/* Trois objectifs sur une rangée à partir de 760px, deux colonnes en
-   dessous. auto-fit laisserait un orphelin. */
+/* Les trois objectifs forment une piste, à tous les formats. Les cartes
+   étant au gabarit de la boucle Garmin Connect (9/16, 230px), les trois
+   tiennent à l'écran large et la piste s'y centre ; sur téléphone une
+   carte se lit en entier et la suivante dépasse, ce qui dit sans mot que
+   ça se fait glisser. `safe` ramène la piste au bord dès qu'elle déborde,
+   sinon son début deviendrait inatteignable. */
 .goals{
-  display:grid;gap:clamp(12px,1.6vw,18px);
-  grid-template-columns:repeat(3,1fr);
-  max-width:1080px;margin:0 auto;
+  display:flex;gap:clamp(10px,1.6vw,18px);
+  justify-content:safe center;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+  max-width:1080px;margin:0 auto;padding-bottom:2px;
 }
-@media(max-width:759px){.goals{grid-template-columns:1fr 1fr}}
+.goals::-webkit-scrollbar{display:none}
 /* Carte objectif : le visuel occupe toute la carte, la nacelle de verre
    se pose dessus. Rien d'autre ne partage la place — c'est la photo qui
    porte le choix. */
+/* Même boîte que `.chapter.editorial .chapter-media.portrait` : le 9/16
+   natif des boucles, borné à 230px. Les deux blocs doivent rester
+   accordés — c'est la demande. */
 .goal{
   position:relative;isolation:isolate;display:block;overflow:hidden;
-  aspect-ratio:3/4.05;padding:0;border:none;cursor:pointer;text-align:center;
+  flex:0 0 min(62vw,230px);scroll-snap-align:center;
+  aspect-ratio:9/16;padding:0;border:none;cursor:pointer;text-align:center;
   border-radius:var(--radius-lg);font-family:var(--font-body);
   background:var(--surface-teal);
   box-shadow:var(--glass-hairline),var(--shadow-lift);
@@ -1233,11 +1245,13 @@ footer a{color:var(--ink)}
 .goal:hover{transform:translateY(-3px)}
 .goal.active{box-shadow:var(--shadow-lift),inset 0 0 0 2px var(--ink)}
 .goal-media{position:absolute;inset:0;display:block;overflow:hidden;z-index:1}
-.goal-media img{
+.goal-media img,
+.goal-media video{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   transition:transform .35s ease-out;
 }
-.goal:hover .goal-media img{transform:scale(1.05)}
+.goal:hover .goal-media img,
+.goal:hover .goal-media video{transform:scale(1.05)}
 /* Un voile sous la nacelle : sans lui, une photo claire laisserait le
    verre sans contraste et le titre deviendrait illisible. */
 .goal::after{
@@ -1264,28 +1278,9 @@ footer a{color:var(--ink)}
 .goal.active .goal-cta{background:var(--cta);color:#fff;box-shadow:none}
 @media(max-width:719px){
   .goals{gap:10px}
-  .goal{border-radius:var(--radius-md);aspect-ratio:3/3.9}
+  .goal{border-radius:var(--radius-md)}
   .goal-body{gap:8px;border-radius:0 0 var(--radius-md) var(--radius-md)}
   .goal-cta{padding:8px 14px;font-size:.76rem}
-}
-/* Sur mobile les objectifs deviennent un carrousel : une carte pleine
-   largeur à la fois, au gabarit de la bannière de clôture, plutôt que
-   deux vignettes trop petites pour que la photo se lise. Le groupe radio
-   et son tabindex tournant sont intacts — seul le rendu change. */
-@media(max-width:759px){
-  .goals{
-    display:flex;gap:clamp(10px,3vw,16px);
-    overflow-x:auto;overflow-y:hidden;
-    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-  }
-  .goals::-webkit-scrollbar{display:none}
-  .goal{
-    flex:0 0 100%;scroll-snap-align:center;
-    aspect-ratio:auto;min-height:clamp(340px,52vh,520px);
-    border-radius:var(--radius-lg);
-  }
-  .goal-body{border-radius:0 0 var(--radius-lg) var(--radius-lg)}
 }
 
 /* Recommandation — n'existe pas tant que rien n'est choisi. */
@@ -1710,7 +1705,8 @@ footer a{color:var(--ink)}
   /* Deux cartes et demie tiennent à l'écran : assez pour montrer que la
      piste défile, assez petit pour que le titre suivant reste visible. */
   .fcard{flex:0 0 min(33vw,126px)}
-  .goal{aspect-ratio:3/3.6}
+  /* Pas de ratio ici : la carte objectif garde le 9/16 de la boucle
+     Garmin Connect à tous les formats. */
   .goal-txt b{font-size:.88rem}
 }
 
