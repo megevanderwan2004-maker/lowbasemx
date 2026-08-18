@@ -26,6 +26,15 @@ const { products, money } = sandbox.window.LOWLABS;
 const esc = (s) =>
   String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+/* La miette de catégorie a désormais sa propre page de rayon. Le slug est
+   dérivé du nom, comme les ancres de la boutique, pour qu'ajouter une
+   catégorie au catalogue n'oblige pas à toucher ce fichier. */
+const catUrl = (cat) =>
+  "/" + String(cat).toLowerCase()
+    .replace(/[áàä]/g, "a").replace(/[éèë]/g, "e").replace(/[íìï]/g, "i")
+    .replace(/[óòö]/g, "o").replace(/[úùü]/g, "u")
+    .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
 const CHECK = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>';
 
 const nav = () => `
@@ -39,8 +48,8 @@ const nav = () => `
     <div class="nav-start">
       <div class="nav-links">
         <a href="/tienda">Tienda</a>
-        <a href="/#wearables">Wearables</a>
-        <a href="/#suplementos">Suplementos</a>
+        <a href="/wearables">Wearables</a>
+        <a href="/suplementos">Suplementos</a>
       </div>
     </div>
     <a class="logo" href="/">lowlabs</a>
@@ -321,7 +330,7 @@ ${nav()}
         <nav class="crumbs rv" aria-label="Migas de pan">
           <a href="/">Inicio</a>
           <span aria-hidden="true">/</span>
-          <a href="/tienda">${esc(p.category)}</a>
+          <a href="${catUrl(p.category)}">${esc(p.category)}</a>
           <span aria-hidden="true">/</span>
           <span>${esc(p.short)}</span>
         </nav>

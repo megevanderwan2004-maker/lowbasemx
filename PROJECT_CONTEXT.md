@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-08-12 (full-screen mobile hero, near-invisible nav, tighter vertical rhythm)
+> Last updated: 2026-08-18 (dedicated /wearables and /suplementos aisle pages)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -15,16 +15,16 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 
 ## 2. Current state
 
-`deploy/` is **canonical and the only actively maintained variant.** It is a static site of 11 HTML pages plus a shared CSS/JS/catalogue triplet. No build step at request time; product pages are generated ahead of time by a Node script (section 4).
+`deploy/` is **canonical and the only actively maintained variant.** It is a static site of 13 HTML pages plus a shared CSS/JS/catalogue triplet. No build step at request time; product pages are generated ahead of time by a Node script (section 4).
 
 **What works today**
-- 11 pages: home, `/tienda`, and 9 product pages, all internally linked and verified.
+- 13 pages: home, `/tienda`, the two aisle pages `/wearables` and `/suplementos`, and 9 product pages, all internally linked and verified.
 - Home opens on the "Los más buscados" carousel, then alternates video band → compact carousel → editorial chapter, with the goal assistant hinging between the wearables and supplements runs.
 - Three home carousels, all on the same compact card (`#mas-buscados`, `#wear-grid`, `#sup-grid`).
 - Carousel cards carry a **price button** in the same glass language as "Comprar", and discreet **dots** signal that a track scrolls. A track that already fits drops its arrows and its whole `.head-aside` row, so nothing empty is left under the title.
 - Editorial chapters (Garmin Connect, Cymbiotika, Absorption, Promix): reduced visual on one side, copy on the other, full viewport height on desktop, **side by side on mobile too**.
 - **Cart on every page**: drawer with image, name, chosen options, quantity, remove, subtotal; a cart icon in the nav carries the count. Lines are Shopify variant references; checkout is a Shopify cart permalink.
-- **Nav**: links, centred wordmark, cart icon. Nothing else — "Comprar" was removed on 2026-08-12.
+- **Nav**: links, centred wordmark, cart icon. Nothing else — "Comprar" was removed on 2026-08-12. The three links are real pages: `/tienda`, `/wearables`, `/suplementos`; the current one carries `aria-current="page"`.
 - **Bundle on every PDP**: viewed product + its two first `pairs`, −10% shown, colour swatches on the watch, added as individual variants with the `BUNDLE10` code attached.
 - All nine products check out on Shopify — colour/size drive the exact variant.
 - Liquid-glass design system: white translucent surfaces, ink text, a masked gradient rim shared by buttons, both bars, and the footer.
@@ -84,6 +84,8 @@ lowlabs-cirqa-context/
 ├── deploy/                    ★ CANONICAL — the deployed site
 │   ├── index.html             Homepage (410 lines)
 │   ├── tienda.html            Shop page; aisles rendered client-side
+│   ├── wearables.html         Wearables aisle page (/wearables)
+│   ├── suplementos.html       Supplements aisle page (/suplementos)
 │   ├── productos/             GENERATED — do not hand-edit
 │   │   ├── cirqa.html  venu-4.html  venu-3s.html  vivoactive-6.html
 │   │   ├── creatina.html  promix-creatina.html  promix-debloat.html
@@ -122,6 +124,7 @@ node build/gen-products.js
 |-------|------|-------|
 | `/` | `deploy/index.html` | Homepage. Carries `class="has-hero"` on `<body>` — this drives the top spacing (section 6). |
 | `/tienda` | `deploy/tienda.html` | Shop. `<div id="shop-sections">` is filled by the `shop` module, one carousel aisle per category. |
+| `/wearables`, `/suplementos` | `deploy/wearables.html`, `deploy/suplementos.html` | Aisle pages, reached from the top nav. Same chrome as `/tienda`; the grid is a `.cat-grid[data-category]` filled by the `catalog` module from `catalog.js`, so **no product is written in their HTML** — adding or removing one from the catalogue updates both pages. Header and closing cross-link are `.band`s reusing the home's loops; the sort chips are the `cat-sort` module. |
 | `/productos/{handle}` | generated | 9 pages. `<body data-product="{handle}">` is how `app.js` knows which catalogue entry to bind. |
 
 `cleanUrls: true` in `vercel.json` is what makes `/tienda` and `/productos/cirqa` resolve without `.html`. `build/serve.js` reproduces that locally.

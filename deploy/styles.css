@@ -1351,6 +1351,55 @@ footer a{color:var(--ink)}
   font-family:var(--font-display);font-size:.75rem;font-weight:500;
   text-transform:uppercase;letter-spacing:.12em;color:var(--teal-brand);line-height:1.4;
 }
+/* =========================================================================
+   Pages de rayon — /wearables et /suplementos
+
+   Aucun gabarit nouveau : la bannière du rayon est un `.band`, la grille
+   une `.cat-grid`, les repères une variante de `.trust-grid`. Seuls le
+   calage vertical et la barre de tri s'ajoutent ici.
+   ========================================================================= */
+/* La bannière tient lieu de hero : elle touche le haut de la carte, la
+   nav flottant dessus comme sur la home. Pas de padding, donc, sinon une
+   bande blanche se glisserait entre la carte et le bandeau. */
+.cat-head{padding:0}
+/* Sous 1024px la nav passe sur deux rangs et la carte descend déjà sous
+   la pilule : le bandeau n'a plus à lui réserver de hauteur. */
+@media(min-width:1024px){
+  .cat-head .band-inner{padding-top:clamp(84px,8.6vw,108px)}
+}
+.cat-list{padding-top:clamp(24px,3.4vw,44px)}
+/* Le bandeau de passerelle ferme la page : il touche le bas de la carte,
+   comme la bannière de clôture de la home. */
+.cat-cross{padding-bottom:0}
+
+/* Barre de tri : les mêmes boutons de verre que les flèches de
+   carrousel. L'état retenu est porté par aria-pressed — c'est lui que
+   lit un lecteur d'écran, autant le styler directement. */
+.sort-chips{display:flex;gap:8px;flex-wrap:wrap}
+/* 44px : la règle de cible tactile du site vaut aussi pour ces puces. */
+.sort-chips .btn{padding:11px 16px;min-height:44px;font-size:.84rem}
+.sort-chips .btn[aria-pressed="true"]{
+  background:var(--ink);color:#fff;
+}
+.sort-chips .btn[aria-pressed="true"]::before{opacity:0}
+@media(min-width:900px){.sort-chips{justify-content:flex-end}}
+
+/* Repères de choix : la grille de garanties, mais avec une affordance au
+   bout de chaque carte. */
+.pick-grid{
+  list-style:none;display:grid;gap:clamp(12px,2vw,20px);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));
+}
+.pick-grid li{
+  display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+  padding:20px 22px;border-radius:var(--radius-md);
+  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
+  box-shadow:var(--glass-edge),var(--glass-hairline);
+}
+.pick-grid b{font-family:var(--font-display);font-size:1.12rem;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
+.pick-grid span{font-size:.86rem;color:var(--teal-700);line-height:1.5;flex:1}
+.pick-grid .btn{margin-top:4px}
+
 .trust-grid{
   list-style:none;display:grid;gap:clamp(12px,2vw,20px);
   grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));
@@ -1378,12 +1427,23 @@ footer a{color:var(--ink)}
   .prod-body{padding:12px 13px 14px;gap:5px}
   .prod-name{font-size:.9rem}
   /* Deux lignes de résumé : sinon la hauteur des cartes d'une rangée est
-     dictée par le texte le plus long. */
-  .prod-tag{
+     dictée par le texte le plus long.
+
+     `-webkit-line-clamp` ne peut pas s'en charger ici : un enfant de flex
+     voit son display blockifié, `-webkit-box` y retombe en `flow-root` et
+     le clamp est ignoré. Restait `flex:1` + `overflow:hidden`, qui
+     étirait la boîte à la hauteur de la plus haute carte de la rangée
+     puis coupait le texte au milieu d'une ligne. On borne donc la boîte
+     à deux interlignes exactement, et c'est le prix qui prend le relais
+     pour aligner les boutons en bas de carte. */
+  /* Portées par `.cat-grid` : les règles de base de `.prod-tag` et
+     `.prod-price` sont écrites plus bas dans la feuille, une simple
+     media query ne suffirait pas à les couvrir. */
+  .cat-grid .prod-tag{
     font-size:.76rem;
-    display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;
-    -webkit-line-clamp:2;line-clamp:2;
+    flex:none;line-height:1.5;max-height:3em;overflow:hidden;
   }
+  .cat-grid .prod-price{margin-top:auto}
   /* Le prix barré et la devise passent à la ligne au lieu d'être rognés. */
   .prod-price{flex-wrap:wrap;gap:4px 7px}
   .prod-price b{font-size:1.02rem}

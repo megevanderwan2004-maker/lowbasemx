@@ -137,8 +137,60 @@
         : CATALOG.products.filter(function(p){ return !only || p.handle !== only; });
       grid.innerHTML = items.map(productCard).join("");
     });
+    /* Les pages de rayon (/wearables, /suplementos) ne listent aucun
+       produit dans leur HTML : elles nomment une catégorie, et c'est
+       catalog.js qui dit ce qu'elle contient. Ajouter ou retirer un
+       produit du catalogue suffit donc à mettre la page à jour. */
+    each(document.querySelectorAll(".cat-grid[data-category]"), function(grid){
+      var items = CATALOG.inCategory(grid.getAttribute("data-category"));
+      grid.innerHTML = items.map(productCard).join("");
+      var count = document.querySelector('[data-count-for="' + grid.id + '"]');
+      if (count){
+        count.textContent = items.length + (items.length > 1 ? " productos" : " producto");
+      }
+    });
     each(document.querySelectorAll(".fcards[data-handles]"), function(track){
       track.innerHTML = pickHandles(track.getAttribute("data-handles")).map(flyCard).join("");
+    });
+  });
+
+  /* =====================================================================
+     Tri d'un rayon — trois entrées, aucune n'écrit dans l'URL ni ne
+     persiste : c'est un confort de lecture, pas un état de la page.
+
+     Les cartes sont déplacées, jamais re-rendues : un re-rendu casserait
+     l'observateur qui met en pause les boucles produit hors écran, et
+     redémarrerait chaque vidéo au premier tri.
+     ===================================================================== */
+  module("cat-sort", function(){
+    each(document.querySelectorAll("[data-sort-for]"), function(bar){
+      var grid = $(bar.getAttribute("data-sort-for"));
+      if (!grid || !grid.getAttribute("data-category")) return;
+
+      var base = CATALOG.inCategory(grid.getAttribute("data-category"));
+      var nodes = Array.prototype.slice.call(grid.children);
+      if (nodes.length !== base.length) return;
+
+      var byHandle = {};
+      each(base, function(p, i){ byHandle[p.handle] = nodes[i]; });
+
+      var ORDER = {
+        "destacados": null,
+        "precio-asc":  function(a, b){ return a.price - b.price; },
+        "precio-desc": function(a, b){ return b.price - a.price; }
+      };
+
+      each(bar.querySelectorAll("button"), function(b){
+        b.addEventListener("click", function(){
+          var cmp = ORDER[b.getAttribute("data-sort")];
+          var items = base.slice();
+          if (cmp) items.sort(cmp);
+          each(items, function(p){ grid.appendChild(byHandle[p.handle]); });
+          each(bar.querySelectorAll("button"), function(o){
+            o.setAttribute("aria-pressed", o === b ? "true" : "false");
+          });
+        }, false);
+      });
     });
   });
 

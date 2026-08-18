@@ -18,6 +18,8 @@ JavaScript ES5-compatible, servis tels quels par Vercel.
 ├── deploy/                 ★ le site déployé
 │   ├── index.html          home
 │   ├── tienda.html         boutique (/tienda)
+│   ├── wearables.html      rayon Wearables (/wearables)
+│   ├── suplementos.html    rayon Suplementos (/suplementos)
 │   ├── productos/          9 fiches produit — GÉNÉRÉES, ne pas éditer à la main
 │   ├── catalog.js          produits + objectifs : prix, textes, specs, médias
 │   ├── cart.js             panier + tiroir, hand-off vers le checkout Shopify
@@ -150,8 +152,9 @@ avertissement.
 2. Déposer ses visuels dans `deploy/media/productos/<handle>/`.
 3. `node build/gen-products.js`.
 4. L'ajouter à la main aux carrousels de la home (`data-handles` sur `#cards`,
-   `#wear-grid` et `#sup-grid` dans `index.html`). Les rayons de `/tienda` le
-   prennent tout seuls depuis sa `category`.
+   `#wear-grid` et `#sup-grid` dans `index.html`). Les rayons de `/tienda` et
+   les pages `/wearables` et `/suplementos` le prennent tout seuls depuis sa
+   `category` — rien à toucher de ce côté.
 5. Mettre à jour le dock : nombre de produits et prix plancher.
 
 ### Règles qui font mal si on les ignore

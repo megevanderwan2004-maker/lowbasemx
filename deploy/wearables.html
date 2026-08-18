@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tienda — lowlabs</title>
-<meta name="description" content="Wearables Garmin y suplementos formulados por científicos. Una selección corta, elegida con criterio, con envío gratis a todo México.">
-<meta property="og:title" content="Tienda | lowlabs">
-<meta property="og:description" content="Wearables Garmin y suplementos formulados por científicos. Una selección corta, elegida con criterio.">
+<title>Wearables Garmin — lowlabs</title>
+<meta name="description" content="Garmin CIRQA™, Venu® 4, Venu® 3S y Vívoactive® 6. Salud 24/7, sueño avanzado y más de 80 actividades, sin suscripción y con envío gratis a todo México.">
+<meta property="og:title" content="Wearables Garmin | lowlabs">
+<meta property="og:description" content="Una banda sin pantalla y tres relojes AMOLED. La misma app gratuita, el mismo cero de suscripción.">
 <meta property="og:image" content="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-lineup.jpg?v=1785272697">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_MX">
@@ -24,10 +24,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 </head>
 <body>
 
-<!-- Filtre de réfraction des boutons en verre liquide. Un bruit fractal
-     déplace le fond puis est refloué : c'est ce qui donne l'ondulation.
-     Seul Firefox honore `backdrop-filter:url()` — ailleurs les boutons
-     retombent sur le flou simple, l'arête portant déjà l'effet. -->
 <svg class="svg-defs" aria-hidden="true" focusable="false">
   <filter id="lg-refract" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
     <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="turbulence"/>
@@ -45,8 +41,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   <div class="nav-pill">
     <div class="nav-start">
       <div class="nav-links">
-        <a href="/tienda" aria-current="page">Tienda</a>
-        <a href="/wearables">Wearables</a>
+        <a href="/tienda">Tienda</a>
+        <a href="/wearables" aria-current="page">Wearables</a>
         <a href="/suplementos">Suplementos</a>
       </div>
     </div>
@@ -60,17 +56,84 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <div class="shell">
   <main id="contenido">
 
-    <!-- Les rayons sont rendus depuis catalog.js : une seule source de vérité
-         pour la home, la boutique et les pages produit. -->
-    <div id="shop-sections"></div>
+    <!-- ===== En-tête de rayon : la bannière du rayon tient lieu de hero.
+         La nav flotte dessus, comme sur la home. ===== -->
+    <section class="cat-head" aria-labelledby="cat-t">
+      <div class="band deep">
+        <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+               disablepictureinpicture disableremoteplayback
+               poster="/media/landing/bandas/poster-loop-wearables.jpg"
+               width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
+          <source src="/media/landing/bandas/loop-wearables.mp4" type="video/mp4">
+        </video>
+        <div class="band-inner">
+          <span class="eyebrow">Wearables</span>
+          <h1 id="cat-t">Mide todo. Sin mirar la muñeca.</h1>
+          <p>Garmin sin suscripción: salud 24/7, sueño avanzado y más de 80 actividades, en la app Garmin Connect™ gratuita.</p>
+          <a class="btn btn-smoke btn-lg" href="#lista">Ver la selección</a>
+        </div>
+      </div>
+    </section>
 
-    <!-- ===== Rappel de garanties ===== -->
-    <section class="chapter tinted" aria-labelledby="tienda-trust-t">
+    <!-- ===== La grille : rien n'est écrit en dur, `data-category` suffit.
+         app.js la remplit depuis catalog.js et tient le compte à jour. ===== -->
+    <section class="cat-list" id="lista" aria-labelledby="lista-t">
+      <div class="container">
+        <div class="section-head rv">
+          <div>
+            <span class="eyebrow">La selección</span>
+            <h2 id="lista-t">Todos los wearables</h2>
+            <p>Una banda sin pantalla y tres relojes AMOLED. La misma app, el mismo cero de suscripción.</p>
+          </div>
+          <div class="head-aside">
+            <p class="shop-count" data-count-for="grid-wearables"></p>
+            <div class="sort-chips" data-sort-for="grid-wearables" role="group" aria-label="Ordenar">
+              <button class="btn btn-quiet btn-sm" type="button" data-sort="destacados" aria-pressed="true">Destacados</button>
+              <button class="btn btn-quiet btn-sm" type="button" data-sort="precio-asc" aria-pressed="false">Precio ↑</button>
+              <button class="btn btn-quiet btn-sm" type="button" data-sort="precio-desc" aria-pressed="false">Precio ↓</button>
+            </div>
+          </div>
+        </div>
+        <div class="cat-grid rv" id="grid-wearables" data-category="Wearables"></div>
+      </div>
+    </section>
+
+    <!-- ===== Trois repères pour choisir, pas une fiche technique ===== -->
+    <section class="cat-facts" aria-labelledby="facts-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">Cómo elegir</span>
+            <h2 id="facts-t">¿Con pantalla o sin ella?</h2>
+          </div>
+        </div>
+        <ul class="pick-grid rv">
+          <li>
+            <b>Sin pantalla</b>
+            <span>La CIRQA™ mide sin nada que mirar: 18 gramos de tela, hasta 10 días de batería.</span>
+            <a class="btn btn-quiet btn-sm" href="/productos/cirqa">Ver la CIRQA</a>
+          </li>
+          <li>
+            <b>Con pantalla AMOLED</b>
+            <span>Venu® 4, Venu® 3S y Vívoactive® 6 leen tus datos de un vistazo, en la muñeca.</span>
+            <a class="btn btn-quiet btn-sm" href="/productos/venu-4">Ver la Venu® 4</a>
+          </li>
+          <li>
+            <b>En todos</b>
+            <span>Garmin Connect™ gratis, para siempre. Sueño, estrés, Body Battery™ y +80 actividades.</span>
+            <a class="btn btn-quiet btn-sm" href="/tienda">Ver la tienda</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== Rappel de garanties — le même bloc que /tienda ===== -->
+    <section class="chapter tinted" aria-labelledby="trust-t">
       <div class="container">
         <div class="section-head center rv">
           <div>
             <span class="eyebrow">Sin letra chica</span>
-            <h2 id="tienda-trust-t">Lo mismo en cada pedido</h2>
+            <h2 id="trust-t">Lo mismo en cada pedido</h2>
           </div>
         </div>
         <ul class="trust-grid rv">
@@ -79,6 +142,24 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           <li><b class="price-num">$0</b><span>Sin suscripción ni cargos recurrentes.</span></li>
           <li><b>Pago seguro</b><span>Tarjeta vía Shopify Checkout.</span></li>
         </ul>
+      </div>
+    </section>
+
+    <!-- ===== Passerelle vers l'autre rayon ===== -->
+    <section class="cat-cross" aria-labelledby="cross-t">
+      <div class="band deep">
+        <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+               disablepictureinpicture disableremoteplayback
+               poster="/media/landing/bandas/poster-loop-capsulas.jpg"
+               width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
+          <source src="/media/landing/bandas/loop-capsulas.mp4" type="video/mp4">
+        </video>
+        <div class="band-inner">
+          <span class="eyebrow">Suplementos</span>
+          <h2 id="cross-t">Lo que el reloj mide, la fórmula lo acompaña.</h2>
+          <p>Creatina, magnesio, sueño y digestión: cinco fórmulas de absorción mejorada, sin suscripción.</p>
+          <a class="btn btn-smoke btn-lg" href="/suplementos">Explorar los suplementos</a>
+        </div>
       </div>
     </section>
 
@@ -120,13 +201,13 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   </div>
 </footer>
 
-<div class="dock" role="region" aria-label="Resumen de la tienda">
+<div class="dock" role="region" aria-label="Resumen del catálogo">
   <div class="dock-shell" id="dock-shell">
     <div class="dock-info">
-      <b class="price-num">Desde $499 MXN</b>
-      <span>9 productos · Envío gratis a todo México</span>
+      <b class="price-num">Envío gratis</b>
+      <span>A todo México · Garantía oficial</span>
     </div>
-    <a class="btn btn-ink" href="#wearables">Ver wearables</a>
+    <a class="btn btn-ink" href="#lista">Ver los wearables</a>
   </div>
 </div>
 
