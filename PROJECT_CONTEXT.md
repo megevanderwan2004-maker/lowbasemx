@@ -69,7 +69,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 1. **Carousels shrunk** to `min(34vw,152px)` (desktop) / `min(33vw,126px)` (mobile) and every neighbouring margin tightened with them, so the reduction did not leave holes. A track that fits now drops its arrows and its whole `.head-aside` row.
 2. **Two aisle pages** — `/wearables` and `/suplementos` — reached from the nav, driven entirely by `data-category`. Product-page breadcrumbs now point at them instead of `/tienda`.
 3. **Goal assistant** moved between the two aisle runs, then re-skinned: muted 9/16 loops in the Garmin Connect box, on white.
-4. **Aisle header loops** — each aisle page got its own footage rather than re-using the home bands.
+4. **Aisle header loops** — each aisle page got its own footage rather than re-using the home bands. `loop-suplementos-hero.mp4` is the **full 12.6 s source**: it alternates between an out-of-focus liquid macro (0–2 s, ~6 s) and the golden capsules (3 s, 8 s → end). It was briefly cut to the capsule tail; the owner asked for the whole clip back on 08-18.
 
 **Previous pass (2026-08-10)** — three chained changes:
 1. **Supplements swapped.** Women's Multivitamin and Synbiotic deleted everywhere (cards, pages, footers, goals). The **Ritual banner went with them** — its visual and CTA pointed at the Synbiotic page — replaced by an Absorption Company chapter in the editorial template. Promix Micronized Creatine became **Promix Non-GMO Creatine** on the 30-stick variant; Cymbiotika creatine switched to a 12-sachet format.
@@ -106,7 +106,7 @@ lowlabs-cirqa-context/
 │   ├── catalog.js             ★ Single source of truth: products + goals (406 lines)
 │   ├── app.js                 All behaviour, 16 isolated modules (1258 lines)
 │   ├── styles.css             Full design system (2189 lines)
-│   └── media/                 83 MB, 73 files — see section 10
+│   └── media/                 86 MB, 73 files — see section 10
 │
 ├── site/                      ⚠️ ABANDONED — single-file version, many revisions behind
 ├── shopify-theme/             ⚠️ ABANDONED — Liquid theme, matches the old single-product page
@@ -348,7 +348,7 @@ Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not de
 
 ## 10. Media
 
-### `deploy/media/` (83 MB, 73 files, committed)
+### `deploy/media/` (86 MB, 73 files, committed)
 
 ```
 deploy/media/
