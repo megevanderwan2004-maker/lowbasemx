@@ -1357,6 +1357,11 @@ footer a{color:var(--ink)}
    nav flottant dessus comme sur la home. Pas de padding, donc, sinon une
    bande blanche se glisserait entre la carte et le bandeau. */
 .cat-head{padding:0}
+/* Les deux boucles d'en-tête sont des portraits 9/16 posés dans un
+   bandeau trois fois plus large : `cover` n'en laisse voir qu'un
+   cinquième, et centré ce cinquième tombe sous la taille du sujet. On
+   remonte le cadre pour qu'il le prenne en entier. */
+.cat-head .band>video{object-position:center 30%}
 /* Sous 1024px la nav passe sur deux rangs et la carte descend déjà sous
    la pilule : le bandeau n'a plus à lui réserver de hauteur. */
 @media(min-width:1024px){
