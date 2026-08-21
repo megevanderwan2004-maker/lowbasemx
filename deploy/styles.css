@@ -94,8 +94,16 @@
      hauteur sous 1024px, où elle passe sur deux rangs. */
   --nav-h:64px;
 
-  /* Gouttière de la toile : la bande grise autour de la carte blanche */
-  --gutter:clamp(8px,1.1vw,16px);
+  /* Gouttière de la toile : la bande grise autour de la carte blanche.
+     Elle tombe à zéro sur téléphone — la carte y touche les deux bords —
+     et reste un filet sur grand écran, assez pour que la carte se lise
+     comme posée sur la toile sans rogner le contenu. */
+  --gutter:clamp(0px,.9vw,14px);
+
+  /* Boîte des visuels portrait : le 9/16 des boucles. Un seul jeton pour
+     le chapitre éditorial et la carte objectif — les deux doivent rester
+     accordés, c'est la demande. */
+  --media-box:clamp(260px,25vw,380px);
 }
 
 /* =========================================================================
@@ -134,7 +142,27 @@ h4{font-size:1rem}
   font-family:var(--font-display);font-size:.75rem;text-transform:uppercase;
   letter-spacing:.13em;font-weight:500;color:var(--teal-700);line-height:1.45;
 }
-.container{max-width:1240px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+.container{max-width:1500px;margin:0 auto;padding:0 clamp(14px,3vw,44px)}
+
+/* Défilement fluide — Lenis (/lenis.min.js, initialisé dans app.js).
+   Ces règles sont celles de la bibliothèque, recopiées ici pour éviter
+   une requête de plus. `html.lenis` n'existe que si l'instance a démarré :
+   sans script, la page garde le défilement natif et son `scroll-behavior`.
+   `.lenis-smooth` neutralise le glissement natif — deux systèmes de
+   défilement animés se battraient sur la même page. */
+html.lenis,html.lenis body{height:auto}
+/* Lenis démarré : le glissement natif s'efface complètement. Il ne
+   servait qu'aux ancres, que app.js reprend à son compte — et laissé en
+   place, il rejouerait une animation à chaque image de celle de Lenis. */
+html.lenis{scroll-behavior:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis:not(.lenis-autoToggle).lenis-stopped{overflow:clip}
+.lenis.lenis-smooth iframe{pointer-events:none}
+/* Les pistes horizontales (carrousels, galerie, vignettes, objectifs)
+   gardent leur geste natif : `contain` empêche le rebond de se propager
+   à la page. La même liste est reprise dans app.js pour laisser passer
+   la molette horizontale. */
+.cards,.goals,.gal-stage,.gal-thumbs,.rail-track{overscroll-behavior-x:contain}
 .price-num{font-variant-numeric:tabular-nums}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 /* Porte-filtres SVG : jamais display:none — un filtre référencé depuis un
@@ -334,8 +362,21 @@ footer::after{
      porter : on descend alors la carte sous la pilule. */
 
   border-radius:var(--radius-lg);
+  /* `hidden` puis `clip` : le second gagne là où il existe. Les deux
+     rognent à l'arrondi, mais `hidden` fait de la carte un conteneur de
+     défilement — et un `position:sticky` à l'intérieur (la galerie
+     produit) se cale alors sur une boîte qui ne défile jamais, donc ne
+     colle pas. `clip` rogne sans créer ce conteneur. Les navigateurs qui
+     l'ignorent gardent `hidden` : le bandeau reste dans le cadre. */
   overflow:hidden;
+  overflow:clip;
   box-shadow:0 1px 2px rgba(23,25,27,.06),0 18px 50px rgba(23,25,27,.07);
+}
+/* Sous 700px la carte est l'écran : gouttière nulle et coins droits,
+   sinon quatre encoches grises se dessineraient contre le bord. */
+@media(max-width:699px){
+  :root{--gutter:0px}
+  .shell{border-radius:0}
 }
 /* La nav flotte au-dessus du hero, qui remplit désormais toute la hauteur
    disponible : aucune réserve à prévoir sur la page d'accueil. Les pages
@@ -514,7 +555,7 @@ body:not(.has-hero) .shell{
   position:relative;isolation:isolate;overflow:hidden;
   min-height:600px;
   height:100vh;height:100svh;height:100dvh;
-  max-height:940px;
+  max-height:1120px;
   /* Même image que l'affiche de la vidéo : chaque peinture de la séquence
      montre la même chose, il n'y a donc aucun flash perceptible. */
   background:#111214 url("https://cdn.shopify.com/s/files/1/1026/1721/9449/files/video-poster.jpg?v=1785304471&width=1600") center/cover no-repeat;
@@ -618,15 +659,15 @@ section{padding:clamp(22px,3.2vw,40px) 0}
      Elle doit être déclarée en scroll-padding autant qu'en padding :
      sans elle, « scroll-snap-align:start » cale la carte sur le bord du
      scrollport et le navigateur défile de lui-même par-dessus la marge. */
-  --cards-inset:clamp(18px,4vw,40px);
+  --cards-inset:clamp(14px,3vw,44px);
   display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
   padding:4px var(--cards-inset) 6px;
   scroll-padding-left:var(--cards-inset);
   scrollbar-width:none;-ms-overflow-style:none;
 }
 .cards::-webkit-scrollbar{display:none}
-@media(min-width:1240px){
-  .cards{--cards-inset:max(40px,calc((100vw - 1240px)/2 + 40px))}
+@media(min-width:1500px){
+  .cards{--cards-inset:max(44px,calc((100vw - 1500px)/2 + 44px))}
 }
 /* Les deux carrousels de la home ne courent plus jusqu'aux bords de la
    fenêtre : c'est la piste elle-même qui est bornée et centrée, pas son
@@ -638,7 +679,7 @@ section{padding:clamp(22px,3.2vw,40px) 0}
     /* Une encoche courte suffit : elle ne sert plus qu'à laisser passer
        l'ombre portée des packshots. */
     --cards-inset:12px;
-    width:min(1080px,100% - clamp(80px,10vw,170px));
+    width:min(1500px,100% - clamp(20px,3vw,64px));
     margin-inline:auto;
     /* Les cartes ayant fondu, une piste courte (les quatre wearables) ne
        remplit plus la largeur : centrée, elle reste sous son titre au
@@ -648,7 +689,7 @@ section{padding:clamp(22px,3.2vw,40px) 0}
   }
 }
 .pcard{
-  position:relative;isolation:isolate;flex:0 0 min(74vw,300px);scroll-snap-align:start;
+  position:relative;isolation:isolate;flex:0 0 min(82vw,380px);scroll-snap-align:start;
   aspect-ratio:3/4.15;border-radius:var(--radius-md);overflow:hidden;
   background:var(--surface-teal);
 }
@@ -678,11 +719,11 @@ section{padding:clamp(22px,3.2vw,40px) 0}
    qui les décolle de la page. */
 .fcards{align-items:stretch;gap:clamp(8px,1.3vw,14px)}
 /* Carte compacte : la boîte média est en aspect-ratio 1, donc c'est la
-   largeur de la carte qui commande sa hauteur. Réduire la base de flex
-   resserre le visuel et la carte ensemble — jamais un petit packshot
-   flottant au milieu d'un cadre resté grand. */
+   base de flex — et elle seule — qui commande la hauteur de la carte.
+   Élargie le 21/08/2026 pour que le packshot occupe vraiment l'écran ;
+   la toucher déplace du même coup les marges des sections voisines. */
 .fcard{
-  flex:0 0 min(34vw,152px);scroll-snap-align:start;
+  flex:0 0 min(44vw,210px);scroll-snap-align:start;
   display:flex;flex-direction:column;align-items:center;gap:0;
   text-decoration:none;color:var(--ink);text-align:center;
   padding:2px 2px 4px;
@@ -947,7 +988,9 @@ details .a{padding:18px 22px;color:var(--ink-soft);font-size:.94rem}
    ========================================================================= */
 .closing{
   position:relative;isolation:isolate;overflow:hidden;padding:0;
-  border-radius:var(--radius-lg);margin:0 clamp(14px,2.4vw,26px) clamp(14px,2.4vw,26px);
+  /* Pleine largeur, comme les bandeaux : elle ferme la page en touchant
+     les deux bords de l'écran plutôt qu'en flottant dans une marge. */
+  border-radius:0;margin:0;margin-inline:calc(-1 * var(--gutter));
 }
 .closing>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 72%;z-index:1}
 .closing::after{
@@ -956,8 +999,8 @@ details .a{padding:18px 22px;color:var(--ink-soft);font-size:.94rem}
 }
 .closing-inner{
   position:relative;z-index:var(--z-content);
-  min-height:clamp(340px,52vh,520px);display:flex;flex-direction:column;
-  justify-content:flex-end;gap:16px;padding:clamp(26px,4vw,52px);color:#fff;
+  min-height:clamp(380px,58vh,600px);display:flex;flex-direction:column;
+  justify-content:flex-end;gap:16px;padding:clamp(22px,3.6vw,52px);color:#fff;
 }
 .closing h2{color:#fff;max-width:16ch;text-shadow:0 2px 24px rgba(12,13,14,.4)}
 .closing p{max-width:42ch;color:rgba(255,255,255,.9);text-shadow:0 1px 14px rgba(12,13,14,.45)}
@@ -1213,8 +1256,8 @@ footer a{color:var(--ink)}
   padding:clamp(22px,3.2vw,40px) 0;
 }
 /* Les trois objectifs forment une piste, à tous les formats. Les cartes
-   étant au gabarit de la boucle Garmin Connect (9/16, 230px), les trois
-   tiennent à l'écran large et la piste s'y centre ; sur téléphone une
+   étant au gabarit de la boucle Garmin Connect (9/16, `--media-box`), les
+   trois tiennent à l'écran large et la piste s'y centre ; sur téléphone une
    carte se lit en entier et la suivante dépasse, ce qui dit sans mot que
    ça se fait glisser. `safe` ramène la piste au bord dès qu'elle déborde,
    sinon son début deviendrait inatteignable. */
@@ -1224,18 +1267,18 @@ footer a{color:var(--ink)}
   overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
   scrollbar-width:none;-ms-overflow-style:none;
-  max-width:1080px;margin:0 auto;padding-bottom:2px;
+  max-width:min(1500px,100%);margin:0 auto;padding-bottom:2px;
 }
 .goals::-webkit-scrollbar{display:none}
 /* Carte objectif : le visuel occupe toute la carte, la nacelle de verre
    se pose dessus. Rien d'autre ne partage la place — c'est la photo qui
    porte le choix. */
 /* Même boîte que `.chapter.editorial .chapter-media.portrait` : le 9/16
-   natif des boucles, borné à 230px. Les deux blocs doivent rester
-   accordés — c'est la demande. */
+   natif des boucles, borné par `--media-box`. Les deux blocs doivent
+   rester accordés — c'est la demande. */
 .goal{
   position:relative;isolation:isolate;display:block;overflow:hidden;
-  flex:0 0 min(62vw,230px);scroll-snap-align:center;
+  flex:0 0 clamp(230px,68vw,var(--media-box));scroll-snap-align:center;
   aspect-ratio:9/16;padding:0;border:none;cursor:pointer;text-align:center;
   border-radius:var(--radius-lg);font-family:var(--font-body);
   background:var(--surface-teal);
@@ -1362,6 +1405,9 @@ footer a{color:var(--ink)}
    cinquième, et centré ce cinquième tombe sous la taille du sujet. On
    remonte le cadre pour qu'il le prenne en entier. */
 .cat-head .band>video{object-position:center 30%}
+/* La bannière tient lieu de hero : elle prend la hauteur d'écran, comme
+   le hero de la home, au lieu des 58vh d'un bandeau de milieu de page. */
+.cat-head .band-inner{min-height:clamp(440px,74vh,820px)}
 /* Sous 1024px la nav passe sur deux rangs et la carte descend déjà sous
    la pilule : le bandeau n'a plus à lui réserver de hauteur. */
 @media(min-width:1024px){
@@ -1515,8 +1561,8 @@ footer a{color:var(--ink)}
 }
 .band-inner{
   position:relative;z-index:var(--z-content);
-  min-height:clamp(320px,50vh,540px);display:flex;flex-direction:column;
-  justify-content:flex-end;gap:14px;padding:clamp(24px,4vw,52px);color:#fff;
+  min-height:clamp(360px,58vh,620px);display:flex;flex-direction:column;
+  justify-content:flex-end;gap:14px;padding:clamp(20px,3.4vw,52px);color:#fff;
 }
 .band-inner .eyebrow{color:rgba(255,255,255,.82)}
 .band-inner h2{color:#fff;max-width:16ch;text-shadow:0 2px 24px rgba(12,13,14,.45)}
@@ -1648,11 +1694,22 @@ footer a{color:var(--ink)}
     min-height:0;padding-block:clamp(22px,2.9vw,40px);
   }
   .chapter.editorial>.container{width:100%}
-  .chapter.editorial .chapter-grid{gap:clamp(40px,7vw,110px);align-items:center}
-  /* Visuel resserré : à 280px de large le portrait faisait 500px de haut
-     et c'est lui, pas le texte, qui creusait le chapitre. */
-  .chapter.editorial .chapter-media.portrait{max-width:230px}
-  .chapter.editorial .chapter-copy h2{max-width:14ch}
+  /* Les deux colonnes sont dimensionnées, pas étirées : le visuel prend
+     sa boîte, la copie sa mesure de lecture, et la paire se centre. Une
+     grille 1fr/1fr laissait tout le flanc droit vide, la copie s'arrêtant
+     à sa mesure au milieu d'une colonne deux fois trop large. */
+  .chapter.editorial .chapter-grid{
+    grid-template-columns:var(--media-box) minmax(0,46ch);
+    justify-content:center;
+    gap:clamp(32px,4.5vw,80px);align-items:center;
+  }
+  .chapter.editorial.flip .chapter-grid{grid-template-columns:minmax(0,46ch) var(--media-box)}
+  /* Le visuel prend la boîte partagée avec la carte objectif : assez
+     large pour que le produit se lise, jamais assez haut pour creuser le
+     chapitre — c'est le 9/16 qui commande la hauteur. */
+  .chapter.editorial .chapter-media.portrait{max-width:var(--media-box)}
+  .chapter.editorial .chapter-copy h2{max-width:18ch}
+  .chapter.editorial .chapter-copy p{max-width:none}
 }
 @supports not (height:100svh){
   @media(min-width:900px){.chapter.editorial{min-height:100vh}}
@@ -1665,10 +1722,10 @@ footer a{color:var(--ink)}
      le média en 2e cellule sur les chapitres inversés, c'est le gabarit
      des colonnes qui doit suivre, pas seulement l'ordre. */
   .chapter.editorial .chapter-grid{
-    grid-template-columns:minmax(0,38%) minmax(0,1fr);
-    gap:clamp(14px,4vw,24px);align-items:center;
+    grid-template-columns:minmax(0,44%) minmax(0,1fr);
+    gap:clamp(12px,3.2vw,22px);align-items:center;
   }
-  .chapter.editorial.flip .chapter-grid{grid-template-columns:minmax(0,1fr) minmax(0,38%)}
+  .chapter.editorial.flip .chapter-grid{grid-template-columns:minmax(0,1fr) minmax(0,44%)}
   .chapter.editorial.flip .chapter-media{order:2}
   .chapter.editorial .chapter-media.portrait{aspect-ratio:9/16;max-width:none;width:100%}
   .chapter.editorial .chapter-copy h2{font-size:clamp(1.3rem,5.4vw,1.9rem);max-width:none}
@@ -1709,7 +1766,7 @@ footer a{color:var(--ink)}
   .chapter-media.contain>img{padding:clamp(10px,4vw,20px)}
   /* Deux cartes et demie tiennent à l'écran : assez pour montrer que la
      piste défile, assez petit pour que le titre suivant reste visible. */
-  .fcard{flex:0 0 min(33vw,126px)}
+  .fcard{flex:0 0 min(42vw,168px)}
   /* Pas de ratio ici : la carte objectif garde le 9/16 de la boucle
      Garmin Connect à tous les formats. */
   .goal-txt b{font-size:.88rem}
@@ -1752,6 +1809,12 @@ footer a{color:var(--ink)}
    prix, options et bouton tiennent au-dessus de la ligne de flottaison,
    le texte long vient après.
    ========================================================================= */
+/* L'intitulé de l'option et la valeur choisie : la règle n'existait que
+   sous 980px, où les options passent en rangée de pastilles. Au-dessus,
+   « Color » et « Negra » se touchaient. */
+.opt-head{display:flex;align-items:baseline;gap:8px;font-size:.78rem;color:var(--teal-700)}
+.opt-head b{font-family:var(--font-display);font-size:.92rem;color:var(--ink);font-weight:600}
+
 /* Galerie : les cadres coexistent dans une piste qui se fait glisser. Rien
    n'est échangé au changement de couleur — on défile, donc le geste natif
    garde son inertie et aucune image ne clignote. */
@@ -1769,8 +1832,15 @@ footer a{color:var(--ink)}
 .gal-stage::-webkit-scrollbar{display:none}
 .gal-frame{flex:0 0 100%;scroll-snap-align:center;margin:0;min-width:0}
 .gal-frame img{width:100%;height:100%;object-fit:cover;display:block}
-/* Les packshots détourés respirent ; les photos remplissent le cadre. */
-.gal-frame img[src$=".png"]{object-fit:contain;padding:clamp(14px,4vw,34px);mix-blend-mode:multiply}
+/* Les packshots détourés respirent ; les photos remplissent le cadre.
+   `.contain` est posée par le générateur sur les vues produit (rendus
+   officiels sur fond blanc) : le bracelet doit rester entier, jamais
+   rogné, quelle que soit l'extension du fichier. */
+.gal-frame img[src$=".png"],
+.gal-frame.contain img{object-fit:contain;padding:clamp(14px,4vw,34px);mix-blend-mode:multiply}
+/* Fond blanc du rendu = fond blanc du cadre : le produit flotte au lieu
+   de poser sur une plaque grise. */
+.gal-stage:has(.gal-frame.contain){background:#fff}
 .gal-dots{display:flex;justify-content:center;gap:7px}
 .gal-dots:empty{display:none}
 .gal-dots i{
@@ -1792,7 +1862,9 @@ footer a{color:var(--ink)}
 .gal-thumb:hover{transform:translateY(-2px)}
 .gal-thumb.on{box-shadow:inset 0 0 0 2px var(--ink)}
 .gal-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.gal-thumb img[src$=".png"]{object-fit:contain;padding:6px;mix-blend-mode:multiply}
+.gal-thumb img[src$=".png"],
+.gal-thumb.contain img{object-fit:contain;padding:6px;mix-blend-mode:multiply}
+.gal-thumb.contain{background:#fff}
 /* Au-dessus de 980px le visuel reste en vue pendant qu'on lit la colonne
    d'achat : la galerie se colle sous la nav. */
 @media(min-width:980px){
@@ -1871,9 +1943,10 @@ footer a{color:var(--ink)}
   /* Le visuel est plafonné en hauteur d'écran, pas en ratio : c'est la
      seule façon de garantir que le nom, le prix et le bouton restent
      au-dessus de la ligne de flottaison sur un téléphone. */
-  .gal-stage{aspect-ratio:auto;height:min(34svh,290px)}
+  .gal-stage{aspect-ratio:auto;height:min(50svh,420px)}
   .gal{gap:8px}
-  .gal-frame img[src$=".png"]{padding:10px}
+  .gal-frame img[src$=".png"],
+  .gal-frame.contain img{padding:clamp(8px,3vw,16px)}
   .gal-thumb{flex:0 0 48px}
   .crumbs{margin-bottom:10px}
   .pdp-buy{padding:clamp(16px,4vw,22px);gap:11px}

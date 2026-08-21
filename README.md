@@ -2,12 +2,16 @@
 
 Site statique de **lowlabs**, revendeur mexicain de wearables Garmin et de suppléments
 sélectionnés (Cymbiotika, Promix, The Absorption Company). Contenu en espagnol,
-prix en MXN. Aucun framework, aucune dépendance npm : du HTML, du CSS et du
-JavaScript ES5-compatible, servis tels quels par Vercel.
+prix en MXN. Aucun framework, aucun bundler : du HTML, du CSS et du JavaScript
+ES5-compatible, servis tels quels par Vercel. Une seule dépendance npm —
+**lenis**, le défilement fluide — et elle n'est pas construite : son fichier
+distribué est copié dans `deploy/`.
 
 - **Dossier déployé** : `deploy/` (c'est le seul dossier servi en production)
 - **Source de vérité produits** : `deploy/catalog.js`
-- **Aperçu local** : `node build/serve.js 4175` → http://localhost:4175
+- **Aperçu local** : `npm run serve` → http://localhost:4175
+- **Après un `npm install`** : `npm run vendor:lenis` remet
+  `deploy/lenis.min.js` à jour depuis `node_modules/`
 
 ---
 
@@ -24,6 +28,7 @@ JavaScript ES5-compatible, servis tels quels par Vercel.
 │   ├── catalog.js          produits + objectifs : prix, textes, specs, médias
 │   ├── cart.js             panier + tiroir, hand-off vers le checkout Shopify
 │   ├── app.js              tout le comportement, en modules isolés
+│   ├── lenis.min.js        défilement fluide — copie de node_modules/lenis
 │   ├── styles.css          design system complet
 │   └── media/              images et vidéos du site (voir plus bas)
 │
@@ -33,6 +38,7 @@ JavaScript ES5-compatible, servis tels quels par Vercel.
 │
 ├── assets/                 sources brutes non servies (voir plus bas)
 ├── assets-hd/              versions HD + tables d'URL CDN
+├── package.json            lenis + les trois scripts (build, serve, vendor)
 ├── CLAUDE.md               produit, marque, concurrence — à lire en premier
 ├── PROJECT_CONTEXT.md      état détaillé du projet et historique
 └── vercel.json             outputDirectory: deploy, cleanUrls: true
@@ -136,13 +142,13 @@ toucher.
 ### Lancer l'aperçu
 
 ```bash
-node build/serve.js 4175
+npm run serve
 ```
 
 ### Après toute modification de `deploy/catalog.js`
 
 ```bash
-node build/gen-products.js
+npm run build
 ```
 
 Les 9 fiches produit sont générées puis **commitées** (`buildCommand` est nul
@@ -180,15 +186,18 @@ avertissement.
   `clamp(22px,3.2vw,40px)`, les têtes de section à `clamp(12px,1.7vw,20px)`, les
   chapitres éditoriaux à `clamp(22px,2.9vw,40px)` sans réserver de hauteur
   d'écran. C'est un réglage demandé trois fois par le propriétaire.
-- Ne pas regrossir les cartes de carrousel : `.fcard` est à `min(34vw,152px)` au
-  large et `min(33vw,126px)` sous 720px. La boîte média est en `aspect-ratio:1`,
-  donc c'est cette base de flex — et elle seule — qui commande la hauteur de la
-  carte. La toucher sans retoucher les marges des sections voisines rouvre
-  exactement le vide que ce réglage a fermé.
+- Les cartes de carrousel ont été **regrossies le 21/08/2026**, à la demande du
+  propriétaire : `.fcard` est à `min(44vw,210px)` au large et `min(42vw,168px)`
+  sous 720px. La boîte média est en `aspect-ratio:1`, donc c'est cette base de
+  flex — et elle seule — qui commande la hauteur de la carte : la changer
+  déplace aussi les marges des sections voisines.
 - Ne pas dissocier les cartes d'objectif de la boucle Garmin Connect : les deux
-  sont volontairement dans la même boîte (9/16 borné à 230px). C'est une
-  demande explicite du propriétaire — retoucher l'une sans l'autre casse
-  l'accord.
+  lisent le **même jeton**, `--media-box` (`clamp(260px,25vw,380px)`, 9/16).
+  C'est une demande explicite du propriétaire — retoucher l'une sans l'autre
+  casse l'accord.
+- Ne pas rendre la gouttière à la carte sur téléphone : `--gutter` vaut zéro
+  sous 700px et `.shell` y perd ses coins arrondis. Le site doit toucher les
+  deux bords de l'écran.
 - Toute copie client est en espagnol (es-MX).
 - Accessibilité : skip link, radiogroups ARIA, cibles tactiles ≥ 44 px,
   `prefers-reduced-motion`.
@@ -243,6 +252,44 @@ Chaque page a sa propre boucle d'en-tête (`bandas/loop-wearables-hero.mp4`,
 gardent `loop-wearables` et `loop-capsulas` : ce sont des fichiers distincts,
 ne pas les fusionner.
 
+L'en-tête de rayon tient lieu de hero : `.cat-head .band-inner` est à
+`clamp(440px,74vh,820px)`, contre `clamp(360px,58vh,620px)` pour un bandeau de
+milieu de page.
+
+## Défilement fluide (Lenis)
+
+Une **seule** instance, créée par le module `smooth-scroll` de `app.js` après
+`/lenis.min.js`. Rien d'autre n'ouvre de boucle d'animation.
+
+- `autoRaf: true` — la boucle de rendu est celle de Lenis, la seule de la page.
+- `syncTouch: false` (défaut) — **le tactile reste natif** : inertie du système,
+  pistes horizontales, galerie produit, aucun verrouillage.
+- Lenis pilote la position réelle du document : `position:sticky`, les
+  `IntersectionObserver` (révélations `.rv`, lecture des vidéos) et les surfaces
+  fixes (nav, dock) fonctionnent sans adaptation.
+- `prefers-reduced-motion` : l'instance n'est pas créée du tout, la page garde
+  son défilement natif.
+- `html.lenis{scroll-behavior:auto}` retire le glissement natif du CSS — deux
+  systèmes animés se battraient sur la même page.
+
+Trois points d'attention si on y touche :
+
+1. **Molette horizontale** — Lenis appelle `preventDefault` sur les `wheel`
+   qu'il traite. `app.js` lui coupe l'événement (et rien d'autre) quand le geste
+   est franchement horizontal *au-dessus d'une piste* : `.cards`, `.goals`,
+   `.gal-stage`, `.gal-thumbs`, `.rail-track`. La même liste est dans
+   `styles.css` pour `overscroll-behavior-x`.
+2. **Défilements programmés** — tout passe par `scrollToY()` (retour de galerie
+   après changement de couleur, atterrissage sur `/tienda#rayon`, liens
+   d'ancrage). Un `window.scrollTo` direct laisserait Lenis et la page se
+   contredire le temps d'une image.
+3. **Tiroir du panier** — il pose `overflow:hidden` sur le corps ; `cart.js`
+   appelle donc `LOWSCROLL.stop()` à l'ouverture et `.start()` à la fermeture,
+   sinon Lenis avancerait sa position sur une page immobile et la rendrait d'un
+   bloc à la fermeture.
+
+---
+
 ## Déploiement
 
 `vercel.json` est prêt (`outputDirectory: deploy`, `cleanUrls: true`,
@@ -272,6 +319,28 @@ simulée à l'écran.
 
 Pour brancher un nouveau produit : le créer dans Shopify, relever le handle et
 les IDs de variantes, ajouter le bloc `shopify` dans `catalog.js`, régénérer.
+
+### CIRQA — couleur, visuel et variante
+
+Les quatre visuels de coloris sont les **rendus produit officiels Garmin**
+(`res.garmin.com`, vue trois-quarts, 1200 × 1200, recadrés au plus près du
+bracelet), servis en local depuis `deploy/media/productos/cirqa/` :
+
+| Couleur (boutique) | Fichier | Numéro de pièce Garmin |
+| --- | --- | --- |
+| Negra | `cirqa-negra.jpg` | `010-04675-00` / `-10` (Noir) |
+| Gris Francés | `cirqa-gris-frances.jpg` | `010-04675-01` / `-11` (Lin) |
+| Malva | `cirqa-malva.jpg` | `010-04675-02` / `-12` (Rose) |
+| Azul Capitán | `cirqa-azul-capitan.jpg` | `010-04675-03` / `-13` (Bleu Marine) |
+
+La chaîne est : **pastille → `state.color` → cadre de galerie portant
+`data-color` → variante Shopify** (`shopify.variants[couleur][taille]`). Aucune
+image n'est échangée au clic : les cadres coexistent dans la piste, c'est elle
+qui glisse. Sous 980px la page revient d'elle-même sur le visuel.
+
+La fiche CIRQA déclare `shotFit: "contain"` : ce sont des rendus sur fond blanc,
+le générateur pose donc `.contain` sur leurs cadres et vignettes pour que le
+bracelet reste entier, jamais rogné.
 
 > **En-tête du checkout** — le nom affiché en haut du checkout est le *nom de la
 > boutique* Shopify, aujourd'hui « My Store ». Il se change dans

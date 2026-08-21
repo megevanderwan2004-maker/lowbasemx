@@ -87,6 +87,14 @@ ${products.map((p) => `        <p><a href="/productos/${p.handle}">${esc(p.name)
   </div>
 </footer>`;
 
+/* Les visuels du CDN Shopify acceptent un paramètre de largeur ; les
+   fichiers locaux, non — le suffixe en ferait une URL introuvable.
+   L'échappement se fait ici : le `&amp;` du suffixe ne doit pas repasser
+   par `esc()`, qui en ferait un `&amp;amp;`. */
+function thumbSrc(src) {
+  return src.indexOf("?") > -1 ? `${esc(src)}&amp;width=160` : esc(src);
+}
+
 function colorRail(p) {
   if (!p.colors) return "";
   return `
@@ -99,7 +107,7 @@ function colorRail(p) {
 ${p.colors
   .map(
     (c, i) => `              <button class="rail-item glass-light${i === 0 ? " active" : ""}" type="button" role="radio" aria-checked="${i === 0}" data-color="${esc(c.name)}">
-                <span class="rail-thumb"><img loading="lazy" src="${esc(c.image)}&amp;width=160" alt="" width="80" height="80"></span>
+                <span class="rail-thumb"><img loading="lazy" src="${thumbSrc(c.image)}" alt="" width="80" height="80"></span>
                 <span class="rail-txt"><b>${esc(c.name)}</b><span>${esc(c.note)}</span></span>
                 <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                 <span class="rail-dot" style="background:${c.dot}" aria-hidden="true"></span>
@@ -213,21 +221,30 @@ function band(p) {
 }
 
 
+/* Les aperçus de lien et le balisage schema.org veulent une URL absolue. */
+function absUrl(src) {
+  return src.indexOf("http") === 0 ? src : "https://lowlabs.mx" + src;
+}
+
 /* Galerie : les couleurs quand il y en a, sinon la photo principale, puis
    les vues supplémentaires du catalogue. Chaque cadre porte sa couleur :
    c'est ce qui permet au sélecteur de faire défiler la piste. */
 function galleryShots(p) {
   const shots = [];
-  if (p.colors) p.colors.forEach((c) => shots.push({ src: c.image, alt: `${p.name} — ${c.name}`, color: c.name }));
-  else shots.push({ src: p.image, alt: p.name, color: "" });
-  (p.gallery || []).forEach((g) => shots.push({ src: g, alt: p.name, color: "" }));
+  /* `shotFit:"contain"` : les vues produit sont des rendus sur fond blanc,
+     le cadre doit les contenir en entier. Les photos de la clé `gallery`
+     restent des photos — elles remplissent le cadre. */
+  const fit = p.shotFit === "contain" ? " contain" : "";
+  if (p.colors) p.colors.forEach((c) => shots.push({ src: c.image, alt: `${p.name} — ${c.name}`, color: c.name, fit }));
+  else shots.push({ src: p.image, alt: p.name, color: "", fit });
+  (p.gallery || []).forEach((g) => shots.push({ src: g, alt: p.name, color: "", fit: "" }));
   return shots;
 }
 
 function galleryFrames(p) {
   return galleryShots(p)
     .map(
-      (sh, i) => `              <figure class="gal-frame${i === 0 ? " on" : ""}"${sh.color ? ` data-color="${esc(sh.color)}"` : ""}>
+      (sh, i) => `              <figure class="gal-frame${i === 0 ? " on" : ""}${sh.fit}"${sh.color ? ` data-color="${esc(sh.color)}"` : ""}>
                 <img ${i === 0 ? 'id="stage-img" fetchpriority="high"' : 'loading="lazy"'} src="${esc(sh.src)}" alt="${esc(sh.alt)}" width="900" height="900">
               </figure>`
     )
@@ -240,7 +257,7 @@ function galleryThumbs(p) {
   return `            <div class="gal-thumbs" role="tablist" aria-label="Vistas del producto">
 ${shots
   .map(
-    (sh, i) => `              <button class="gal-thumb${i === 0 ? " on" : ""}" type="button" role="tab" aria-selected="${i === 0}" data-i="${i}"${sh.color ? ` data-color="${esc(sh.color)}"` : ""}>
+    (sh, i) => `              <button class="gal-thumb${i === 0 ? " on" : ""}${sh.fit}" type="button" role="tab" aria-selected="${i === 0}" data-i="${i}"${sh.color ? ` data-color="${esc(sh.color)}"` : ""}>
                 <img loading="lazy" src="${esc(sh.src)}" alt="${esc(sh.alt)}" width="120" height="120">
               </button>`
   )
@@ -261,7 +278,7 @@ function page(p) {
     name: p.name,
     brand: { "@type": "Brand", name: p.brand },
     description: p.tagline,
-    image: p.image.indexOf("http") === 0 ? p.image : "https://lowlabs.mx" + p.image,
+    image: absUrl(p.image),
     offers: {
       "@type": "Offer",
       price: String(p.price),
@@ -282,7 +299,7 @@ function page(p) {
 <meta name="description" content="${esc(p.tagline)} ${money(p.price)} MXN con envío gratis a todo México.">
 <meta property="og:title" content="${esc(p.name)} | lowlabs">
 <meta property="og:description" content="${esc(p.tagline)}">
-<meta property="og:image" content="${esc(p.image)}">
+<meta property="og:image" content="${esc(absUrl(p.image))}">
 <meta property="og:type" content="product">
 <meta property="og:locale" content="es_MX">
 <meta name="theme-color" content="#ffffff">
@@ -469,6 +486,8 @@ ${footer()}
   </div>
 </div>
 
+<!-- Défilement fluide : une seule instance, démarrée par app.js. -->
+<script src="/lenis.min.js" defer></script>
 <script src="/catalog.js" defer></script>
 <script src="/cart.js" defer></script>
 <script src="/app.js" defer></script>

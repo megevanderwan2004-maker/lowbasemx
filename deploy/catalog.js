@@ -27,7 +27,8 @@
       compareAt: 4199,
       badge: "Más vendido",
       category: "Wearables",
-      image: CDN + "cirqa-negra.jpg?v=1785272697",
+      /* Rendus officiels Garmin, un par coloris (voir `colors`). */
+      image: "/media/productos/cirqa/cirqa-negra.jpg",
       hero: CDN + "cirqa-hero-entrenamiento.jpg?v=1785272697",
       /* Détouré : c'est cette vue qui sert au carrousel « Los más buscados »,
          où les produits flottent sans cadre. */
@@ -40,11 +41,20 @@
         "Malva":        { "S–M": "64093481238905", "L–XL": "64093481271673" },
         "Azul Capitán": { "S–M": "64093481304441", "L–XL": "64093481337209" }
       }},
+      /* Les quatre visuels de coloris sont les rendus produit officiels
+         Garmin (res.garmin.com, vue trois-quarts « cf »), un par numéro de
+         pièce : 010-04675-00 Noir → Negra, -01 Lin → Gris Francés,
+         -02 Rose → Malva, -03 Bleu Marine → Azul Capitán. Ils sont
+         recadrés au plus près du bracelet et servis en local.
+         `shotFit` dit au générateur de les CONTENIR dans le cadre de la
+         galerie : ce sont des rendus sur fond blanc, les rogner couperait
+         le bracelet. */
+      shotFit: "contain",
       colors: [
-        { name: "Negra",        dot: "#2b2b2e", image: CDN + "cirqa-negra.jpg?v=1785272697",        note: "Discreción total, del gimnasio a la oficina" },
-        { name: "Gris Francés", dot: "#a99f88", image: CDN + "cirqa-gris-frances.jpg?v=1785272697", note: "Un neutro cálido que acompaña sin pedir atención" },
-        { name: "Malva",        dot: "#a4787e", image: CDN + "cirqa-malva.jpg?v=1785272697",        note: "Suave y personal, para medir tu bienestar en calma" },
-        { name: "Azul Capitán", dot: "#2e3f63", image: CDN + "cirqa-azul-capitan.jpg?v=1785272696", note: "Profundo y sereno, con carácter para todo el día" }
+        { name: "Negra",        dot: "#2b2b2e", image: "/media/productos/cirqa/cirqa-negra.jpg",        note: "Discreción total, del gimnasio a la oficina" },
+        { name: "Gris Francés", dot: "#a6a098", image: "/media/productos/cirqa/cirqa-gris-frances.jpg", note: "Un neutro cálido que acompaña sin pedir atención" },
+        { name: "Malva",        dot: "#9f8384", image: "/media/productos/cirqa/cirqa-malva.jpg",        note: "Suave y personal, para medir tu bienestar en calma" },
+        { name: "Azul Capitán", dot: "#2e3f63", image: "/media/productos/cirqa/cirqa-azul-capitan.jpg", note: "Profundo y sereno, con carácter para todo el día" }
       ],
       sizes: [
         { name: "S–M",  note: "muñeca 120–200 mm" },

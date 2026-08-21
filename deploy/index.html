@@ -321,48 +321,11 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       </div>
     </section>
 
-    <!-- La bannière Ritual est retirée avec le Synbiotic : son visuel et
-         son bouton pointaient sur cette fiche, qui n'existe plus. -->
-
-    <!-- Chapitre The Absorption Company, même gabarit éditorial. -->
-    <section class="chapter editorial sand" aria-labelledby="cap10-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media portrait rv">
-            <img loading="lazy" src="/media/productos/absorption-sleep/absorption-sleep.png" alt="The Absorption Company Sleep, caja de 7 sticks" width="1000" height="1000">
-          </div>
-          <div class="chapter-copy">
-            <span class="eyebrow rv">The Absorption Company</span>
-            <h2 id="cap10-t" class="rv">Duerme profundo, despierta ligero.</h2>
-            <p class="rv">Una mezcla respaldada por la ciencia, sin melatonina: azafrán liposomal, pasiflora, PharmaGABA® y magnesio bisglicinato, en siete sticks de sabor Chamomile Lemonade.*</p>
-            <a class="btn btn-ink rv" href="/productos/absorption-sleep">Ver Sleep — $499 MXN</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Fond blanc, exactement celui de la boucle : le produit flotte, sans
-         plaque ni cadre autour de la vidéo. -->
-    <section class="chapter editorial flip on-white" aria-labelledby="cap12-t">
-      <div class="container">
-        <div class="chapter-grid">
-          <div class="chapter-media portrait rv">
-            <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
-                   disablepictureinpicture disableremoteplayback
-                   poster="/media/productos/promix-debloat/poster-debloat-loop.jpg"
-                   width="1080" height="1920" aria-hidden="true" tabindex="-1" data-autoloop>
-              <source src="/media/productos/promix-debloat/debloat-loop.mp4" type="video/mp4">
-            </video>
-          </div>
-          <div class="chapter-copy">
-            <span class="eyebrow rv">Promix</span>
-            <h2 id="cap12-t" class="rv" lang="en">Clean nutrition. Real performance.</h2>
-            <p class="rv">Nutrición limpia diseñada para ayudarte a rendir mejor. Sin aditivos artificiales, sin transgénicos, probada por laboratorio externo.*</p>
-            <a class="btn btn-ink rv" href="/tienda#suplementos">Descubre Promix</a>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- Les chapitres éditoriaux s'arrêtent à Cymbiotika : la bannière Ritual
+         est partie avec le Synbiotic (son visuel et son bouton pointaient sur
+         cette fiche), et les chapitres The Absorption Company et Promix ont
+         été retirés de l'accueil. Sleep et Debloat restent au catalogue, dans
+         le carrousel suppléments et dans le rayon /suplementos. -->
 
     <!-- ===== Bannière de clôture ===== -->
     <section class="closing on-media" aria-labelledby="closing-t">
@@ -423,6 +386,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   </div>
 </div>
 
+<!-- Défilement fluide : une seule instance, démarrée par app.js. -->
+<script src="/lenis.min.js" defer></script>
 <script src="/catalog.js" defer></script>
 <script src="/cart.js" defer></script>
 <script src="/app.js" defer></script>

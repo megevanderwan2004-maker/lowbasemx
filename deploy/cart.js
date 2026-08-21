@@ -261,12 +261,17 @@
        chevaucherait le pied du tiroir. */
     document.body.className += " cart-open";
     document.body.style.overflow = "hidden";
+    /* Le défilement fluide s'arrête avec la page : sinon il avancerait
+       sa position sur un document verrouillé et la rendrait d'un bloc à
+       la fermeture. */
+    if (global.LOWSCROLL) global.LOWSCROLL.stop();
   }
   function close(){
     if (!root) return;
     root.className = "cart";
     document.body.className = document.body.className.replace(/\s*cart-open/g, "");
     document.body.style.overflow = "";
+    if (global.LOWSCROLL) global.LOWSCROLL.start();
     setTimeout(function(){ if (root && root.className === "cart") root.setAttribute("hidden", ""); }, 260);
   }
 

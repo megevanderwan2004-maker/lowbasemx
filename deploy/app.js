@@ -29,6 +29,15 @@
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
 
+  /* Bascule une classe sans toucher aux autres : réécrire className en
+     entier effacerait celles que le générateur a posées — `.contain` sur
+     les vues produit, par exemple, qui commande leur cadrage. */
+  function flag(el, name, on){
+    var re = new RegExp("(^|\\s)" + name + "(?=\\s|$)", "g");
+    var base = el.className.replace(re, " ").replace(/\s+/g, " ").replace(/^ | $/g, "");
+    el.className = on ? (base + " " + name) : base;
+  }
+
   /* Chaque module est isolé : une panne dans l'un ne doit jamais empêcher
      les autres de s'initialiser — et surtout jamais laisser la page
      invisible, puisque .rv part d'une opacité nulle. */
@@ -38,6 +47,89 @@
       if (window.console && console.error) console.error("[lowlabs] " + name, err);
     }
   }
+
+  /* =====================================================================
+     Défilement fluide — une seule instance de Lenis
+
+     Lenis pilote la position réelle du document : `position:sticky`, les
+     ancres, les observateurs d'intersection et les surfaces fixes
+     continuent donc de fonctionner sans adaptation.
+
+     Trois garde-fous :
+     · `autoRaf` — la boucle d'animation est celle de Lenis, la seule de
+       la page. Aucune autre n'est ouverte ici.
+     · `syncTouch:false` (défaut) — le tactile reste natif : sur
+       téléphone le doigt garde l'inertie du système, les pistes
+       horizontales leur élan, et rien ne verrouille le défilement.
+     · mouvement réduit — Lenis honore `prefers-reduced-motion` de
+       lui-même ; on ne le démarre même pas, la page garde son défilement
+       natif.
+     ===================================================================== */
+  var lenis = null;
+
+  /* Le seul point d'entrée pour amener la page quelque part : sans lui,
+     un `window.scrollTo` pendant que Lenis anime laisserait les deux
+     positions se contredire pendant une frame. */
+  function scrollToY(y, instant){
+    y = Math.max(0, Math.round(y));
+    if (lenis){ lenis.scrollTo(y, { immediate: !!instant }); return; }
+    try { window.scrollTo({ top: y, behavior: instant ? "instant" : (reduceMotion ? "auto" : "smooth") }); }
+    catch(e){ window.scrollTo(0, y); }
+  }
+
+  module("smooth-scroll", function(){
+    if (reduceMotion || !window.Lenis) return;
+
+    lenis = new window.Lenis({
+      autoRaf: true,
+      lerp: .1,
+      wheelMultiplier: 1,
+      /* Les ancres restent à nous : le site dégage la nav flottante avec
+         `scroll-margin-top`, que Lenis ne relit pas. */
+      anchors: false
+    });
+
+    /* Molette horizontale sur une piste : Lenis appelle preventDefault sur
+       tous les événements `wheel` qu'il traite, ce qui tuerait le geste
+       latéral au trackpad. On lui coupe donc l'événement — et rien
+       d'autre — quand le geste est franchement horizontal ; le navigateur
+       fait alors défiler la piste lui-même.
+       Le tactile, lui, n'est jamais intercepté : Lenis ne le touche pas. */
+    var TRACKS = ".cards,.goals,.gal-stage,.gal-thumbs,.rail-track";
+    document.addEventListener("wheel", function(e){
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      if (!e.target || !e.target.closest || !e.target.closest(TRACKS)) return;
+      e.stopPropagation();
+    }, { capture: true, passive: true });
+
+    /* Les liens d'ancrage de la page : on refait le calcul que le
+       navigateur ferait (le retrait de `scroll-margin-top`) puis on laisse
+       Lenis y glisser. Le lien d'évitement garde son saut instantané —
+       c'est ce qu'attend un lecteur au clavier. */
+    document.addEventListener("click", function(e){
+      var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
+      if (!a || a.className.indexOf("skip") > -1) return;
+      var id = a.getAttribute("href").slice(1);
+      if (!id) return;
+      var target = document.getElementById(id);
+      if (!target) return;
+      e.preventDefault();
+      var y = target.getBoundingClientRect().top + window.pageYOffset
+            - (parseFloat(window.getComputedStyle(target).scrollMarginTop) || 0);
+      scrollToY(y, false);
+      if (history.replaceState) history.replaceState(null, "", "#" + id);
+    }, false);
+  });
+
+  /* Le seul contrôle exposé : le tiroir du panier verrouille la page en
+     posant `overflow:hidden` sur le corps. Sans cet arrêt, Lenis
+     continuerait d'avancer sa position interne sur une page devenue
+     immobile — et la relâcherait d'un coup à la fermeture. */
+  window.LOWSCROLL = {
+    stop:  function(){ if (lenis) lenis.stop(); },
+    start: function(){ if (lenis) lenis.start(); },
+    to:    scrollToY
+  };
 
   /* La carte produit est le seul gabarit : home, boutique et recommandation
      la réutilisent, aucune variante n'est dupliquée ailleurs. */
@@ -254,9 +346,9 @@
          flottante au-dessus du titre du rayon. */
       var y = target.getBoundingClientRect().top + window.pageYOffset
             - (parseFloat(window.getComputedStyle(target).scrollMarginTop) || 0);
-      y = Math.max(0, Math.round(y));
-      try { window.scrollTo({ top: y, behavior: "instant" }); }
-      catch(e){ window.scrollTo(0, y); }
+      /* Instantané : c'est un atterrissage, pas un déplacement voulu par
+         le lecteur — et Lenis animerait par-dessus le saut du navigateur. */
+      scrollToY(y, true);
     }
 
     /* Se poser une seule fois ne tient pas : le navigateur exécute son
@@ -719,11 +811,9 @@
   }
 
   function galMark(i){
-    each(galFrames, function(f, k){
-      f.className = k === i ? "gal-frame on" : "gal-frame";
-    });
+    each(galFrames, function(f, k){ flag(f, "on", k === i); });
     each(galThumbs, function(t, k){
-      t.className = k === i ? "gal-thumb on" : "gal-thumb";
+      flag(t, "on", k === i);
       t.setAttribute("aria-selected", k === i ? "true" : "false");
     });
     each(galDots ? galDots.children : [], function(d, k){
@@ -750,9 +840,7 @@
     var navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 64;
     var top = navH + 22;
     if (box.top >= top && box.bottom <= window.innerHeight) return;
-    var y = (window.pageYOffset || document.documentElement.scrollTop) + box.top - top;
-    try { window.scrollTo({ top: y, behavior: reduceMotion ? "auto" : "smooth" }); }
-    catch(e){ window.scrollTo(0, y); }
+    scrollToY((window.pageYOffset || document.documentElement.scrollTop) + box.top - top, false);
   }
 
   function showFrameByColor(color){
