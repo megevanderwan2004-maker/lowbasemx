@@ -791,10 +791,12 @@
       if (v) el.textContent = v;
     });
 
-    /* La galerie suit la couleur : le cadre qui la porte devient l'actif.
-       Rien à précharger ni à faire fondre — les cadres sont déjà dans la
-       piste, on ne fait que la faire glisser. */
-    if (state.color) showFrameByColor(state.color);
+    /* La galerie suit l'option qui la pilote : la couleur quand il y en a,
+       sinon le format s'il porte ses visuels. Rien à précharger ni à faire
+       fondre — les cadres sont déjà dans la piste, on ne fait que la faire
+       glisser. */
+    if (state.color) showFrame("data-color", state.color);
+    else if (state.size) showFrame("data-size", state.size);
 
     var label = $("dock-variant");
     if (label) label.textContent = variantLabel();
@@ -876,10 +878,10 @@
     scrollToY((window.pageYOffset || document.documentElement.scrollTop) + box.top - top, false);
   }
 
-  function showFrameByColor(color){
+  function showFrame(attr, value){
     if (!galFrames) return;
     for (var i = 0; i < galFrames.length; i++){
-      if (galFrames[i].getAttribute("data-color") === color){ galGo(i); return; }
+      if (galFrames[i].getAttribute(attr) === value){ galGo(i); return; }
     }
   }
 
@@ -897,10 +899,12 @@
     each(galThumbs, function(t){
       t.addEventListener("click", function(){
         var i = Number(t.getAttribute("data-i")) || 0;
-        /* Une vignette de couleur vaut choix de couleur : sans ça la
-           galerie et le prix parleraient de deux produits différents. */
+        /* Une vignette vaut choix d'option : sans ça la galerie et le prix
+           parleraient de deux produits différents. */
         var c = t.getAttribute("data-color");
+        var z = t.getAttribute("data-size");
         if (c && c !== state.color){ state.color = c; syncSelection(); }
+        else if (z && z !== state.size){ state.size = z; syncSelection(); }
         galGo(i);
       }, false);
     });
@@ -1090,7 +1094,15 @@
       }, false);
     });
     each(document.querySelectorAll(".size-btn"), function(b){
-      b.addEventListener("click", function(){ state.size = b.getAttribute("data-size"); syncSelection(); }, false);
+      b.addEventListener("click", function(){
+        var next = b.getAttribute("data-size");
+        var changed = next !== state.size;
+        state.size = next;
+        syncSelection();
+        /* Même raison que pour les coloris : sur mobile le sélecteur est
+           sous le visuel, et un format qui change de photo doit se voir. */
+        if (changed && !PRODUCT.colors) revealGallery();
+      }, false);
     });
 
     /* Groupes radio : navigation aux flèches, tabindex glissant */

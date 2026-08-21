@@ -107,12 +107,34 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
                vignettes au clic, et la couleur choisie qui la pilote. -->
           <div class="gal" id="gal">
             <div class="gal-stage" id="gal-stage">
-              <figure class="gal-frame on">
-                <img id="stage-img" fetchpriority="high" src="/media/productos/absorption-sleep/absorption-sleep.png" alt="The Absorption Company Sleep" width="900" height="900">
+              <figure class="gal-frame on contain" data-size="7 sticks">
+                <img id="stage-img" fetchpriority="high" src="/media/productos/absorption-sleep/absorption-sleep.png" alt="The Absorption Company Sleep — 7 sticks" width="900" height="900">
+              </figure>
+              <figure class="gal-frame contain" data-size="14 sticks">
+                <img loading="lazy" src="/media/productos/absorption-sleep/sleep-14-sticks.jpg" alt="The Absorption Company Sleep — 14 sticks" width="900" height="900">
+              </figure>
+              <figure class="gal-frame contain" data-size="28 dosis">
+                <img loading="lazy" src="/media/productos/absorption-sleep/sleep-28-dosis.jpg" alt="The Absorption Company Sleep — 28 dosis" width="900" height="900">
+              </figure>
+              <figure class="gal-frame contain" data-size="28 dosis">
+                <img loading="lazy" src="/media/productos/absorption-sleep/sleep-28-dosis-vaso.jpg" alt="The Absorption Company Sleep — 28 dosis" width="900" height="900">
               </figure>
             </div>
             <div class="gal-dots" id="gal-dots" aria-hidden="true"></div>
-
+            <div class="gal-thumbs" role="tablist" aria-label="Vistas del producto">
+              <button class="gal-thumb on contain" type="button" role="tab" aria-selected="true" data-i="0" data-size="7 sticks">
+                <img loading="lazy" src="/media/productos/absorption-sleep/absorption-sleep.png" alt="The Absorption Company Sleep — 7 sticks" width="120" height="120">
+              </button>
+              <button class="gal-thumb contain" type="button" role="tab" aria-selected="false" data-i="1" data-size="14 sticks">
+                <img loading="lazy" src="/media/productos/absorption-sleep/sleep-14-sticks.jpg" alt="The Absorption Company Sleep — 14 sticks" width="120" height="120">
+              </button>
+              <button class="gal-thumb contain" type="button" role="tab" aria-selected="false" data-i="2" data-size="28 dosis">
+                <img loading="lazy" src="/media/productos/absorption-sleep/sleep-28-dosis.jpg" alt="The Absorption Company Sleep — 28 dosis" width="120" height="120">
+              </button>
+              <button class="gal-thumb contain" type="button" role="tab" aria-selected="false" data-i="3" data-size="28 dosis">
+                <img loading="lazy" src="/media/productos/absorption-sleep/sleep-28-dosis-vaso.jpg" alt="The Absorption Company Sleep — 28 dosis" width="120" height="120">
+              </button>
+            </div>
           </div>
 
           <!-- La nacelle ne porte pas .rv : animer l'opacité d'une surface

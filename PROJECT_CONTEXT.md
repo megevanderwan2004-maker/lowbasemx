@@ -280,7 +280,9 @@ Supplement prices are the brands' **one-time** (non-subscription) prices convert
 
 **Three shapes of variant table.** `shopify.variant` (single), `shopify.variants[value]` (one option), `shopify.variants[colour][size]` (two options). `variantOf()` resolves all three and falls back to the single variant rather than to nothing. An option may also carry `price` (Sleep's formats); `priceOf()` resolves it and `syncPrice()` in `app.js` repaints the price, the struck-through price, the dock and the button label. `sizeLabel` renames the second option ("Formato" on Sleep).
 
-**Several views per colour.** `colors[i].image` is the main one, `colors[i].views[]` the others; every one of them carries the colour in the gallery, so the picker lands on the first and a swipe walks the rest of that colour before reaching the next one. CIRQA and Venu 4 carry three each (three-quarter, sensor, profile).
+**The option drives the gallery.** Colour when the product has colours, otherwise the size — Sleep's three boxes look nothing alike, so picking a format has to change the photo. Frames carry `data-color` **or** `data-size` and `showFrame(attr, value)` scrolls the track to the first match; a gallery thumb sets whichever option it carries.
+
+**Several views per option.** `colors[i].image` (or `sizes[i].image`) is the main one, `views[]` the others; every one of them carries the option value, so the picker lands on the first and a swipe walks the rest before reaching the next value. CIRQA and Venu 4 carry three views per colour (three-quarter, sensor, profile); Sleep's 28-dose format carries two.
 
 **Media fields on a product**
 

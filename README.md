@@ -347,8 +347,13 @@ les IDs de variantes, ajouter le bloc `shopify` dans `catalog.js`, régénérer.
 
 ### Coloris, formats et vues produit
 
-Un coloris peut porter **plusieurs vues** : `colors[i].image` est la principale,
-`colors[i].views[]` les suivantes. Toutes portent la couleur dans la galerie, si
+C'est **l'option qui pilote la galerie** : la couleur quand la fiche en a, sinon
+le format s'il porte ses visuels — les trois étuis de Sleep ne se ressemblent
+pas, choisir un format doit changer la photo. Le cadre porte `data-color` ou
+`data-size` et le sélecteur fait glisser la piste jusqu'à lui.
+
+Un coloris (ou un format) peut porter **plusieurs vues** : `colors[i].image`
+— ou `sizes[i].image` — est la principale, `views[]` les suivantes. Toutes portent la couleur dans la galerie, si
 bien que le sélecteur amène sur la première vue du coloris et que le geste
 latéral fait défiler les autres avant de passer au coloris suivant. La CIRQA et
 la Venu 4 ont trois vues par coloris (face, capteur au dos, profil).

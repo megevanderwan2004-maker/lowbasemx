@@ -238,24 +238,39 @@ function galleryShots(p) {
      le cadre doit les contenir en entier. Les photos de la clé `gallery`
      restent des photos — elles remplissent le cadre. */
   const fit = p.shotFit === "contain" ? " contain" : "";
+  /* Une option pilote la galerie : la couleur quand il y en a, sinon le
+     format s'il porte ses visuels (les trois étuis de Sleep). Les vues
+     supplémentaires suivent la principale en portant la même valeur — le
+     sélecteur amène sur la première, le geste latéral fait défiler les
+     autres sans changer d'option. */
+  const sized = !p.colors && p.sizes && p.sizes.some((s) => s.image);
   if (p.colors)
     p.colors.forEach((c) => {
       shots.push({ src: c.image, alt: `${p.name} — ${c.name}`, color: c.name, fit });
-      /* Les vues supplémentaires du coloris suivent la principale, en
-         portant la même couleur : le sélecteur amène sur la première (il
-         cherche le premier cadre de la couleur) et le geste latéral fait
-         défiler les autres sans changer de coloris. */
       (c.views || []).forEach((v) => shots.push({ src: v, alt: `${p.name} — ${c.name}`, color: c.name, fit }));
+    });
+  else if (sized)
+    p.sizes.forEach((s) => {
+      shots.push({ src: s.image || p.image, alt: `${p.name} — ${s.name}`, size: s.name, fit });
+      (s.views || []).forEach((v) => shots.push({ src: v, alt: `${p.name} — ${s.name}`, size: s.name, fit }));
     });
   else shots.push({ src: p.image, alt: p.name, color: "", fit });
   (p.gallery || []).forEach((g) => shots.push({ src: g, alt: p.name, color: "", fit: "" }));
   return shots;
 }
 
+/* Le cadre porte la valeur qui l'a amené : c'est ce qui permet au
+   sélecteur de faire défiler la piste jusqu'à lui. */
+function shotKey(sh) {
+  if (sh.color) return ` data-color="${esc(sh.color)}"`;
+  if (sh.size) return ` data-size="${esc(sh.size)}"`;
+  return "";
+}
+
 function galleryFrames(p) {
   return galleryShots(p)
     .map(
-      (sh, i) => `              <figure class="gal-frame${i === 0 ? " on" : ""}${sh.fit}"${sh.color ? ` data-color="${esc(sh.color)}"` : ""}>
+      (sh, i) => `              <figure class="gal-frame${i === 0 ? " on" : ""}${sh.fit}"${shotKey(sh)}>
                 <img ${i === 0 ? 'id="stage-img" fetchpriority="high"' : 'loading="lazy"'} src="${esc(sh.src)}" alt="${esc(sh.alt)}" width="900" height="900">
               </figure>`
     )
@@ -268,7 +283,7 @@ function galleryThumbs(p) {
   return `            <div class="gal-thumbs" role="tablist" aria-label="Vistas del producto">
 ${shots
   .map(
-    (sh, i) => `              <button class="gal-thumb${i === 0 ? " on" : ""}${sh.fit}" type="button" role="tab" aria-selected="${i === 0}" data-i="${i}"${sh.color ? ` data-color="${esc(sh.color)}"` : ""}>
+    (sh, i) => `              <button class="gal-thumb${i === 0 ? " on" : ""}${sh.fit}" type="button" role="tab" aria-selected="${i === 0}" data-i="${i}"${shotKey(sh)}>
                 <img loading="lazy" src="${esc(sh.src)}" alt="${esc(sh.alt)}" width="120" height="120">
               </button>`
   )

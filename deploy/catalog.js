@@ -292,11 +292,19 @@
       }},
       /* L'intitulé de l'option : « Talla » n'aurait aucun sens ici. */
       sizeLabel: "Formato",
+      /* Chaque format a SON visuel : l'étui de 7, celui de 14 et le sachet
+         de 28 doses ne se ressemblent pas. La galerie les porte comme elle
+         porte les coloris ailleurs — choisir un format amène dessus. */
       sizes: [
-        { name: "7 sticks",  note: "una semana",  price: 499 },
-        { name: "14 sticks", note: "dos semanas", price: 899 },
-        { name: "28 dosis",  note: "un mes",      price: 1599 }
+        { name: "7 sticks",  note: "una semana",  price: 499,
+          image: "/media/productos/absorption-sleep/absorption-sleep.png" },
+        { name: "14 sticks", note: "dos semanas", price: 899,
+          image: "/media/productos/absorption-sleep/sleep-14-sticks.jpg" },
+        { name: "28 dosis",  note: "un mes",      price: 1599,
+          image: "/media/productos/absorption-sleep/sleep-28-dosis.jpg",
+          views: ["/media/productos/absorption-sleep/sleep-28-dosis-vaso.jpg"] }
       ],
+      shotFit: "contain",
       name: "The Absorption Company Sleep",
       short: "Sleep",
       brand: "The Absorption Company",
