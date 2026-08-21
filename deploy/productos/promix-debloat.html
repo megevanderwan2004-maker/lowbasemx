@@ -110,9 +110,37 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               <figure class="gal-frame on">
                 <img id="stage-img" fetchpriority="high" src="/media/productos/promix-debloat/promix-debloat.png" alt="Promix Debloat Prebiotic + Probiotic" width="900" height="900">
               </figure>
+              <figure class="gal-frame">
+                <img loading="lazy" src="/media/productos/promix-debloat/debloat-bolsa.jpg" alt="Promix Debloat Prebiotic + Probiotic" width="900" height="900">
+              </figure>
+              <figure class="gal-frame">
+                <img loading="lazy" src="/media/productos/promix-debloat/debloat-sobres.jpg" alt="Promix Debloat Prebiotic + Probiotic" width="900" height="900">
+              </figure>
+              <figure class="gal-frame">
+                <img loading="lazy" src="/media/productos/promix-debloat/debloat-trio.jpg" alt="Promix Debloat Prebiotic + Probiotic" width="900" height="900">
+              </figure>
+              <figure class="gal-frame">
+                <img loading="lazy" src="/media/productos/promix-debloat/debloat-mano.jpg" alt="Promix Debloat Prebiotic + Probiotic" width="900" height="900">
+              </figure>
             </div>
             <div class="gal-dots" id="gal-dots" aria-hidden="true"></div>
-
+            <div class="gal-thumbs" role="tablist" aria-label="Vistas del producto">
+              <button class="gal-thumb on" type="button" role="tab" aria-selected="true" data-i="0">
+                <img loading="lazy" src="/media/productos/promix-debloat/promix-debloat.png" alt="Promix Debloat Prebiotic + Probiotic" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="1">
+                <img loading="lazy" src="/media/productos/promix-debloat/debloat-bolsa.jpg" alt="Promix Debloat Prebiotic + Probiotic" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="2">
+                <img loading="lazy" src="/media/productos/promix-debloat/debloat-sobres.jpg" alt="Promix Debloat Prebiotic + Probiotic" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="3">
+                <img loading="lazy" src="/media/productos/promix-debloat/debloat-trio.jpg" alt="Promix Debloat Prebiotic + Probiotic" width="120" height="120">
+              </button>
+              <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="4">
+                <img loading="lazy" src="/media/productos/promix-debloat/debloat-mano.jpg" alt="Promix Debloat Prebiotic + Probiotic" width="120" height="120">
+              </button>
+            </div>
           </div>
 
           <!-- La nacelle ne porte pas .rv : animer l'opacité d'une surface
@@ -127,13 +155,13 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
             <div class="pdp-price price-num">
               <b id="pdp-price">$599</b>
-              
+              <s id="pdp-compare" aria-hidden="true" hidden></s>
               <span>MXN · Envío gratis</span>
               
             </div>
 
             <div class="pdp-cta">
-              <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button">Añadir al carrito — $599 MXN</button>
+              <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button" data-label="Añadir al carrito">Añadir al carrito — $599 MXN</button>
               <p class="pdp-note">Pago seguro con tarjeta vía Shopify Checkout</p>
             </div>
 
@@ -290,6 +318,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
         <p><a href="/productos/absorption-sleep">The Absorption Company Sleep</a></p>
         <p><a href="/productos/promix-creatina">Promix Non-GMO Creatine</a></p>
         <p><a href="/productos/promix-debloat">Promix Debloat Prebiotic + Probiotic</a></p>
+        <p><a href="/productos/banda-cirqa">Banda CIRQA™ de repuesto</a></p>
       </div>
       <div>
         <h3 class="foot-title">Ayuda</h3>
@@ -310,7 +339,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <div class="dock" role="region" aria-label="Comprar Debloat">
   <div class="dock-shell" id="dock-shell">
     <div class="dock-info">
-      <b class="price-num">$599 MXN</b>
+      <b class="price-num" id="dock-price">$599 MXN</b>
       <span id="dock-variant">Debloat · Envío gratis</span>
     </div>
     <button class="btn btn-ink" id="dock-btn" type="button">Añadir al carrito</button>

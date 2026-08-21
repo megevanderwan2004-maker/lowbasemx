@@ -120,10 +120,13 @@ ${p.colors
 
 function sizeRow(p) {
   if (!p.sizes) return "";
+  /* L'intitulé se déclare dans la fiche : « Talla » pour un bracelet,
+     « Formato » pour une boîte de sticks. */
+  const label = p.sizeLabel || "Talla";
   return `
             <div class="opt">
-              <p class="opt-head"><span>Talla</span><b data-opt="size">${esc(p.sizes[0].name)}</b></p>
-            <div class="rail-sizes" role="radiogroup" aria-label="Talla">
+              <p class="opt-head"><span>${esc(label)}</span><b data-opt="size">${esc(p.sizes[0].name)}</b></p>
+            <div class="rail-sizes" role="radiogroup" aria-label="${esc(label)}">
 ${p.sizes
   .map(
     (s, i) => `              <button class="size-btn glass-light${i === 0 ? " active" : ""}" type="button" role="radio" aria-checked="${i === 0}" data-size="${esc(s.name)}"><b>${esc(s.name)}</b><small>${esc(s.note)}</small></button>`
@@ -235,7 +238,15 @@ function galleryShots(p) {
      le cadre doit les contenir en entier. Les photos de la clé `gallery`
      restent des photos — elles remplissent le cadre. */
   const fit = p.shotFit === "contain" ? " contain" : "";
-  if (p.colors) p.colors.forEach((c) => shots.push({ src: c.image, alt: `${p.name} — ${c.name}`, color: c.name, fit }));
+  if (p.colors)
+    p.colors.forEach((c) => {
+      shots.push({ src: c.image, alt: `${p.name} — ${c.name}`, color: c.name, fit });
+      /* Les vues supplémentaires du coloris suivent la principale, en
+         portant la même couleur : le sélecteur amène sur la première (il
+         cherche le premier cadre de la couleur) et le geste latéral fait
+         défiler les autres sans changer de coloris. */
+      (c.views || []).forEach((v) => shots.push({ src: v, alt: `${p.name} — ${c.name}`, color: c.name, fit }));
+    });
   else shots.push({ src: p.image, alt: p.name, color: "", fit });
   (p.gallery || []).forEach((g) => shots.push({ src: g, alt: p.name, color: "", fit: "" }));
   return shots;
@@ -375,13 +386,13 @@ ${galleryThumbs(p)}
 
             <div class="pdp-price price-num">
               <b id="pdp-price">${money(p.price)}</b>
-              ${p.compareAt ? `<s aria-hidden="true">${money(p.compareAt)}</s>` : ""}
+              <s id="pdp-compare" aria-hidden="true"${p.compareAt ? "" : " hidden"}>${p.compareAt ? money(p.compareAt) : ""}</s>
               <span>MXN · Envío gratis</span>
               ${p.compareAt ? `<span class="sr-only">Precio anterior: ${money(p.compareAt)} pesos. Precio actual: ${money(p.price)} pesos mexicanos.</span>` : ""}
             </div>
 ${colorRail(p)}${sizeRow(p)}
             <div class="pdp-cta">
-              <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button">${esc(buyLabel)}</button>
+              <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button" data-label="Añadir al carrito">${esc(buyLabel)}</button>
               <p class="pdp-note">${hasShopify ? "Pago seguro con tarjeta vía Shopify Checkout" : "Disponible bajo pedido — te contactamos para confirmar tu compra"}</p>
             </div>
 
@@ -479,7 +490,7 @@ ${footer()}
 <div class="dock" role="region" aria-label="Comprar ${esc(p.short)}">
   <div class="dock-shell" id="dock-shell">
     <div class="dock-info">
-      <b class="price-num">${money(p.price)} MXN</b>
+      <b class="price-num" id="dock-price">${money(p.price)} MXN</b>
       <span id="dock-variant">${esc(p.short)} · Envío gratis</span>
     </div>
     <button class="btn btn-ink" id="dock-btn" type="button">Añadir al carrito</button>

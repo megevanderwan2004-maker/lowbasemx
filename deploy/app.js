@@ -82,7 +82,11 @@
 
     lenis = new window.Lenis({
       autoRaf: true,
-      lerp: .1,
+      /* Inertie : plus le lerp est bas, plus la page continue sur sa
+         lancée. À .1 l'effet passait inaperçu sur un trackpad, dont
+         l'inertie système ressemble déjà à ça ; à .075 le glissement se
+         voit à la souris comme au trackpad sans jamais retarder la main. */
+      lerp: .075,
       wheelMultiplier: 1,
       /* Les ancres restent à nous : le site dégage la nav flottante avec
          `scroll-margin-top`, que Lenis ne relit pas. */
@@ -757,7 +761,7 @@
   function variantLabel(){
     var bits = [];
     if (state.color) bits.push(state.color);
-    if (state.size) bits.push("Talla " + state.size);
+    if (state.size) bits.push((PRODUCT && PRODUCT.sizeLabel ? PRODUCT.sizeLabel : "Talla") + " " + state.size);
     bits.push("Envío gratis");
     return bits.join(" · ");
   }
@@ -794,6 +798,35 @@
 
     var label = $("dock-variant");
     if (label) label.textContent = variantLabel();
+
+    syncPrice();
+  }
+
+  /* Un format peut coûter plus cher que la fiche (les 14 sticks de Sleep,
+     par exemple) : le prix affiché, le prix barré, le dock et l'intitulé du
+     bouton suivent la sélection. Sans ça le client lirait 499 et paierait
+     1 599. */
+  function syncPrice(){
+    if (!PRODUCT || !CATALOG.priceOf) return;
+    var pr = CATALOG.priceOf(PRODUCT, state.color, state.size);
+    var money = CATALOG.money;
+
+    var main = $("pdp-price");
+    if (main) main.textContent = money(pr.price);
+
+    var cmp = $("pdp-compare");
+    if (cmp){
+      if (pr.compareAt){ cmp.textContent = money(pr.compareAt); cmp.removeAttribute("hidden"); }
+      else cmp.setAttribute("hidden", "");
+    }
+
+    var dock = $("dock-price");
+    if (dock) dock.textContent = money(pr.price) + " MXN";
+
+    var btn = $("checkout-btn");
+    if (btn && btn.getAttribute("data-label")){
+      btn.textContent = btn.getAttribute("data-label") + " — " + money(pr.price) + " MXN";
+    }
   }
 
   /* =====================================================================
@@ -1012,20 +1045,13 @@
        choisies plus haut pour le produit consulté, la variante unique
        pour les compléments. */
     function lineFor(p, i){
-      var shop = p.shopify;
-      if (!shop) return null;
+      if (!p.shopify) return null;
       var color = colors[i];
       var size = i === 0 ? state.size : null;
-      var variant = shop.variant || null;
-      if (shop.variants && color){
-        var byColor = shop.variants[color];
-        /* Pas de taille choisie pour un article recommandé : on prend la
-           première du catalogue plutôt que d'abandonner la variante. */
-        if (byColor){
-          if (!size && p.sizes) size = p.sizes[0].name;
-          variant = (size && byColor[size]) || variant;
-        }
-      }
+      /* Pas de taille choisie pour un article recommandé : on prend la
+         première du catalogue plutôt que d'abandonner la variante. */
+      if (!size && p.sizes) size = p.sizes[0].name;
+      var variant = CATALOG.variantOf ? CATALOG.variantOf(p, color, size) : (p.shopify.variant || null);
       if (!variant) return null;
       return { variant: variant, handle: p.handle, color: color || null,
                size: size || null, qty: 1 };
@@ -1110,11 +1136,8 @@
        lui qui reconstruira le panier Shopify au moment de payer : d'ici
        là, rien ne quitte le site. */
     if (window.LOWCART){
-      var variant = shop.variant || null;
-      if (shop.variants && state.color && state.size){
-        var byColor = shop.variants[state.color];
-        variant = (byColor && byColor[state.size]) || variant;
-      }
+      var variant = CATALOG.variantOf ? CATALOG.variantOf(PRODUCT, state.color, state.size)
+                                      : (shop.variant || null);
       if (variant){
         LOWCART.add([{ variant: variant, handle: PRODUCT.handle,
                        color: state.color, size: state.size, qty: 1 }]);
@@ -1123,8 +1146,7 @@
     }
     /* La référence est résolue AVANT de désactiver le bouton : une
        combinaison inconnue ne doit pas laisser un bouton mort. */
-    var byColor = shop.variants && state.color ? shop.variants[state.color] : null;
-    var id = byColor && state.size ? byColor[state.size] : null;
+    var id = CATALOG.variantOf ? CATALOG.variantOf(PRODUCT, state.color, state.size) : null;
     if (!id){
       window.location.href = STORE + "/products/" + shop.handle + "?locale=es&country=MX";
       return;

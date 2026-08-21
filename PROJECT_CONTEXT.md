@@ -9,7 +9,7 @@
 
 **Lowlabs** is a Mexican reseller working directly with Garmin at reseller pricing, plus a curated supplement line. Brand positioning is "curated wellness and technology" — premium wellness editorial, not sporty gadget. All customer-facing content is in Spanish (es-MX), prices in MXN.
 
-The site started as a **single-product landing page** for the Garmin CIRQA Smart Band (launched 2026-07-21), became a five- then nine-product storefront, and on 2026-08-10 **swapped its supplement half**: the two Cymbiotika newcomers (Women's Multivitamin, Synbiotic) left, Promix Relax and The Absorption Company Sleep arrived. The catalogue still holds **nine products across four brands** — Garmin (4 wearables), Cymbiotika (1), Promix (3) and The Absorption Company (1).
+The site started as a **single-product landing page** for the Garmin CIRQA Smart Band (launched 2026-07-21), became a five- then nine-product storefront, and on 2026-08-10 **swapped its supplement half**: the two Cymbiotika newcomers (Women's Multivitamin, Synbiotic) left, Promix Relax and The Absorption Company Sleep arrived. On 2026-08-21 it gained its first **accessory** and its first **multi-option supplement**: the catalogue now holds **ten products across four brands** — Garmin (4 wearables + 1 replacement band), Cymbiotika (1), Promix (3) and The Absorption Company (1, in three formats). A third category, **Accesorios**, appeared with the band.
 
 The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor in Mexico for 18 years. Lowlabs differentiates on price, a much shorter catalogue, and brand aesthetics.
 
@@ -29,7 +29,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 - **Cart on every page**: drawer with image, name, chosen options, quantity, remove, subtotal; a cart icon in the nav carries the count. Lines are Shopify variant references; checkout is a Shopify cart permalink.
 - **Nav**: links, centred wordmark, cart icon. Nothing else — "Comprar" was removed on 2026-08-12. The three links are real pages: `/tienda`, `/wearables`, `/suplementos`; the current one carries `aria-current="page"`.
 - **Bundle on every PDP**: viewed product + its two first `pairs`, −10% shown, colour swatches on the watch, added as individual variants with the `BUNDLE10` code attached.
-- All nine products check out on Shopify — colour/size drive the exact variant.
+- All ten products check out on Shopify. **Three shapes of variant table** now coexist — single variant, one option (Venu 4 by colour, Sleep by format), two options (CIRQA and the band, colour × size) — and `LOWLABS.variantOf()` in `catalog.js` is the only resolver. `LOWLABS.priceOf()` does the same for prices, since a Sleep format costs more than the product's base price.
 - Liquid-glass design system: white translucent surfaces, ink text, a masked gradient rim shared by buttons, both bars, and the footer.
 
 **What is NOT connected**
@@ -43,6 +43,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 **Recent history** (`git log`, newest first)
 | Commit | Date | What changed |
 |--------|------|--------------|
+| `—` | 08-21 | **Venu 4 in 3 colours, Sleep in 3 formats, replacement band added** (Shopify variants created); shared variant/price resolver; 3 official views per CIRQA and Venu 4 colour; brand galleries on the supplements; lifestyle triptych on `/wearables` |
 | `9dc1daa` | 08-21 | **Full-bleed pass**: zero gutter on phones, 1500px container, bigger carousel/chapter/goal media, taller bands; **Lenis** smooth scroll; CIRQA colours switched to the official Garmin renders |
 | `b0f2669` | 08-18 | `/wearables` and `/suplementos` get their own header loop (treadmill / capsules) |
 | `b8582a6` | 08-18 | Goal assistant switched to muted 9/16 loops, sized on the Garmin Connect box, white background |
@@ -123,13 +124,13 @@ lowlabs-cirqa-context/
 ## 4. Technology stack and the generation step
 
 - **No framework, no npm, no `package.json`.** Vanilla HTML/CSS/ES5-compatible JS.
-- **One build step, run manually**: `node build/gen-products.js` reads `deploy/catalog.js` in a `vm` sandbox (exposing a fake `window`) and writes the nine product pages. This exists because `vercel.json` declares `buildCommand: null` — the generated files must be committed.
+- **One build step, run manually**: `node build/gen-products.js` reads `deploy/catalog.js` in a `vm` sandbox (exposing a fake `window`) and writes the ten product pages. This exists because `vercel.json` declares `buildCommand: null` — the generated files must be committed.
 
 ```bash
 node build/gen-products.js
 ```
 
-**Run it after any change to `catalog.js`, or to the nav/footer/band templates inside `gen-products.js`.** Forgetting leaves the nine product pages stale, and nothing warns you.
+**Run it after any change to `catalog.js`, or to the nav/footer/band templates inside `gen-products.js`.** Forgetting leaves the ten product pages stale, and nothing warns you.
 
 - **Google Fonts**: Outfit (display) + DM Sans (body) — web-safe stand-ins for the brand fonts Codec Pro and Canva Sans.
 - **Images**: mostly local under `deploy/media/`; CIRQA photography still comes from the Shopify CDN.
@@ -200,6 +201,7 @@ Each page embeds `<filter id="lg-refract">`. **It is scoped to Firefox on purpos
 |--------|-------|-------|
 | `.prod` | `/productos/*` "Otros productos" | Framed card: media box, category, name, tagline, price, button |
 | `.fcard` inside `.cards.fcards` | both home carousels and every Tienda aisle | **Floating**: cut-out packshot or product loop, `mix-blend-mode: multiply`, drop shadow, short name, then **`.fcard-buy`** — the price as a `btn btn-ink btn-sm` pill. It is a `span` with `pointer-events:none` (the card is already the link) and `margin-top:auto`, so every button lines up whatever the name's line count |
+| `.shots` | `/wearables` | Lifestyle triptych: three 4:5 photos, a snapping track below 760px and a three-column grid above. Added 2026-08-21 with the Garmin usage photography |
 | `.goal` | the assistant | Full-bleed **muted loop** in a 9/16 box sized by `--media-box` — deliberately the same box as the Garmin Connect chapter media. **`.goal-body` is fully transparent** — the card's own gradient scrim carries legibility; only the `.goal-cta` pill keeps a glass surface |
 | `.prod` inside `.cat-grid[data-category]` | `/wearables`, `/suplementos` | The same framed card, driven by category instead of a hand-written list |
 
@@ -258,7 +260,7 @@ Full-bleed, `object-fit: cover`. The wordmark and tagline are **baked into the i
 
 ## 7. Catalogue and Shopify
 
-`deploy/catalog.js` exports `window.LOWLABS` with `products`, `goals`, `categories`, and the helpers `byHandle`, `byGoal`, `inCategory`, `money`, `url`. It is the only place prices, images, specs and variant IDs live.
+`deploy/catalog.js` exports `window.LOWLABS` with `products`, `goals`, `categories`, and the helpers `byHandle`, `byGoal`, `inCategory`, `money`, `url`, **`variantOf`** and **`priceOf`**. It is the only place prices, images, specs and variant IDs live.
 
 ### Products and provisional prices
 | Handle | Product | Price (MXN) | Compare at | Source price | Shopify |
@@ -271,9 +273,14 @@ Full-bleed, `object-fit: cover`. The wordmark and tagline are **baked into the i
 | `promix-creatina` | Promix Non-GMO Creatine — 30 sticks × 5 g | 659 | — | $32 US | ❌ |
 | `promix-relax` | Promix Relax: Magnesium Complex — 90 caps / 30 servings | 989 | — | $48 US | ❌ |
 | `promix-debloat` | Promix Debloat Prebiotic + Probiotic | 599 | — | $29 US | ❌ |
-| `absorption-sleep` | The Absorption Company Sleep — 7 sticks, Chamomile Lemonade | 499 | — | $24 US | ❌ |
+| `absorption-sleep` | The Absorption Company Sleep — 7 / 14 sticks or 28 doses | 499 / 899 / 1,599 | — | $24 US (7 sticks) | ❌ |
+| `banda-cirqa` | Banda CIRQA™ de repuesto — 3 colours × 2 sizes | 1,099 | — | MSRP MX | ❌ |
 
-Supplement prices are the brands' **one-time** (non-subscription) prices converted at the rounded rate used since the first Promix pair (≈ ×20.6). The dock's floor is **"Desde $499 MXN"** and its count **9 productos** — both are hand-written in `index.html` and `tienda.html`.
+Supplement prices are the brands' **one-time** (non-subscription) prices converted at the rounded rate used since the first Promix pair (≈ ×20.6). **The 899 and 1,599 of the two larger Sleep formats are lowlabs estimates** computed from the price per stick, approved by the owner on 2026-08-21 — they are not the brand's own prices, so check them against The Absorption Company before a launch. The dock's floor is **"Desde $499 MXN"** and its count **10 productos** — both are hand-written in `index.html` and `tienda.html`.
+
+**Three shapes of variant table.** `shopify.variant` (single), `shopify.variants[value]` (one option), `shopify.variants[colour][size]` (two options). `variantOf()` resolves all three and falls back to the single variant rather than to nothing. An option may also carry `price` (Sleep's formats); `priceOf()` resolves it and `syncPrice()` in `app.js` repaints the price, the struck-through price, the dock and the button label. `sizeLabel` renames the second option ("Formato" on Sleep).
+
+**Several views per colour.** `colors[i].image` is the main one, `colors[i].views[]` the others; every one of them carries the colour in the gallery, so the picker lands on the first and a swipe walks the rest of that colour before reaching the next one. CIRQA and Venu 4 carry three each (three-quarter, sensor, profile).
 
 **Media fields on a product**
 
@@ -290,6 +297,21 @@ Supplement prices are the brands' **one-time** (non-subscription) prices convert
 | Product handle | `garmin-cirqa-smart-band` |
 | Store ID | `1026/1721/9449` |
 | CDN base | `https://cdn.shopify.com/s/files/1/1026/1721/9449/files/` |
+
+### Variant IDs created on 2026-08-21
+| Product | Option | Variant |
+|---------|--------|---------|
+| Venu 4 | Crema | 64212128956793 *(was the Default Title variant — id preserved)* |
+| Venu 4 | Gris Taupe | 64326127550841 |
+| Venu 4 | Negro | 64326127583609 |
+| Sleep | 7 sticks | 64212136624505 *(was the Default Title variant — id preserved)* |
+| Sleep | 14 sticks | 64326122668409 |
+| Sleep | 28 dosis | 64326122701177 |
+| Banda de repuesto | Gris Lima S–M / L–XL | 64326134333817 / 64326134366585 |
+| Banda de repuesto | Oliva Oscuro S–M / L–XL | 64326134399353 / 64326134432121 |
+| Banda de repuesto | Azul Francés S–M / L–XL | 64326134464889 / 64326134497657 |
+
+Both option creations used `productOptionUpdate` with `variantStrategy: LEAVE_AS_IS`, which renames the existing `Title / Default Title` option in place: **the original variant IDs survived**, so no checkout link broke. The band product is `gid://shopify/Product/15731159859577`, handle `banda-cirqa-repuesto` (Shopify's auto-handle carried a ™ and was rewritten).
 
 ### CIRQA variant IDs
 | Color | S–M | L–XL |

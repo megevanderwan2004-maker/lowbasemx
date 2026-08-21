@@ -50,11 +50,24 @@
          galerie : ce sont des rendus sur fond blanc, les rogner couperait
          le bracelet. */
       shotFit: "contain",
+      /* `image` est la vue principale du coloris, `views` les autres vues du
+         MÊME coloris : le capteur et ses LED, puis la boucle ouverte de
+         profil. Toutes portent la couleur dans la galerie — choisir un
+         coloris amène sur sa première vue, et le geste latéral fait
+         défiler les trois avant de passer au coloris suivant. */
       colors: [
-        { name: "Negra",        dot: "#2b2b2e", image: "/media/productos/cirqa/cirqa-negra.jpg",        note: "Discreción total, del gimnasio a la oficina" },
-        { name: "Gris Francés", dot: "#a6a098", image: "/media/productos/cirqa/cirqa-gris-frances.jpg", note: "Un neutro cálido que acompaña sin pedir atención" },
-        { name: "Malva",        dot: "#9f8384", image: "/media/productos/cirqa/cirqa-malva.jpg",        note: "Suave y personal, para medir tu bienestar en calma" },
-        { name: "Azul Capitán", dot: "#2e3f63", image: "/media/productos/cirqa/cirqa-azul-capitan.jpg", note: "Profundo y sereno, con carácter para todo el día" }
+        { name: "Negra",        dot: "#2b2b2e", image: "/media/productos/cirqa/cirqa-negra.jpg",
+          views: ["/media/productos/cirqa/cirqa-negra-sensor.jpg", "/media/productos/cirqa/cirqa-negra-perfil.jpg"],
+          note: "Discreción total, del gimnasio a la oficina" },
+        { name: "Gris Francés", dot: "#a6a098", image: "/media/productos/cirqa/cirqa-gris-frances.jpg",
+          views: ["/media/productos/cirqa/cirqa-gris-frances-sensor.jpg", "/media/productos/cirqa/cirqa-gris-frances-perfil.jpg"],
+          note: "Un neutro cálido que acompaña sin pedir atención" },
+        { name: "Malva",        dot: "#9f8384", image: "/media/productos/cirqa/cirqa-malva.jpg",
+          views: ["/media/productos/cirqa/cirqa-malva-sensor.jpg", "/media/productos/cirqa/cirqa-malva-perfil.jpg"],
+          note: "Suave y personal, para medir tu bienestar en calma" },
+        { name: "Azul Capitán", dot: "#2e3f63", image: "/media/productos/cirqa/cirqa-azul-capitan.jpg",
+          views: ["/media/productos/cirqa/cirqa-azul-capitan-sensor.jpg", "/media/productos/cirqa/cirqa-azul-capitan-perfil.jpg"],
+          note: "Profundo y sereno, con carácter para todo el día" }
       ],
       sizes: [
         { name: "S–M",  note: "muñeca 120–200 mm" },
@@ -78,7 +91,25 @@
     {
       handle: "venu-4",
       pairs: ["promix-creatina", "creatina", "absorption-sleep"],
-      shopify: { handle: "garmin-venu-4", variant: "64212128956793" },
+      /* Une seule option, la couleur : `variants` est donc une table plate,
+         couleur → référence, sans niveau de taille. */
+      shopify: { handle: "garmin-venu-4", variants: {
+        "Crema":      "64212128956793",
+        "Gris Taupe": "64326127550841",
+        "Negro":      "64326127583609"
+      }},
+      shotFit: "contain",
+      colors: [
+        { name: "Crema",      dot: "#e8e2d2", image: "/media/productos/venu-4/venu-4-crema.jpg",
+          views: ["/media/productos/venu-4/venu-4-crema-sensor.jpg", "/media/productos/venu-4/venu-4-crema-perfil.jpg"],
+          note: "Silicona color hueso y bisel dorado" },
+        { name: "Gris Taupe", dot: "#87837b", image: "/media/productos/venu-4/venu-4-gris-taupe.jpg",
+          views: ["/media/productos/venu-4/venu-4-gris-taupe-sensor.jpg", "/media/productos/venu-4/venu-4-gris-taupe-perfil.jpg"],
+          note: "Un neutro cálido con bisel plateado" },
+        { name: "Negro",      dot: "#373737", image: "/media/productos/venu-4/venu-4-negro.jpg",
+          views: ["/media/productos/venu-4/venu-4-negro-sensor.jpg", "/media/productos/venu-4/venu-4-negro-perfil.jpg"],
+          note: "Discreto de la oficina al gimnasio" }
+      ],
       name: "Garmin Venu® 4",
       short: "Venu® 4",
       brand: "Garmin",
@@ -89,6 +120,14 @@
       category: "Wearables",
       image: "/media/productos/venu-4/venu-4.png",
       hero: "/media/productos/venu-4/venu-4.png",
+      /* Photos d'usage Garmin : la montre au poignet, à l'entraînement et
+         la lampe de la Venu 4 dans le noir. Elles ferment la galerie,
+         après les vues produit. */
+      gallery: [
+        "/media/productos/venu-4/entreno-flexiones.jpg",
+        "/media/productos/venu-4/entreno-kettlebell.jpg",
+        "/media/productos/venu-4/linterna-noche.jpg"
+      ],
       highlights: [
         "Pantalla AMOLED brillante y siempre legible",
         "Predisposición para entrenar, VO2 max y estado del entreno",
@@ -190,7 +229,15 @@
       ],
       video: "/media/productos/creatina/sup-creatina.mp4",
       poster: "/media/productos/creatina/poster-sup-creatina.jpg",
-      videoRatio: "portrait"
+      videoRatio: "portrait",
+      /* Visuels de marque Cymbiotika. La boîte porte bien « 24 x 30 mL
+         Liquid Packets » : c'est le format que nous vendons. */
+      gallery: [
+        "/media/productos/creatina/creatina-caja.jpg",
+        "/media/productos/creatina/creatina-sobre.jpg",
+        "/media/productos/creatina/creatina-bolsa.jpg",
+        "/media/productos/creatina/creatina-textura.jpg"
+      ]
     },
     /* ---------------------------------------------------------------------
        Les suppléments Cymbiotika ajoutés au catalogue.
@@ -236,7 +283,20 @@
     {
       handle: "absorption-sleep",
       pairs: ["cirqa", "promix-relax", "venu-3s"],
-      shopify: { handle: "the-absorption-company-sleep", variant: "64212136624505" },
+      /* Option unique : le format. La table est donc plate, format →
+         référence, et chaque format porte SON prix. */
+      shopify: { handle: "the-absorption-company-sleep", variants: {
+        "7 sticks":  "64212136624505",
+        "14 sticks": "64326122668409",
+        "28 dosis":  "64326122701177"
+      }},
+      /* L'intitulé de l'option : « Talla » n'aurait aucun sens ici. */
+      sizeLabel: "Formato",
+      sizes: [
+        { name: "7 sticks",  note: "una semana",  price: 499 },
+        { name: "14 sticks", note: "dos semanas", price: 899 },
+        { name: "28 dosis",  note: "un mes",      price: 1599 }
+      ],
       name: "The Absorption Company Sleep",
       short: "Sleep",
       brand: "The Absorption Company",
@@ -285,6 +345,12 @@
       image: "/media/productos/promix-creatina/promix-creatine-sticks.png",
       hero: "/media/productos/promix-creatina/promix-creatine-sticks.png",
       packshot: "/media/productos/promix-creatina/promix-creatine-sticks.png",
+      /* Visuels de marque Promix. Le sachet porte « 30 × 5 g Stick Packs » :
+         c'est l'emballage de nos 30 sticks, pas un autre format. */
+      gallery: [
+        "/media/productos/promix-creatina/promix-creatine-bolsa.jpg",
+        "/media/productos/promix-creatina/promix-creatine-lifestyle.jpg"
+      ],
       highlights: [
         "Creatina monohidratada micronizada, sin endulzar y sin sabor",
         "Apoya de forma segura el aumento de tamaño, fuerza y potencia muscular*",
@@ -321,6 +387,14 @@
       poster: "/media/productos/promix-debloat/poster-debloat-loop.jpg",
       packshot: "/media/productos/promix-debloat/promix-debloat.png",
       videoRatio: "portrait",
+      /* Visuels de marque Promix. Le sachet liste 4 White Peach + 4 Florida
+         Orange + 4 Tropical Mango : ce sont bien nos 12 sobres. */
+      gallery: [
+        "/media/productos/promix-debloat/debloat-bolsa.jpg",
+        "/media/productos/promix-debloat/debloat-sobres.jpg",
+        "/media/productos/promix-debloat/debloat-trio.jpg",
+        "/media/productos/promix-debloat/debloat-mano.jpg"
+      ],
       highlights: [
         "Prebióticos y probióticos en un mismo sobre",
         "Pensado para la digestión y el confort intestinal*",
@@ -339,6 +413,61 @@
         eyebrow: "Promix",
         title: "Un sobre, un vaso de agua.",
         text: "Prebióticos y probióticos que se toman como una bebida, en tres sabores para no cansarte del mismo. Para el confort digestivo de todos los días.*"
+      }
+    },
+    {
+      /* Accessoire officiel Garmin : les trois teintes que la CIRQA elle-même
+         n'a pas. SKU et prix viennent de la fiche revendeur Garmin
+         (`assets/cirqa/documentos/`), où les sept bracelets sont à 1 099 MXN.
+         Les quatre autres teintes (Negra, Gris Francés, Malva, Azul Capitán)
+         existent aussi chez Garmin : elles attendent leurs visuels. */
+      handle: "banda-cirqa",
+      pairs: ["cirqa", "absorption-sleep", "promix-relax"],
+      shopify: { handle: "banda-cirqa-repuesto", variants: {
+        "Gris Lima":    { "S–M": "64326134333817", "L–XL": "64326134366585" },
+        "Oliva Oscuro": { "S–M": "64326134399353", "L–XL": "64326134432121" },
+        "Azul Francés": { "S–M": "64326134464889", "L–XL": "64326134497657" }
+      }},
+      name: "Banda CIRQA™ de repuesto",
+      short: "Banda de repuesto",
+      brand: "Garmin",
+      tagline: "Cambia el color sin cambiar de banda.",
+      price: 1099,
+      category: "Accesorios",
+      image: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
+      hero: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
+      packshot: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
+      shotFit: "contain",
+      colors: [
+        { name: "Gris Lima",    dot: "#a8a98d", image: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
+          note: "Gris cálido con remate lima" },
+        { name: "Oliva Oscuro", dot: "#4f5232", image: "/media/productos/banda-cirqa/banda-oliva-oscuro.jpg",
+          note: "Verde profundo, casi militar" },
+        { name: "Azul Francés", dot: "#8e9cc4", image: "/media/productos/banda-cirqa/banda-azul-frances.jpg",
+          note: "Azul claro y luminoso" }
+      ],
+      sizes: [
+        { name: "S–M",  note: "muñeca 120–200 mm" },
+        { name: "L–XL", note: "muñeca 145–240 mm" }
+      ],
+      highlights: [
+        "Compatible con todas las Garmin CIRQA™ Smart Band",
+        "El mismo tejido elástico y el mismo cierre que la banda original",
+        "Dos tallas, para muñecas de 120 a 240 mm",
+        "Accesorio oficial Garmin"
+      ],
+      specs: [
+        ["Marca", "Garmin"],
+        ["Compatibilidad", "CIRQA™ Smart Band"],
+        ["Tallas", "S–M (120–200 mm) · L–XL (145–240 mm)"],
+        ["Material", "Tejido elástico, cierre de gancho"],
+        ["Colores", "Gris Lima, Oliva Oscuro, Azul Francés"],
+        ["Envío", "Gratis a todo México"]
+      ],
+      story: {
+        eyebrow: "Garmin",
+        title: "Un gesto, otro color.",
+        text: "La banda se cambia en segundos, sin herramientas. La misma CIRQA para entrenar, para la oficina y para dormir."
       }
     }
   ];
@@ -401,6 +530,49 @@
     return "$" + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
+  /* -----------------------------------------------------------------------
+     Résolution d'une variante Shopify — le seul endroit qui connaisse la
+     forme de `shopify.variants`. Trois formes cohabitent :
+
+       · variante unique        shopify.variant           = "id"
+       · une option             shopify.variants[valeur]  = "id"
+         (couleur seule, comme la Venu 4 ; ou format seul, comme Sleep)
+       · deux options           shopify.variants[couleur][taille] = "id"
+
+     Une combinaison inconnue retombe sur la variante unique plutôt que sur
+     rien : mieux vaut ouvrir la fiche boutique que casser le panier.
+     ----------------------------------------------------------------------- */
+  function variantOf(p, color, size){
+    var shop = p && p.shopify;
+    if (!shop) return null;
+    var table = shop.variants;
+    if (!table) return shop.variant || null;
+    var node = (color != null && table[color] != null) ? table[color]
+             : (size  != null && table[size]  != null) ? table[size]
+             : null;
+    if (node == null) return shop.variant || null;
+    if (typeof node === "string") return node;
+    if (size != null && node[size]) return node[size];
+    /* Taille non choisie — un article recommandé, par exemple : on prend la
+       première du catalogue plutôt que d'abandonner la variante. */
+    if (p.sizes && node[p.sizes[0].name]) return node[p.sizes[0].name];
+    return shop.variant || null;
+  }
+
+  /* Prix d'une combinaison : une option peut porter le sien (les formats de
+     Sleep, par exemple). Sans prix propre, c'est celui de la fiche. */
+  function priceOf(p, color, size){
+    var list = [];
+    if (p.sizes) list = list.concat(p.sizes);
+    if (p.colors) list = list.concat(p.colors);
+    for (var i = 0; i < list.length; i++){
+      var o = list[i];
+      if (o.price == null) continue;
+      if (o.name === size || o.name === color) return { price: o.price, compareAt: o.compareAt || null };
+    }
+    return { price: p.price, compareAt: p.compareAt || null };
+  }
+
   global.LOWLABS = {
     products: PRODUCTS,
     goals: GOALS,
@@ -411,6 +583,8 @@
       return PRODUCTS.filter(function(p){ return p.category === cat; });
     },
     money: money,
+    variantOf: variantOf,
+    priceOf: priceOf,
     url: function(h){ return "/productos/" + h; }
   };
 })(window);

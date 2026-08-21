@@ -1791,6 +1791,34 @@ footer a{color:var(--ink)}
 }
 .more-btn.on{display:inline-flex}
 
+/* Triptyque de photos d'usage : trois portraits 4/5 qui donnent le ton
+   d'un rayon. Piste qui se fait glisser sous 760px — une pile de trois
+   portraits pleine largeur ferait défiler la page sur trois écrans —
+   grille de trois au-dessus. Même encoche que les carrousels, donc le
+   premier visuel s'aligne sur le titre. */
+.shots{
+  --cards-inset:clamp(14px,3vw,44px);
+  display:flex;gap:clamp(10px,1.6vw,18px);
+  overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:0 var(--cards-inset);scroll-padding-left:var(--cards-inset);
+  scrollbar-width:none;-ms-overflow-style:none;
+  overscroll-behavior-x:contain;
+}
+.shots::-webkit-scrollbar{display:none}
+.shots figure{
+  position:relative;flex:0 0 min(76vw,340px);scroll-snap-align:start;margin:0;
+  aspect-ratio:4/5;border-radius:var(--radius-lg);overflow:hidden;
+  background:var(--surface-teal);box-shadow:var(--shadow-soft);
+}
+.shots img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+@media(min-width:760px){
+  .shots{
+    display:grid;grid-template-columns:repeat(3,1fr);overflow:visible;
+    max-width:1500px;margin-inline:auto;padding-inline:clamp(14px,3vw,44px);
+  }
+  .shots figure{flex:none;width:auto}
+}
+
 /* Duo d'écrans d'app : deux captures portrait côte à côte. */
 .screens{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,1.6vw,18px)}
 .screens figure{

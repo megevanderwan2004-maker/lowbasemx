@@ -24,7 +24,7 @@ distribué est copié dans `deploy/`.
 │   ├── tienda.html         boutique (/tienda)
 │   ├── wearables.html      rayon Wearables (/wearables)
 │   ├── suplementos.html    rayon Suplementos (/suplementos)
-│   ├── productos/          9 fiches produit — GÉNÉRÉES, ne pas éditer à la main
+│   ├── productos/          10 fiches produit — GÉNÉRÉES, ne pas éditer à la main
 │   ├── catalog.js          produits + objectifs : prix, textes, specs, médias
 │   ├── cart.js             panier + tiroir, hand-off vers le checkout Shopify
 │   ├── app.js              tout le comportement, en modules isolés
@@ -135,6 +135,17 @@ public et `assets/cirqa/documentos/` contient des documents revendeur
 confidentiels — voir l'avertissement de `PROJECT_CONTEXT.md` §10 avant d'y
 toucher.
 
+Le lot de 41 visuels de marque reçu le 21/08/2026 a été **classé par produit**
+(`cirqa/producto/`, `banda-cirqa/`, `venu-4/{producto,lifestyle,app}/`,
+`creatina/`, `promix-*/`, `absorption-sleep/`) plutôt que laissé dans le
+dossier fourre-tout où il est arrivé.
+
+⚠️ **Vérifier le format sur l'emballage avant de publier un visuel de marque.**
+Trois pièges rencontrés : `absorption-sleep/sleep-caja-14-sticks.png` montre un
+étui de **14** sticks et `sleep-bolsa-28-dosis.png` un sachet de **28 doses**,
+alors que la fiche vendait 7 sticks (d'où l'option Formato) ; à l'inverse le
+sachet Promix porte bien « 30 × 5 g Stick Packs », c'est notre SKU.
+
 ---
 
 ## Travailler sur le site
@@ -151,7 +162,7 @@ npm run serve
 npm run build
 ```
 
-Les 9 fiches produit sont générées puis **commitées** (`buildCommand` est nul
+Les 10 fiches produit sont générées puis **commitées** (`buildCommand` est nul
 côté Vercel). Oublier cette commande laisse les fiches périmées sans aucun
 avertissement.
 
@@ -302,9 +313,23 @@ vercel --prod
 
 ## Panier et Shopify
 
-**Les neuf produits sont branchés.** Chaque fiche de `catalog.js` porte un bloc
-`shopify` avec son handle et, selon le cas, sa variante unique ou sa table
-couleur × taille.
+**Les dix produits sont branchés.** Chaque fiche de `catalog.js` porte un bloc
+`shopify` avec son handle et l'une des **trois formes** de table de variantes :
+
+| Forme | Exemple | Écriture |
+|---|---|---|
+| Variante unique | Venu 3S, Relax | `shopify.variant = "id"` |
+| Une option | Venu 4 (couleur), Sleep (format) | `shopify.variants[valeur] = "id"` |
+| Deux options | CIRQA, Banda de repuesto | `shopify.variants[couleur][taille] = "id"` |
+
+`LOWLABS.variantOf(p, couleur, taille)` (dans `catalog.js`) est le **seul**
+endroit qui connaisse ces formes : la fiche, le bundle et le panier passent
+tous par lui. Ne pas relire `shopify.variants` à la main ailleurs.
+
+Une option peut aussi porter **son propre prix** — `sizes[i].price`, comme les
+trois formats de Sleep. `LOWLABS.priceOf(p, couleur, taille)` le résout, et
+`syncPrice()` dans `app.js` met à jour le prix affiché, le prix barré, le dock
+et l'intitulé du bouton. Sans ça le client lirait 499 et paierait 1 599.
 
 Le panier (`deploy/cart.js`) ne stocke que des **références de variantes** : le
 nom, la photo et le prix sont relus du catalogue au rendu. Au moment de payer,
@@ -320,6 +345,17 @@ simulée à l'écran.
 Pour brancher un nouveau produit : le créer dans Shopify, relever le handle et
 les IDs de variantes, ajouter le bloc `shopify` dans `catalog.js`, régénérer.
 
+### Coloris, formats et vues produit
+
+Un coloris peut porter **plusieurs vues** : `colors[i].image` est la principale,
+`colors[i].views[]` les suivantes. Toutes portent la couleur dans la galerie, si
+bien que le sélecteur amène sur la première vue du coloris et que le geste
+latéral fait défiler les autres avant de passer au coloris suivant. La CIRQA et
+la Venu 4 ont trois vues par coloris (face, capteur au dos, profil).
+
+L'intitulé de la seconde option se déclare : `sizeLabel: "Formato"` sur Sleep,
+« Talla » partout ailleurs. Il est repris par la fiche, le dock et le panier.
+
 ### CIRQA — couleur, visuel et variante
 
 Les quatre visuels de coloris sont les **rendus produit officiels Garmin**
@@ -332,6 +368,14 @@ bracelet), servis en local depuis `deploy/media/productos/cirqa/` :
 | Gris Francés | `cirqa-gris-frances.jpg` | `010-04675-01` / `-11` (Lin) |
 | Malva | `cirqa-malva.jpg` | `010-04675-02` / `-12` (Rose) |
 | Azul Capitán | `cirqa-azul-capitan.jpg` | `010-04675-03` / `-13` (Bleu Marine) |
+
+Ces quatre teintes sont confirmées par les **SKU de la boutique** : la variante
+« Gris Francés / L–XL » porte `010-04675-01`, que Garmin nomme *Lin*. Les
+bracelets Oliva Oscuro, Azul Francés et Gris Lima sont d'**autres** teintes,
+vendues séparément (voir la fiche `banda-cirqa`) — ne pas les confondre.
+
+Chaque coloris a trois vues : `cirqa-<color>.jpg` (trois-quarts),
+`-sensor.jpg` (capteur et LED) et `-perfil.jpg` (boucle ouverte).
 
 La chaîne est : **pastille → `state.color` → cadre de galerie portant
 `data-color` → variante Shopify** (`shopify.variants[couleur][taille]`). Aucune

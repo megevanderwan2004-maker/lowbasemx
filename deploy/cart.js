@@ -51,23 +51,31 @@
 
   function lineImage(p){ return p ? (p.packshot || p.image) : ""; }
 
+  /* L'intitulé de la seconde option se déclare dans la fiche : « Talla »
+     pour un bracelet, « Formato » pour une boîte de sticks. */
+  function sizeLabel(p){ return (p && p.sizeLabel) || "Talla"; }
+
+  /* Le prix d'une ligne dépend de l'option choisie : un format de Sleep ne
+     coûte pas le prix de la fiche. Le catalogue tranche. */
+  function linePrice(p, l){
+    if (!p) return 0;
+    if (CATALOG && CATALOG.priceOf) return CATALOG.priceOf(p, l.color, l.size).price;
+    return p.price;
+  }
+
   function lineOptions(l){
     var bits = [];
     if (l.color) bits.push(l.color);
-    if (l.size) bits.push("Talla " + l.size);
+    if (l.size) bits.push(sizeLabel(product(l)) + " " + l.size);
     return bits.join(" · ");
   }
 
   /* Le client corrige sa couleur ou sa taille sans repasser par la fiche :
      un menu par option, et la variante Shopify est recalculée derrière. */
   function variantFor(p, color, size){
-    var shop = p.shopify;
-    if (!shop) return null;
-    if (shop.variants && color){
-      var byColor = shop.variants[color];
-      if (byColor && size && byColor[size]) return byColor[size];
-    }
-    return shop.variant || null;
+    if (!p.shopify) return null;
+    return CATALOG && CATALOG.variantOf ? CATALOG.variantOf(p, color, size)
+                                        : (p.shopify.variant || null);
   }
 
   function pickers(p, l, i){
@@ -82,10 +90,11 @@
       html += "</select>";
     }
     if (p.sizes){
-      html += '<select data-var="size" data-i="' + i + '" aria-label="Talla">';
+      var slab = sizeLabel(p);
+      html += '<select data-var="size" data-i="' + i + '" aria-label="' + esc(slab) + '">';
       for (var z = 0; z < p.sizes.length; z++){
         var sname = p.sizes[z].name;
-        html += '<option value="' + esc(sname) + '"' + (sname === l.size ? " selected" : "") + '>Talla ' + esc(sname) + '</option>';
+        html += '<option value="' + esc(sname) + '"' + (sname === l.size ? " selected" : "") + '>' + esc(slab) + ' ' + esc(sname) + '</option>';
       }
       html += "</select>";
     }
@@ -113,7 +122,7 @@
     var t = 0;
     for (var i = 0; i < lines.length; i++){
       var p = product(lines[i]);
-      if (p) t += p.price * lines[i].qty;
+      if (p) t += linePrice(p, lines[i]) * lines[i].qty;
     }
     return t;
   }
@@ -230,7 +239,7 @@
                 '<button class="cart-rm" type="button" data-act="rm" data-i="' + i + '">Quitar</button>' +
               '</div>' +
             '</div>' +
-            '<b class="cart-price price-num">' + money(p.price * l.qty) + '</b>' +
+            '<b class="cart-price price-num">' + money(linePrice(p, l) * l.qty) + '</b>' +
           '</article>';
       }
       box.innerHTML = html;
