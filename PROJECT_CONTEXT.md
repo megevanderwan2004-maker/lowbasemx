@@ -43,7 +43,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 **Recent history** (`git log`, newest first)
 | Commit | Date | What changed |
 |--------|------|--------------|
-| `—` | 08-21 | **Venu 4 in 3 colours, Sleep in 3 formats, replacement band added** (Shopify variants created); shared variant/price resolver; 3 official views per CIRQA and Venu 4 colour; brand galleries on the supplements; lifestyle triptych on `/wearables` |
+| `dd108fb` | 08-21 | **Venu 4 in 3 colours, Sleep in 3 formats, replacement band added** (Shopify variants created); shared variant/price resolver; 3 official views per CIRQA and Venu 4 colour; brand galleries on the supplements; lifestyle triptych on `/wearables` |
 | `9dc1daa` | 08-21 | **Full-bleed pass**: zero gutter on phones, 1500px container, bigger carousel/chapter/goal media, taller bands; **Lenis** smooth scroll; CIRQA colours switched to the official Garmin renders |
 | `b0f2669` | 08-18 | `/wearables` and `/suplementos` get their own header loop (treadmill / capsules) |
 | `b8582a6` | 08-18 | Goal assistant switched to muted 9/16 loops, sized on the Garmin Connect box, white background |
@@ -310,6 +310,8 @@ Supplement prices are the brands' **one-time** (non-subscription) prices convert
 | Banda de repuesto | Gris Lima S–M / L–XL | 64326134333817 / 64326134366585 |
 | Banda de repuesto | Oliva Oscuro S–M / L–XL | 64326134399353 / 64326134432121 |
 | Banda de repuesto | Azul Francés S–M / L–XL | 64326134464889 / 64326134497657 |
+
+Every variant now carries its own image in Shopify (`productVariantsBulkUpdate` with a `mediaId`), so the checkout shows the colour or format the customer picked. On the CIRQA the four official renders were **added alongside** the older store photos rather than replacing them — the duplicates are harmless but can be tidied from the admin.
 
 Both option creations used `productOptionUpdate` with `variantStrategy: LEAVE_AS_IS`, which renames the existing `Title / Default Title` option in place: **the original variant IDs survived**, so no checkout link broke. The band product is `gid://shopify/Product/15731159859577`, handle `banda-cirqa-repuesto` (Shopify's auto-handle carried a ™ and was rewritten).
 
