@@ -94,11 +94,13 @@
      hauteur sous 1024px, où elle passe sur deux rangs. */
   --nav-h:64px;
 
-  /* Gouttière de la toile : la bande grise autour de la carte blanche.
-     Elle tombe à zéro sur téléphone — la carte y touche les deux bords —
-     et reste un filet sur grand écran, assez pour que la carte se lise
-     comme posée sur la toile sans rogner le contenu. */
-  --gutter:clamp(0px,.9vw,14px);
+  /* Gouttière de la toile : elle vaut zéro à toutes les largeurs depuis le
+     22/08/2026. Le site touche les quatre bords de l'écran, la « carte
+     posée sur une toile grise » n'existe plus. Le jeton reste pour les
+     règles qui s'en servent encore (bandeaux, hero) : les mettre à zéro
+     une par une n'apporterait rien et rendrait un retour en arrière
+     impossible. */
+  --gutter:0px;
 
   /* Boîte des visuels portrait : le 9/16 des boucles. Un seul jeton pour
      le chapitre éditorial et la carte objectif — les deux doivent rester
@@ -116,19 +118,32 @@ html{
   /* --dock-h = hauteur de la pilule seule ; +12px pour l'écart bas du dock,
      +16px de respiration. Mesurée en JS, jamais codée en dur. */
   scroll-padding-bottom:calc(var(--dock-h) + 28px + env(safe-area-inset-bottom,0px));
-  background:var(--canvas);
+  /* Aucun fond ici : le fond du document est celui de <body>, qui peut
+     changer selon la page. C'est lui qui peint les zones de sécurité —
+     derrière l'encoche et sous la barre d'accueil de l'iPhone. */
 }
 [id]{scroll-margin-top:calc(104px + var(--topbar-h))}
 body{
   font-family:var(--font-body);
   color:var(--ink);
-  background:var(--canvas);
+  /* Le fond du document déborde dans les zones de sécurité de l'iPhone.
+     Il prend donc la couleur de CE QUI COMMENCE la page, pour que la bande
+     derrière la caméra se confonde avec elle : blanc là où la page ouvre
+     sur du blanc, encre là où elle ouvre sur une vidéo sombre. */
+  background:var(--surface);
   line-height:1.6;
   font-size:1rem;
   -webkit-font-smoothing:antialiased;
-  /* Réserve constante pour le dock : ne change jamais, sinon le scroll saute. */
-  padding-bottom:calc(var(--dock-h) + 28px + env(safe-area-inset-bottom,0px));
+  /* La réserve du dock est portée par le pied de page, pas par le corps :
+     posée ici, elle laissait voir le fond du document sur 90px sous le
+     pied — ce qui se remarquait dès que ce fond a cessé d'être neutre. */
 }
+/* Pages qui ouvrent sur un visuel sombre : la home (hero vidéo) et les
+   deux rayons (bandeau d'en-tête). `has-dark-top` est posée dans le HTML,
+   comme `has-hero`. */
+body.has-hero,
+body.has-dark-top{background:#111214}
+
 img{max-width:100%;height:auto;display:block}
 a{color:var(--teal-700)}
 
@@ -348,10 +363,10 @@ footer::after{
    ========================================================================= */
 .shell{
   position:relative;z-index:0;isolation:isolate;
-  /* width plutôt qu'une simple marge auto : sans elle, la toile grise
-     n'apparaît sur aucun écran de moins de 1680px et l'effet « carte
-     posée sur un fond » disparaît complètement. */
-  max-width:1680px;
+  /* Plus de largeur maximale : au-delà de 1680px la carte laissait deux
+     bandes grises sur les grands écrans. C'est le contenu qui se borne
+     (`.container` à 1500px), pas la page. */
+  max-width:none;
   width:calc(100% - 2 * var(--gutter));
   /* Le bandeau est fixe et hors flux : sans cette réserve, le haut de la
      carte passerait dessous. */
@@ -361,7 +376,9 @@ footer::after{
      sur deux rangs et le hero, à ratio natif, devient trop court pour la
      porter : on descend alors la carte sous la pilule. */
 
-  border-radius:var(--radius-lg);
+  /* Coins droits : arrondir une surface qui touche les bords de l'écran
+     y dessinerait quatre encoches. */
+  border-radius:0;
   /* `hidden` puis `clip` : le second gagne là où il existe. Les deux
      rognent à l'arrondi, mais `hidden` fait de la carte un conteneur de
      défilement — et un `position:sticky` à l'intérieur (la galerie
@@ -370,22 +387,15 @@ footer::after{
      l'ignorent gardent `hidden` : le bandeau reste dans le cadre. */
   overflow:hidden;
   overflow:clip;
-  box-shadow:0 1px 2px rgba(23,25,27,.06),0 18px 50px rgba(23,25,27,.07);
-}
-/* Sous 700px la carte est l'écran : gouttière nulle et coins droits,
-   sinon quatre encoches grises se dessineraient contre le bord. */
-@media(max-width:699px){
-  :root{--gutter:0px}
-  .shell{border-radius:0}
 }
 /* La nav flotte au-dessus du hero, qui remplit désormais toute la hauteur
    disponible : aucune réserve à prévoir sur la page d'accueil. Les pages
    sans hero, elles, doivent démarrer sous la pilule. */
 body:not(.has-hero) .shell{
-  margin-top:calc(var(--topbar-h) + var(--nav-h) + var(--gutter) + 10px);
+  margin-top:calc(var(--topbar-h) + env(safe-area-inset-top,0px) + var(--nav-h) + var(--gutter) + 10px);
 }
 @media(min-width:1024px){
-  body:not(.has-hero) .shell{margin-top:calc(var(--topbar-h) + var(--gutter))}
+  body:not(.has-hero) .shell{margin-top:calc(var(--topbar-h) + env(safe-area-inset-top,0px) + var(--gutter))}
 }
 
 /* =========================================================================
@@ -439,7 +449,11 @@ body:not(.has-hero) .shell{
    Nav flottante — LOGO CENTRÉ
    ========================================================================= */
 .nav{
-  position:fixed;top:calc(var(--topbar-h) + clamp(8px,1.2vw,14px));left:0;right:0;
+  /* La zone de sécurité s'ajoute au calage : sur un iPhone à encoche la
+     page passe DESSOUS la barre d'état, et sans ce retrait la pilule s'y
+     glisserait. Sur tout écran sans encoche, `env()` vaut zéro et rien ne
+     bouge. */
+  position:fixed;top:calc(var(--topbar-h) + env(safe-area-inset-top,0px) + clamp(8px,1.2vw,14px));left:0;right:0;
   z-index:var(--z-nav);
   display:flex;justify-content:center;padding:0 12px;pointer-events:none;
 }
@@ -1011,13 +1025,18 @@ details .a{padding:18px 22px;color:var(--ink-soft);font-size:.94rem}
    ========================================================================= */
 footer{
   position:relative;
-  background:var(--lg-fill);color:var(--ink-soft);padding:56px 0 40px;font-size:.9rem;
+  background:var(--lg-fill);color:var(--ink-soft);font-size:.9rem;
+  /* 40px de respiration + la réserve du dock, qui était sur <body> : c'est
+     le pied qui peint désormais jusqu'au bas du document, zone de sécurité
+     de l'iPhone comprise. La réserve ne change jamais, sinon le
+     défilement sauterait. */
+  padding:56px 0 calc(40px + var(--dock-h) + 28px + env(safe-area-inset-bottom,0px));
   box-shadow:var(--lg-depth);
-  /* Même gouttière que la coquille : la bande grise reste continue. */
-  max-width:1680px;
+  /* Il suivait la carte : il suit maintenant la pleine largeur. */
+  max-width:none;
   width:calc(100% - 2 * var(--gutter));
   margin:var(--gutter) auto 0;
-  border-radius:var(--radius-lg);
+  border-radius:0;
 }
 @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
   footer{
@@ -1129,7 +1148,7 @@ footer a{color:var(--ink)}
   height:calc(100svh - var(--topbar-h) - var(--gutter));
   min-height:420px;
   background:#111214;
-  border-radius:var(--radius-lg) var(--radius-lg) var(--radius-md) var(--radius-md);
+  border-radius:0;
 }
 @supports not (height:100svh){
   .hero-full{height:calc(100vh - var(--topbar-h) - var(--gutter))}
@@ -1161,7 +1180,6 @@ footer a{color:var(--ink)}
      le temps de laisser passer la vidéo. */
   body.has-hero .shell{
     margin-top:0;overflow:visible;
-    border-radius:0 0 var(--radius-lg) var(--radius-lg);
   }
   body.has-hero .hero-full{
     height:100svh;height:100dvh;

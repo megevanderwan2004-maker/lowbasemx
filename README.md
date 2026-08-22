@@ -206,9 +206,21 @@ avertissement.
   lisent le **même jeton**, `--media-box` (`clamp(260px,25vw,380px)`, 9/16).
   C'est une demande explicite du propriétaire — retoucher l'une sans l'autre
   casse l'accord.
-- Ne pas rendre la gouttière à la carte sur téléphone : `--gutter` vaut zéro
-  sous 700px et `.shell` y perd ses coins arrondis. Le site doit toucher les
-  deux bords de l'écran.
+- **Le site est en pleine page depuis le 22/08/2026** : `--gutter` vaut zéro à
+  toutes les largeurs, `.shell` et `footer` n'ont plus ni largeur maximale, ni
+  coins arrondis, ni ombre. La « carte blanche posée sur une toile grise » a
+  été retirée à la demande du propriétaire — elle laissait deux bandes grises
+  sur tout écran de plus de 1680px. C'est le contenu qui se borne
+  (`.container`, 1500px), jamais la page.
+- **Le fond du document est celui de `<body>`, pas de `<html>`.** C'est lui qui
+  peint les zones de sécurité de l'iPhone — la bande derrière la caméra et
+  celle sous la barre d'accueil. Il prend donc la couleur de ce qui commence
+  la page : `body.has-hero` et `body.has-dark-top` (les deux rayons) le
+  passent à l'encre, les autres pages le laissent blanc. Poser une couleur
+  sur `<html>` rendrait ce choix impossible : une règle sur `<html>` ne peut
+  pas lire une classe de `<body>`.
+- La réserve du dock est portée par le **pied de page**, pas par `<body>` :
+  sur `<body>` elle laissait voir le fond du document sur 90px sous le pied.
 - Toute copie client est en espagnol (es-MX).
 - Accessibilité : skip link, radiogroups ARIA, cibles tactiles ≥ 44 px,
   `prefers-reduced-motion`.

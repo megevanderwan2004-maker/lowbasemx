@@ -24,7 +24,8 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 - **Goal assistant**: three cards carrying a muted 9/16 loop (`deploy/media/landing/objetivos/goal-*.mp4`, declared as `video`/`poster` on `GOALS` in `catalog.js`). The cards are deliberately the **same box as the Garmin Connect chapter loop** — both read the `--media-box` token, `clamp(260px,25vw,380px)` in 9/16 — and the track scrolls at every width, so on a phone one card reads whole and the next peeks. Section background is plain white, not the old sand gradient.
 - Carousel cards carry a **price button** in the same glass language as "Comprar", and discreet **dots** signal that a track scrolls. A track that already fits drops its arrows and its whole `.head-aside` row, so nothing empty is left under the title.
 - Editorial chapters (Garmin Connect, Cymbiotika): visual on one side, copy on the other, **side by side on mobile too**. Since 08-21 the two columns are sized rather than stretched (`--media-box` + `46ch`) and the pair is centred, so the copy no longer leaves a hole on one flank.
-- **Full-bleed layout (08-21)**: `--gutter` falls to zero below 700px — the card *is* the phone screen, square corners included — `.container` runs to 1500px, the closing banner and the cinematic bands touch both edges, and the aisle-page header takes hero height (`clamp(440px,74vh,820px)`).
+- **Full page (08-22)**: `.shell` and `footer` lost their 1680px cap, their radius and their shadow; the gutter is zero everywhere. The document background moved from `<html>` to `<body>` so a page class can set it — it is what paints the iPhone's safe areas, so it takes the colour of whatever opens the page (ink on the home and the two aisles, white elsewhere). The floating nav and the no-hero pages offset themselves by `env(safe-area-inset-top)`.
+- **Full-bleed media (08-21)**: `--gutter` falls to zero below 700px — the card *is* the phone screen, square corners included — `.container` runs to 1500px, the closing banner and the cinematic bands touch both edges, and the aisle-page header takes hero height (`clamp(440px,74vh,820px)`).
 - **Smooth scrolling**: one Lenis instance (`deploy/lenis.min.js`, the only npm dependency), started by the `smooth-scroll` module. Touch stays native, horizontal tracks keep their own gesture, `prefers-reduced-motion` skips it entirely. See section 9.
 - **Cart on every page**: drawer with image, name, chosen options, quantity, remove, subtotal; a cart icon in the nav carries the count. Lines are Shopify variant references; checkout is a Shopify cart permalink.
 - **Nav**: links, centred wordmark, cart icon. Nothing else — "Comprar" was removed on 2026-08-12. The three links are real pages: `/tienda`, `/wearables`, `/suplementos`; the current one carries `aria-current="page"`.
@@ -43,6 +44,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 **Recent history** (`git log`, newest first)
 | Commit | Date | What changed |
 |--------|------|--------------|
+| `—` | 08-22 | **Full page**: card identity removed (no max-width, radius or shadow), gutter zero everywhere, body paints the iPhone safe areas in the page's own opening colour, nav offset by the notch |
 | `dd108fb` | 08-21 | **Venu 4 in 3 colours, Sleep in 3 formats, replacement band added** (Shopify variants created); shared variant/price resolver; 3 official views per CIRQA and Venu 4 colour; brand galleries on the supplements; lifestyle triptych on `/wearables` |
 | `9dc1daa` | 08-21 | **Full-bleed pass**: zero gutter on phones, 1500px container, bigger carousel/chapter/goal media, taller bands; **Lenis** smooth scroll; CIRQA colours switched to the official Garmin renders |
 | `b0f2669` | 08-18 | `/wearables` and `/suplementos` get their own header loop (treadmill / capsules) |
@@ -231,7 +233,7 @@ A supplement that declares a `video` plays it inside `.fcard`; a radial mask dis
 Ink-to-ink gaps between home sections now sit in a **74–79px band on desktop**, with no outliers. Section padding is unchanged since 08-12; the 08-21 pass only grew the media inside. The home measures **7 309px desktop (1440×900) / 6 337px mobile (390×844)** — two chapters fewer, much larger visuals. Do not restore the old values without asking — the owner has asked three times for sections to sit closer.
 
 ### Measured layout variables
-- `--gutter` — grey canvas around the card: `clamp(0px,.9vw,14px)`, forced to `0` below 700px where `.shell` also drops its radius. The bands and the closing banner escape it with `margin-inline:calc(-1 * var(--gutter))`.
+- `--gutter` — **`0` at every width since 2026-08-22.** It used to hold the grey canvas around the white card; the card is gone (no max-width, no radius, no shadow on `.shell` or `footer`), so the site touches all four edges. The token stays because the bands, the closing banner and the hero still compute against it — zeroing them one by one would buy nothing and make a rollback impossible.
 - `--media-box` — the shared 9/16 box, `clamp(260px,25vw,380px)`: editorial chapter media **and** goal cards. Keep them equal.
 - `--dock-h` — buy dock height; `body { padding-bottom }` reserves it.
 - `--nav-h` — nav pill height; doubles below 1024px.
@@ -251,7 +253,6 @@ Full-bleed, `object-fit: cover`. The wordmark and tagline are **baked into the i
 | Width | What changes |
 |-------|--------------|
 | `640px` | Top bar text shrinks to stay on one line |
-| `699/700px` | `--gutter` drops to zero and `.shell` loses its radius: the card touches both edges of the phone |
 | `719/720px` | Media caps kick in; grids go 2-per-row; `Ver más` clamping activates |
 | `759/760px` | Hero switches from the desktop image to the **full-screen video**; hero CTAs stop being centred |
 | `899/900px` | Chapters and floating grids go multi-column; carousel arrows appear (when the track actually scrolls); editorial chapters take their desktop form; home carousels get their bounded, centred track |
