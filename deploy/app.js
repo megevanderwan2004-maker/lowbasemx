@@ -739,9 +739,20 @@
     /* .has-hero est posée dans le HTML, pas ici : elle conditionne la
        réserve haute de la carte, qui doit être bonne dès la première
        peinture — sinon le contenu saute au chargement du script. */
-    var hero = $("hero");
-    var flux = $("contenido");
-    if (!hero || !flux){ document.body.className += " past-hero"; return; }
+    /* Le visuel d'ouverture, quel qu'il soit : le hero de la home, ou la
+       bannière plein écran d'une page de rayon. Jusqu'au 22/08/2026 seul
+       `#hero` comptait, donc les deux rayons recevaient `past-hero` d'entrée
+       — le dock y rééchantillonnait le fond de la bannière en permanence,
+       exactement ce que la règle `body:not(.past-hero) .dock-shell` cherche
+       à éviter, et la pilule n'avait aucun moyen de savoir qu'elle flottait
+       sur une vidéo. */
+    var ouverture = $("hero") || document.querySelector(".cat-head");
+    /* Le repère est le bord haut de CE QUI SUIT le visuel : `#contenido` sur
+       la home, `.cat-list` sur un rayon. Ni l'un ni l'autre n'est collant,
+       la mesure est donc stable — le hero, lui, est épinglé et son propre
+       bord bas ne dit plus où il finit. */
+    var flux = ouverture && ouverture.nextElementSibling;
+    if (!ouverture || !flux){ document.body.className += " past-hero"; return; }
 
     /* Le repère est le bord haut de `main`, qui commence exactement là où
        le hero finit. Pas un IntersectionObserver : depuis le défilement

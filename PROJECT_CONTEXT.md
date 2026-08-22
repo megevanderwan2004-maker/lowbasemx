@@ -352,8 +352,15 @@ Until 2026-08-22 `/wearables` and `/suplementos` fell into `body:not(.has-hero) 
 `body.has-dark-top .shell{margin-top:0}` fixes both ends at once, and below 1024px `.cat-head .band-inner` takes `100dvh` (`100svh` fallback). Now measured 0 → 812, nav floating over it, CTA clearing the dock by 24px.
 
 Two consequences, do not undo them:
-- **`.cat-head .band.deep::after` inverts the top of its veil.** The nav's text is ink on a white halo, so it needs a *light* floor; the mid-page `deep` gradient darkens the top instead and would make the pill unreadable over a dark frame. Values copied from `.hero-full::before` so the pill reads the same on all three pages that float it.
+- **The top of the veil is gone**, here and on the hero — see below. `.cat-head .band.deep::after` keeps only its bottom floor.
 - **`.band-inner`'s bottom padding counts the dock** — at `100dvh` with bottom-aligned content the button was sliding under it.
+
+### The top of the video is no longer veiled
+The nav has no surface of its own, so its ink was made readable by a **42% white veil** over the hero's first 30% (`.hero-full::before`). Over a dark, flat video it was invisible. Over a video with bright areas at the top — the wooden ceiling on the wearables loop — it flattened the first ~250px into a uniform band: the page no longer read as a video starting at the top of the screen, but as **an empty area sitting above one**.
+
+Removed from both on 2026-08-22. Only the bottom floors remain, under the copy. The nav's contrast is carried by **the pill itself** while it floats over the opening visual: `body:not(.past-hero) .nav-pill` takes a white `.34 → .26` surface plus a rim. The contrast now plays out over the header's 350px instead of the image's first 250. The pill is a header and is allowed a surface — the reference, whoop.com, has a fully opaque one. On a page with no opening visual, `past-hero` is set on load and the pill keeps its original transparency; over white content it needs nothing. A .3s transition softens the switch. The `prefers-reduced-transparency` block restates the rule at equal specificity, otherwise the opening-visual rule would win and hand a translucent pill to someone who asked for the opposite.
+
+**`past-hero` now covers the aisles.** The module only knew `#hero`, so both aisle pages got the class on load: the dock resampled the banner's background permanently — exactly what `body:not(.past-hero) .dock-shell` exists to avoid — and the pill had no way to know it was floating over video. It now takes `#hero` **or** `.cat-head`, and measures the top edge of whatever follows (`#contenido` or `.cat-list`); neither is sticky, so the measurement stays valid where the pinned hero no longer reports where it ends.
 
 Desktop was already correct (top margin resolves to 0 above 1024px, `padding-top` clears the nav) and is untouched; the aisle banner stays at 74vh there, not full height.
 

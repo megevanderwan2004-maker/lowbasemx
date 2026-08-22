@@ -487,6 +487,19 @@ body.has-dark-top .shell{margin-top:0}
      donnaient encore l'impression d'une plaque posée : allégés d'autant.
      Le contraste du texte est repris par son halo (voir .nav-links a). */
   box-shadow:0 10px 30px rgba(23,25,27,.07);
+  transition:background .3s ease-out,box-shadow .3s ease-out;
+}
+/* Tant qu'elle flotte sur le visuel d'ouverture — hero de la home, bannière
+   de rayon — la pilule prend une vraie surface. C'est ce qui a remplacé le
+   voile blanc posé sur le haut de la vidéo : le contraste se joue sur les
+   350px de l'en-tête au lieu des 250 premiers de l'image, donc l'ouverture
+   reste une vidéo pleine et non une bande claire suivie d'une vidéo.
+   Sur une page sans visuel d'ouverture, `past-hero` est posée d'entrée et
+   la pilule garde sa transparence : sur du contenu blanc, elle n'a besoin
+   de rien. */
+body:not(.past-hero) .nav-pill{
+  background:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.26) 100%);
+  box-shadow:0 10px 30px rgba(23,25,27,.10),inset 0 0 0 1px rgba(255,255,255,.3);
 }
 .nav-pill::after{opacity:.4}
 @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
@@ -501,6 +514,10 @@ body.has-dark-top .shell{margin-top:0}
 }
 @media (prefers-reduced-transparency:reduce){
   .nav-pill,.dock-shell,footer{background:rgba(255,255,255,.98)}
+  /* Redit avec la même spécificité que la règle du visuel d'ouverture,
+     sinon celle-ci l'emporterait et rendrait la pilule translucide à
+     quelqu'un qui a justement demandé le contraire. */
+  body:not(.past-hero) .nav-pill{background:rgba(255,255,255,.98)}
 }
 
 /* Les liens restent visibles à tous les formats : sous 1024px la rangée
@@ -1233,15 +1250,17 @@ body.has-hero #contenido{position:relative;z-index:1;background:var(--surface)}
 
 /* Deux planchers de contraste : en haut pour la nav en verre transparent,
    en bas pour les actions. Le milieu du visuel reste intact. */
+/* Un seul plancher, en bas, pour les actions. Le haut de la vidéo est laissé
+   INTACT depuis le 22/08/2026 : il portait un voile blanc à 42 % censé rendre
+   la nav lisible, mais sur les premiers 30 % de la hauteur il aplatissait
+   l'image en une bande claire uniforme — on ne lisait plus une vidéo qui
+   commence en haut de l'écran, mais une zone vide posée au-dessus d'elle.
+   Le contraste de la nav est repris par la pilule elle-même, qui est un
+   en-tête et a le droit d'avoir une surface (voir `body:not(.past-hero)
+   .nav-pill`). */
 .hero-full::before{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:
-    /* Voile haut inversé : la nav n'a plus de surface propre et son texte
-       est encre. C'est donc un dégradé CLAIR qui lui rend sa lisibilité —
-       assombrir jouerait contre elle. Il reste assez léger pour laisser
-       voir la vidéo. */
-    linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.14) 16%,rgba(255,255,255,0) 30%),
-    linear-gradient(180deg,rgba(12,13,14,0) 56%,rgba(12,13,14,.46) 100%);
+  background:linear-gradient(180deg,rgba(12,13,14,0) 56%,rgba(12,13,14,.46) 100%);
 }
 .hero-full::after{
   content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
@@ -1679,15 +1698,12 @@ body.has-hero #contenido{position:relative;z-index:1;background:var(--surface)}
 /* Certaines sources sont des visuels clairs (gélules dorées, tissu beige) :
    le voile sombre y suffit, mais le texte a besoin d'un plancher plus haut. */
 .band.deep::after{background:linear-gradient(180deg,rgba(12,13,14,.42) 0%,rgba(12,13,14,.3) 40%,rgba(12,13,14,.82) 100%)}
-/* En-tête de rayon : le haut du voile s'inverse. La nav flotte maintenant SUR
-   la bannière, et son texte est de l'encre posée sur un halo blanc — il lui
-   faut un plancher CLAIR. Assombrir le haut, comme le fait `.deep` au milieu
-   de page, jouerait contre elle. Mêmes valeurs que `.hero-full::before`, pour
-   que la pilule se lise pareil sur les trois pages qui la font flotter. */
+/* En-tête de rayon : le haut du voile disparaît, comme sur le hero. Le
+   dégradé `deep` d'un bandeau de milieu de page assombrit ses 40 premiers
+   pour-cent — sur une ouverture plein écran, cela ternit précisément ce que
+   l'on veut montrer. Ne reste que le plancher du bas, sous le texte. */
 .cat-head .band.deep::after{
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.14) 16%,rgba(255,255,255,0) 30%),
-    linear-gradient(180deg,rgba(12,13,14,0) 40%,rgba(12,13,14,.82) 100%);
+  background:linear-gradient(180deg,rgba(12,13,14,0) 40%,rgba(12,13,14,.82) 100%);
 }
 /* Variante centrée : le texte occupe le milieu, pas le bas. */
 .band.center .band-inner{justify-content:center;align-items:center;text-align:center}

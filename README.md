@@ -315,14 +315,44 @@ plus de vidéo rognée en bas.
 
 Deux conséquences à ne pas défaire :
 
-- **`.cat-head .band.deep::after` inverse le haut de son voile.** Le texte de la
-  nav est de l'encre posée sur un halo blanc : il lui faut un plancher *clair*.
-  Le dégradé `deep` d'un bandeau de milieu de page assombrit au contraire le
-  haut, ce qui rendrait la pilule illisible dès que la vidéo passe sur un plan
-  sombre. Les valeurs sont celles de `.hero-full::before`, pour que la pilule se
-  lise pareil sur les trois pages qui la font flotter.
+- **Le haut du voile est retiré**, ici comme sur le hero — voir la section
+  suivante. `.cat-head .band.deep::after` ne garde que le plancher du bas.
 - **La réserve basse de `.band-inner`** compte le dock : à `100dvh` avec un
   contenu calé en bas, le bouton passait sous lui.
+
+## Le haut de la vidéo n'est plus voilé
+
+La nav n'ayant pas de surface propre, son encre était rendue lisible par un
+**voile blanc à 42 %** posé sur les 30 premiers pour-cent du hero
+(`.hero-full::before`) puis, brièvement, des bannières de rayon. Sur une vidéo
+sombre et plate ce voile ne se voyait pas. Sur une vidéo qui a des zones claires
+en haut — le plafond de bois du rayon wearables — il aplatissait les 250
+premiers pixels en une bande uniforme : on ne lisait plus une vidéo qui commence
+en haut de l'écran, mais **une zone vide posée au-dessus d'elle**.
+
+Retiré des deux le 22/08/2026. Ne restent que les planchers du bas, sous les
+textes. Le contraste de la nav est repris par **la pilule elle-même**, tant
+qu'elle flotte sur le visuel d'ouverture :
+
+```
+body:not(.past-hero) .nav-pill   surface blanche .34 → .26 + liseré
+```
+
+Le raisonnement : le contraste se joue désormais sur les 350px de l'en-tête au
+lieu des 250 premiers de l'image. La pilule est un en-tête, elle a le droit
+d'avoir une surface — la référence, whoop.com, en a une complètement opaque.
+Sur une page sans visuel d'ouverture, `past-hero` est posée d'entrée et la
+pilule garde sa transparence d'origine : sur du contenu blanc, elle n'a besoin
+de rien. Le passage de l'une à l'autre est adouci par une transition de .3s.
+
+**`past-hero` couvre maintenant les rayons.** Jusque-là le module ne connaissait
+que `#hero`, donc les deux rayons recevaient la classe d'entrée : le dock y
+rééchantillonnait le fond de la bannière en permanence — exactement ce que
+`body:not(.past-hero) .dock-shell` cherche à éviter — et la pilule n'avait aucun
+moyen de savoir qu'elle flottait sur une vidéo. Le module prend désormais
+`#hero` **ou** `.cat-head`, et mesure le bord haut de ce qui les suit
+(`#contenido` ou `.cat-list`) : ni l'un ni l'autre n'est collant, donc la mesure
+reste stable là où le hero, épinglé, ne dit plus où il finit.
 
 ## Défilement « feuille » — le hero ne défile pas
 
