@@ -67,8 +67,10 @@ deploy/media/
 │   └── absorption-sleep/       packshot 7 sticks
 │
 ├── landing/
-│   ├── hero/                   hero-runners.jpg (desktop), hero-mobile.mp4
-│   │                           + son affiche (plein écran sous 760px)
+│   ├── hero/                   hero-desktop.mp4 + son affiche (au-dessus de
+│   │                           760px), hero-mobile.mp4 + son affiche (plein
+│   │                           écran sous 760px). hero-runners.jpg : l'ancien
+│   │                           visuel desktop, conservé, plus référencé
 │   ├── objetivos/              les 3 boucles de l'assistant + leurs affiches
 │   ├── bandas/                 boucles des bandeaux pleine largeur + affiches
 │   │                           (dont les deux en-têtes `loop-*-hero` des rayons)
@@ -229,22 +231,30 @@ avertissement.
 
 ## Le hero
 
-Deux visuels, deux comportements :
+Deux boucles vidéo, deux comportements :
 
-- **Desktop** — `hero-runners.jpg`, wordmark et baseline incrustés, dans la
-  carte à coins arrondis. L'image est portée par un `<source>` : sous 760px
-  aucune source ne correspond et seul un GIF transparent d'un pixel est chargé,
-  le mobile ne paie donc pas ses 172 ko.
+- **Desktop** — `hero-desktop.mp4` (736×414, 6 s, 416 ko), en `object-fit:cover`
+  sur toute la hauteur disponible. Depuis le 22/08/2026 : c'était
+  `hero-runners.jpg` avant, une photo qui portait le wordmark et la baseline
+  **incrustés**. La vidéo ne les porte pas — ils sont repris en HTML dans
+  `.hero-mark`, un bloc optiquement centré qui n'existe qu'au-dessus de 760px.
+  Le fichier source est en 736 px de large : il est **agrandi 2 à 3,4 fois**
+  selon l'écran, ce que son étalonnage sombre et son flou de profondeur rendent
+  acceptable, mais qui reste un plafond de qualité.
 - **Mobile (< 760px)** — `hero-mobile.mp4` en **plein écran** : `100dvh` avec
   `100svh` en repli pour suivre la barre d'adresse, bord à bord grâce à
   `margin-inline:-gutter`, la carte renonçant à sa marge haute, à son coin et à
   son clipping le temps de le laisser passer. La vidéo est en 9/16 : un écran
-  plus étroit la rogne sur les côtés, le wordmark est centré et y survit.
+  plus étroit la rogne sur les côtés, le wordmark **y est toujours incrusté** et
+  survit au recadrage. C'est pourquoi `.hero-mark` est masquée sous 760px : elle
+  dédoublerait le wordmark. La baseline, elle, sort du cadre et est reprise par
+  `.hero-tagline`, qui ne vit que sous ce seuil.
 
-La boucle n'a **ni `autoplay` ni `poster`** : les deux déclenchent le
-téléchargement même quand l'élément est masqué, et le desktop paierait la
-vidéo pour rien. C'est `section-loops` qui lance la lecture à l'entrée dans le
-cadre, et l'affiche est un fond CSS déclaré dans la requête média.
+Aucune des deux boucles n'a **d'`autoplay` ni de `poster`** : les deux
+déclenchent le téléchargement même quand l'élément est masqué, et chaque format
+paierait la vidéo de l'autre. C'est `section-loops` qui lance la lecture à
+l'entrée dans le cadre — donc jamais pour la boucle en `display:none` — et
+chaque affiche est un fond CSS déclaré à côté de sa boucle.
 
 ## Les pages de rayon — `/wearables` et `/suplementos`
 

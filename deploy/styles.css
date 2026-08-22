@@ -1153,12 +1153,19 @@ footer a{color:var(--ink)}
 @supports not (height:100svh){
   .hero-full{height:calc(100vh - var(--topbar-h) - var(--gutter))}
 }
-/* Le wordmark incrusté est centré : en recadrage « cover » il survit à
-   tous les formats. La baseline, elle, occupe le coin bas droit et sort
-   du cadre sur mobile — elle y est reprise en HTML (voir .hero-tagline). */
-.hero-still{
+/* Desktop : la boucle vidéo remplace la photo depuis le 22/08/2026. Elle
+   reste hors du DOM visible sous 760px — display:none suffit, l'observateur
+   de `section-loops` ne la croise alors jamais et son `preload=none` évite
+   tout téléchargement sur téléphone. L'affiche est un fond CSS et non un
+   attribut `poster`, pour la même raison : déclarée ici, elle n'est demandée
+   que par les écrans qui voient la boucle, et elle tient lieu de visuel
+   quand le mouvement est réduit.
+   Recadrage centré et non « center 46% » comme la photo : le sujet de la
+   vidéo est la ligne d'horizon, qui traverse le milieu du cadre. */
+.hero-loop-desktop{
   position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;object-position:center 46%;z-index:1;
+  object-fit:cover;object-position:center;z-index:1;
+  background:#111214 url("/media/landing/hero/poster-hero-desktop.jpg") center/cover no-repeat;
 }
 /* Mobile : la boucle vidéo remplace l'image. Elle reste hors du DOM
    visible au-dessus de 760px — display:none suffit, l'observateur de
@@ -1186,7 +1193,7 @@ footer a{color:var(--ink)}
     aspect-ratio:auto;max-height:none;min-height:0;border-radius:0;
     margin-inline:calc(-1 * var(--gutter));
   }
-  .hero-still{display:none}
+  .hero-loop-desktop{display:none}
   .hero-loop{
     display:block;position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;object-position:center;z-index:1;
@@ -1214,12 +1221,12 @@ footer a{color:var(--ink)}
   background-image:var(--grain);background-repeat:repeat;background-size:160px 160px;
 }
 @media (min-resolution:2dppx){.hero-full::after{background-size:96px 96px;opacity:.1}}
-/* L'image porte déjà le wordmark : l'overlay se contente des actions.
-   Sous 760px le visuel devient trop court pour porter des boutons —
-   ils repassent alors dans le flux, sur le fond sombre du bloc. */
-/* Les actions sont toujours posées SUR l'image : en flux normal elles
-   ajouteraient une bande sombre sous le visuel, qui donnait l'impression
-   d'un hero coupé en deux. */
+/* Cet overlay ne porte que les actions : le wordmark et la baseline vivent
+   dans .hero-mark, optiquement centré, alors que les boutons restent ancrés
+   en bas. Les deux blocs sont séparés pour cette seule raison.
+   Les actions sont toujours posées SUR le visuel : en flux normal elles
+   ajouteraient une bande sombre sous lui, qui donnait l'impression d'un hero
+   coupé en deux. */
 .hero-full-inner{
   position:absolute;left:0;right:0;bottom:0;z-index:var(--z-content);
   display:flex;flex-direction:column;align-items:center;
@@ -1242,17 +1249,35 @@ footer a{color:var(--ink)}
   .hero-full-inner .btn{flex:1 1 0;min-width:0;padding:12px 10px;font-size:.85rem;min-height:46px}
 }
 @media(min-width:760px){
-  /* Les deux actions sont centrées sous le wordmark incrusté, lui aussi
-     centré ; la baseline garde son coin bas droit. */
+  /* Les deux actions sont centrées sous .hero-mark, lui aussi centré. La
+     baseline y est reprise : celle-ci ne sert plus qu'au mobile. */
   .hero-full-inner{
     align-items:center;
     padding:0 clamp(18px,4vw,40px) calc(clamp(28px,4vw,56px) + var(--dock-h));
   }
   .hero-tagline{display:none}
 }
+/* Le wordmark et la baseline étaient incrustés dans la photo. La vidéo ne
+   les porte pas : ils reviennent en HTML, et seulement au-dessus de 760px —
+   sous ce seuil la boucle mobile porte encore son wordmark incrusté, et la
+   baseline est déjà reprise par .hero-tagline.
+   Le bloc est optiquement centré, là où le wordmark de la photo se trouvait.
+   La réserve basse retire le dock du calcul : sans elle, le centre
+   géométrique place le wordmark trop bas dans l'espace réellement visible. */
+.hero-mark{
+  display:none;
+  position:absolute;inset:0;z-index:var(--z-content);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:clamp(10px,1.3vw,18px);
+  padding:0 clamp(18px,4vw,40px) calc(var(--dock-h) + clamp(40px,7vh,90px));
+  /* Rien n'est cliquable ici : le bloc couvre tout le hero et intercepterait
+     autrement le survol de la nav et des boutons. */
+  pointer-events:none;
+}
+@media(min-width:760px){.hero-mark{display:flex}}
 .hero-full .wordmark{
   font-family:var(--font-display);font-weight:600;color:#fff;line-height:.92;
-  letter-spacing:-.05em;font-size:clamp(3rem,10vw,7rem);
+  letter-spacing:-.05em;font-size:clamp(3rem,8vw,6.4rem);
   text-shadow:0 6px 60px rgba(12,13,14,.4);
 }
 .hero-full .wordmark-sub{

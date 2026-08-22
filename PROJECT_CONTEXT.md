@@ -242,12 +242,14 @@ Ink-to-ink gaps between home sections now sit in a **74–79px band on desktop**
 `body.has-hero` (static in `index.html`) decides whether the shell starts under the nav or lets the hero run beneath it.
 
 ### Hero
-Full-bleed, `object-fit: cover`. The wordmark and tagline are **baked into the image**:
-- Source is `1366×768` — do not upscale it.
-- **Below 760px the hero is a full-screen video**, not the image: `hero-mobile.mp4` (720×1280, wordmark baked in by the owner), `height:100dvh` with `100svh` as fallback so it follows the address bar on recent phones. It escapes the card's gutter with `margin-inline:-gutter`, and `body.has-hero .shell` drops its top margin, its top radius and its clipping to let it through — the rest of the card keeps its gutter and corners. The 9/16 video is wider than a phone screen, so `cover` trims the sides; the wordmark is centred and survives.
-- `hero-runners-mobile.jpg` (384×768) is the previous mobile crop, now unused but kept.
-- The desktop image is carried by a `<source>` inside `<picture>` with a 1×1 transparent `src` fallback: `display:none` does not stop an `<img>` from loading, and mobile was paying 172 kB for a visual it never shows. Symmetrically the video has neither `autoplay` nor `poster` — both trigger a download even when hidden — so `section-loops` starts it and the poster is a CSS background inside the media query.
-- Above 760px the two CTAs are **centred** (`.hero-full-inner{align-items:center}`).
+Full-bleed, `object-fit: cover`. **Two video loops, one per format** — since 2026-08-22 the desktop side is a video too, not a photo:
+- **Above 760px**: `hero-desktop.mp4` (`736×414`, 6.26 s, 24 fps, no audio track, 416 kB), `.hero-loop-desktop`, cropped `center`. It replaced `hero-runners.jpg`, which carried the wordmark and the tagline **baked in**. The video does not carry them, so they came back as HTML in `.hero-mark` — a `position:absolute; inset:0` flex column, optically centred, `pointer-events:none`, `display:flex` **only** above 760px. It reuses the `.hero-full .wordmark` / `.wordmark-sub` rules that had been dead CSS since the wordmark was baked in.
+- The source is only 736 px wide, so it is **upscaled 2×–3.4×** depending on the screen. Its dark grading and shallow depth of field hide most of it, but that is the ceiling: a higher-resolution master is the only way to raise it.
+- **Below 760px the hero is a full-screen video**: `hero-mobile.mp4` (720×1280, wordmark baked in by the owner), `height:100dvh` with `100svh` as fallback so it follows the address bar on recent phones. It escapes the card's gutter with `margin-inline:-gutter`, and `body.has-hero .shell` drops its top margin, its top radius and its clipping to let it through — the rest of the card keeps its gutter and corners. The 9/16 video is wider than a phone screen, so `cover` trims the sides; the wordmark is centred and survives.
+- **`.hero-mark` is hidden below 760px on purpose**: the mobile loop still has its own wordmark baked in, and showing the HTML one would double it. The tagline is the mirror case — it falls outside the mobile crop, so `.hero-tagline` carries it under 760px and is `display:none` above.
+- `hero-runners.jpg` (1366×768) and `hero-runners-mobile.jpg` (384×768) are the previous desktop visual and its mobile crop — kept, referenced by nothing.
+- **Neither loop has `autoplay` or `poster`** — both trigger a download even when the element is `display:none`, and each format would pay for the other's video. `section-loops` starts playback on intersection (a `display:none` element never intersects, so the hidden loop is never even fetched) and each poster is a CSS background declared next to its loop.
+- Above 760px the two CTAs are **centred** (`.hero-full-inner{align-items:center}`) and stay anchored to the bottom of the hero; `.hero-mark` sits in the middle, above them.
 
 ### Responsive breakpoints
 | Width | What changes |
@@ -427,7 +429,9 @@ deploy/media/
 │   ├── promix-relax/       promix-relax.png
 │   └── absorption-sleep/   absorption-sleep.png
 ├── landing/
-│   ├── hero/               hero-runners.jpg + hero-runners-mobile.jpg
+│   ├── hero/               hero-desktop.mp4 + poster-hero-desktop.jpg,
+│   │                       hero-mobile.mp4 + poster-hero-mobile.jpg,
+│   │                       hero-runners.jpg + hero-runners-mobile.jpg (retirés)
 │   ├── objetivos/          goal-dormir / -rendimiento / -salud .mp4 (+ posters)
 │   ├── bandas/             loop-wearables, loop-capsulas, loop-brand,
 │   │                       loop-wearables-hero, loop-suplementos-hero (+ posters)
@@ -535,7 +539,7 @@ vercel --prod
 - **Do not reintroduce green.** The `--teal-*` names are historical; their values are grey.
 - **Do not unscope the `#lg-refract` backdrop filter** from the Firefox guard.
 - **Do not lower the `--lg-fill` floor opacity** below `.64`.
-- **Do not upscale `hero-runners.jpg`** — the source is 1366×768.
+- **Do not upscale `hero-desktop.mp4`** — the source is 736×414 and already stretched 2×–3.4× by `cover`. Re-encoding it larger adds bytes, not detail; only a higher-resolution master helps.
 - **Do not remove `outputDirectory: "deploy"`** from `vercel.json`.
 - **Do not open a second Lenis instance, a second `requestAnimationFrame` loop, or add another scroll/animation library.** One instance, `autoRaf`, and the reveals stay on `IntersectionObserver`.
 - **Do not call `window.scrollTo` directly** in `app.js` — use `scrollToY()`, or `LOWSCROLL` from another file.

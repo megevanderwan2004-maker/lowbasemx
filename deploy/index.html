@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://cdn.shopify.com">
 <!-- Typographie verrouillée : Outfit (titres) + DM Sans (texte courant). Aucune autre famille sur le site. -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="/media/landing/hero/hero-runners.jpg" media="(min-width: 760px)" fetchpriority="high">
+<link rel="preload" as="image" href="/media/landing/hero/poster-hero-desktop.jpg" media="(min-width: 760px)" fetchpriority="high">
 <link rel="preload" as="image" href="/media/landing/hero/poster-hero-mobile.jpg" media="(max-width: 759px)" fetchpriority="high">
 <script>
 document.documentElement.className += " js";
@@ -78,17 +78,18 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
   <!-- ===== Hero pleine largeur ===== -->
   <header class="hero-full" id="hero">
-    <!-- Desktop : le visuel d'origine, wordmark incrusté. Il est porté par
-         un <source> plutôt que par le src : `display:none` n'empêche pas
-         une image de se télécharger, et le mobile paierait 172 ko pour un
-         visuel qu'il n'affiche jamais. Sous 760px aucune source ne
-         correspond, le src de repli (1 px transparent) est donc le seul
-         octet chargé. -->
-    <picture>
-      <source media="(min-width: 760px)" srcset="/media/landing/hero/hero-runners.jpg">
-      <img class="hero-still" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-           alt="" aria-hidden="true" width="1366" height="768" fetchpriority="high">
-    </picture>
+    <!-- Desktop : boucle vidéo, depuis le 22/08/2026. Mêmes précautions que
+         la boucle mobile juste dessous — ni `autoplay` ni `poster`, qui
+         déclenchent le téléchargement même quand l'élément est en
+         display:none, et le téléphone paierait 416 ko pour un visuel qu'il
+         n'affiche jamais. C'est `section-loops` qui lance la lecture quand
+         la boucle entre dans le cadre, donc jamais sous 760px, et l'affiche
+         est posée en fond CSS au-dessus. -->
+    <video class="hero-loop-desktop" muted loop playsinline webkit-playsinline preload="none"
+           disablepictureinpicture disableremoteplayback
+           width="736" height="414" aria-hidden="true" tabindex="-1" data-autoloop>
+      <source src="/media/landing/hero/hero-desktop.mp4" type="video/mp4">
+    </video>
     <!-- Mobile : boucle vidéo à la place de l'image. Ni `autoplay` ni
          `poster` ici — les deux déclenchent le téléchargement même quand
          l'élément est en display:none. C'est `section-loops` qui lance la
@@ -99,9 +100,16 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
            width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
       <source src="/media/landing/hero/hero-mobile.mp4" type="video/mp4">
     </video>
-    <!-- Le wordmark est incrusté dans l'image : le répéter en HTML le
-         dédoublerait. Le titre reste accessible via le h1 hors écran. -->
     <h1 class="sr-only">lowlabs — curated wellness and technology</h1>
+    <!-- La photo portait le wordmark et la baseline incrustés ; la vidéo,
+         non. Ils reviennent donc en HTML, au-dessus de 760px seulement :
+         sous ce seuil c'est la boucle mobile qui porte le wordmark, et la
+         baseline est déjà reprise par .hero-tagline. Décoratifs — le h1
+         hors écran ci-dessus dit déjà les mêmes mots. -->
+    <div class="hero-mark rv" aria-hidden="true">
+      <p class="wordmark">lowlabs</p>
+      <p class="wordmark-sub" lang="en">Curated <b>wellness</b> and <b>technology</b></p>
+    </div>
     <div class="hero-full-inner">
       <p class="hero-tagline rv" lang="en">Curated <b>wellness</b> and <b>technology</b></p>
       <div class="hero-actions rv">
