@@ -346,6 +346,17 @@ The CIRQA entry declares **`shotFit: "contain"`** — a per-product flag read by
 
 `shotFit` does a second, less obvious thing: `.gal-stage:has(.gal-frame.contain)` turns the frame white. Without the flag the frame keeps `--surface-teal`, and a transparent packshot sits on a grey plate — which reads as a background stuck to the product. That was Debloat until 2026-08-22: its PNG was already cut out, the grey came from the page. **Any product whose main visual is a cut-out must declare `shotFit: "contain"`.**
 
+### Aisle headers reach the top of the screen
+Until 2026-08-22 `/wearables` and `/suplementos` fell into `body:not(.has-hero) .shell` and reserved `env(safe-area-inset-top) + 110px` of nav below 1024px. Measured at 375×812: the video started at y=120 and stopped at 601px (74vh) — a dead ink band above it, and a video cropped at both ends, with the CTA sliding under the dock. whoop.com does the opposite: their hero starts at y=0 and the header sits *on* it.
+
+`body.has-dark-top .shell{margin-top:0}` fixes both ends at once, and below 1024px `.cat-head .band-inner` takes `100dvh` (`100svh` fallback). Now measured 0 → 812, nav floating over it, CTA clearing the dock by 24px.
+
+Two consequences, do not undo them:
+- **`.cat-head .band.deep::after` inverts the top of its veil.** The nav's text is ink on a white halo, so it needs a *light* floor; the mid-page `deep` gradient darkens the top instead and would make the pill unreadable over a dark frame. Values copied from `.hero-full::before` so the pill reads the same on all three pages that float it.
+- **`.band-inner`'s bottom padding counts the dock** — at `100dvh` with bottom-aligned content the button was sliding under it.
+
+Desktop was already correct (top margin resolves to 0 above 1024px, `padding-top` clears the nav) and is untouched; the aisle banner stays at 74vh there, not full height.
+
 ### Sheet scroll — the hero does not scroll
 Taken from **whoop.com** on 2026-08-22, on both breakpoints. The hero stays pinned to the top of the window and the content rises **over** it like an opaque sheet. Three rules:
 

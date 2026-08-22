@@ -397,6 +397,14 @@ body:not(.has-hero) .shell{
 @media(min-width:1024px){
   body:not(.has-hero) .shell{margin-top:calc(var(--topbar-h) + env(safe-area-inset-top,0px) + var(--gutter))}
 }
+/* Les deux rayons ouvrent sur une bannière plein cadre, exactement comme la
+   home ouvre sur son hero : elle doit donc toucher le haut de l'ÉCRAN, la nav
+   flottant dessus. Sans cette exception ils tombaient dans
+   `body:not(.has-hero)` et se réservaient 110px de nav sous 1024px — une bande
+   d'encre morte au-dessus de la vidéo, et une vidéo rognée d'autant. C'est ce
+   que fait whoop.com : leur vidéo part de y=0 et c'est l'en-tête qui se pose
+   dessus, jamais l'inverse. */
+body.has-dark-top .shell{margin-top:0}
 
 /* =========================================================================
    Bandeau défilant — fixé tout en haut, au-dessus de la nav
@@ -1497,10 +1505,20 @@ body.has-hero #contenido{position:relative;z-index:1;background:var(--surface)}
 /* La bannière tient lieu de hero : elle prend la hauteur d'écran, comme
    le hero de la home, au lieu des 58vh d'un bandeau de milieu de page. */
 .cat-head .band-inner{min-height:clamp(440px,74vh,820px)}
-/* Sous 1024px la nav passe sur deux rangs et la carte descend déjà sous
-   la pilule : le bandeau n'a plus à lui réserver de hauteur. */
 @media(min-width:1024px){
+  /* La nav flotte sur la bannière : le texte lui laisse la place. */
   .cat-head .band-inner{padding-top:clamp(84px,8.6vw,108px)}
+}
+@media(max-width:1023px){
+  /* Toute la hauteur visible, comme le hero de la home : `dvh` suit la barre
+     d'adresse des téléphones récents, `svh` sert de repli. Avant, la bannière
+     s'arrêtait à 74vh — soit 601px sur 812 — et laissait la grille pointer
+     sous elle : la vidéo était coupée en haut ET en bas. */
+  .cat-head .band-inner{
+    min-height:100svh;min-height:100dvh;
+    /* Le texte est calé en bas : sans cette réserve il passe sous le dock. */
+    padding-bottom:calc(clamp(20px,3.4vw,52px) + var(--dock-h) + 16px + env(safe-area-inset-bottom,0px));
+  }
 }
 .cat-list{padding-top:clamp(24px,3.4vw,44px)}
 /* Le bandeau de passerelle ferme la page : il touche le bas de la carte,
@@ -1661,6 +1679,16 @@ body.has-hero #contenido{position:relative;z-index:1;background:var(--surface)}
 /* Certaines sources sont des visuels clairs (gélules dorées, tissu beige) :
    le voile sombre y suffit, mais le texte a besoin d'un plancher plus haut. */
 .band.deep::after{background:linear-gradient(180deg,rgba(12,13,14,.42) 0%,rgba(12,13,14,.3) 40%,rgba(12,13,14,.82) 100%)}
+/* En-tête de rayon : le haut du voile s'inverse. La nav flotte maintenant SUR
+   la bannière, et son texte est de l'encre posée sur un halo blanc — il lui
+   faut un plancher CLAIR. Assombrir le haut, comme le fait `.deep` au milieu
+   de page, jouerait contre elle. Mêmes valeurs que `.hero-full::before`, pour
+   que la pilule se lise pareil sur les trois pages qui la font flotter. */
+.cat-head .band.deep::after{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.14) 16%,rgba(255,255,255,0) 30%),
+    linear-gradient(180deg,rgba(12,13,14,0) 40%,rgba(12,13,14,.82) 100%);
+}
 /* Variante centrée : le texte occupe le milieu, pas le bas. */
 .band.center .band-inner{justify-content:center;align-items:center;text-align:center}
 .band.center .band-inner h2,.band.center .band-inner p{max-width:22ch;margin-inline:auto}

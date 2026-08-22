@@ -299,9 +299,30 @@ Chaque page a sa propre boucle d'en-tête (`bandas/loop-wearables-hero.mp4`,
 gardent `loop-wearables` et `loop-capsulas` : ce sont des fichiers distincts,
 ne pas les fusionner.
 
-L'en-tête de rayon tient lieu de hero : `.cat-head .band-inner` est à
-`clamp(440px,74vh,820px)`, contre `clamp(360px,58vh,620px)` pour un bandeau de
-milieu de page.
+L'en-tête de rayon tient lieu de hero, et **touche le haut de l'écran** — la
+nav flottant dessus, comme sur la home. Sous 1024px il prend `100dvh` (`100svh`
+en repli) ; au-dessus il reste à `clamp(440px,74vh,820px)`, contre
+`clamp(360px,58vh,620px)` pour un bandeau de milieu de page.
+
+Ça n'a pas toujours été le cas sur téléphone. Jusqu'au 22/08/2026 les deux
+rayons tombaient dans `body:not(.has-hero) .shell` et se réservaient
+`env(safe-area-inset-top) + 110px` de nav : la vidéo commençait à 120px du haut,
+s'arrêtait à 74vh, et laissait au-dessus d'elle une bande d'encre morte où la
+pilule flottait toute seule. C'est l'inverse de ce que fait whoop.com, dont la
+vidéo part de y=0 et sur laquelle l'en-tête vient se poser. `body.has-dark-top
+.shell{margin-top:0}` corrige les deux bouts d'un coup — plus de bande en haut,
+plus de vidéo rognée en bas.
+
+Deux conséquences à ne pas défaire :
+
+- **`.cat-head .band.deep::after` inverse le haut de son voile.** Le texte de la
+  nav est de l'encre posée sur un halo blanc : il lui faut un plancher *clair*.
+  Le dégradé `deep` d'un bandeau de milieu de page assombrit au contraire le
+  haut, ce qui rendrait la pilule illisible dès que la vidéo passe sur un plan
+  sombre. Les valeurs sont celles de `.hero-full::before`, pour que la pilule se
+  lise pareil sur les trois pages qui la font flotter.
+- **La réserve basse de `.band-inner`** compte le dock : à `100dvh` avec un
+  contenu calé en bas, le bouton passait sous lui.
 
 ## Défilement « feuille » — le hero ne défile pas
 
