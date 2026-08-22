@@ -16,6 +16,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.shopify.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<!-- Le 1er cadre de la galerie, et non `p.image` : depuis que Sleep affiche
+     le sachet de 28 doses comme visuel principal tout en ouvrant sa fiche sur
+     l'étui de 7 sticks, les deux ne sont plus le même fichier — précharger
+     `p.image` y téléchargerait 209 ko qui ne sont pas à l'écran. -->
 <link rel="preload" as="image" href="/media/productos/promix-debloat/promix-debloat.png" fetchpriority="high">
 <script>
 document.documentElement.className += " js";
@@ -107,7 +111,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
                vignettes au clic, et la couleur choisie qui la pilote. -->
           <div class="gal" id="gal">
             <div class="gal-stage" id="gal-stage">
-              <figure class="gal-frame on">
+              <figure class="gal-frame on contain">
                 <img id="stage-img" fetchpriority="high" src="/media/productos/promix-debloat/promix-debloat.png" alt="Promix Debloat Prebiotic + Probiotic" width="900" height="900">
               </figure>
               <figure class="gal-frame">
@@ -125,7 +129,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             </div>
             <div class="gal-dots" id="gal-dots" aria-hidden="true"></div>
             <div class="gal-thumbs" role="tablist" aria-label="Vistas del producto">
-              <button class="gal-thumb on" type="button" role="tab" aria-selected="true" data-i="0">
+              <button class="gal-thumb on contain" type="button" role="tab" aria-selected="true" data-i="0">
                 <img loading="lazy" src="/media/productos/promix-debloat/promix-debloat.png" alt="Promix Debloat Prebiotic + Probiotic" width="120" height="120">
               </button>
               <button class="gal-thumb" type="button" role="tab" aria-selected="false" data-i="1">

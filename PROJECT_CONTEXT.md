@@ -293,7 +293,7 @@ Supplement prices are the brands' **one-time** (non-subscription) prices convert
 |-------|--------|
 | `image` / `hero` | The still. Used by the PDP stage, the `.prod` card and the recommendation block when no loop exists. |
 | `video` + `poster` + `videoRatio` (`"portrait"` \| `"wide"`) | The loop replaces the packshot on the PDP stage, in the editorial chapter, and — for `category: "Suplementos"` only — inside the floating carousels. `creatina` and `promix-debloat` declare one. |
-| `packshot` | The cut-out used wherever products float without a frame. Without it a product shows a visible rectangle in the carousels. |
+| `packshot` | The cut-out used wherever products float without a frame — the home carousels **and every Tienda card**, both through `flyMedia()`, which reads `packshot` before `image`. Without it a product shows a visible rectangle in the carousels. An alpha channel is not enough: the PNG must be *genuinely* cut out. `absorption-sleep.png` had alpha but 76% of its surface was an opaque white rectangle, so the card's `drop-shadow` — which traces alpha — drew the shadow of a box. |
 
 ### Store
 | Setting | Value |
@@ -344,6 +344,24 @@ The chain is **swatch → `state.color` → the gallery frame carrying that `dat
 
 The CIRQA entry declares **`shotFit: "contain"`** — a per-product flag read by `gen-products.js`, which puts `.contain` on the frames and thumbs it generates. Framing used to be inferred from the file extension (`[src$=".png"]`), which no longer works now that product renders are JPEG on white.
 
+`shotFit` does a second, less obvious thing: `.gal-stage:has(.gal-frame.contain)` turns the frame white. Without the flag the frame keeps `--surface-teal`, and a transparent packshot sits on a grey plate — which reads as a background stuck to the product. That was Debloat until 2026-08-22: its PNG was already cut out, the grey came from the page. **Any product whose main visual is a cut-out must declare `shotFit: "contain"`.**
+
+### Sheet scroll — the hero does not scroll
+Taken from **whoop.com** on 2026-08-22, on both breakpoints. The hero stays pinned to the top of the window and the content rises **over** it like an opaque sheet. Three rules:
+
+```
+body.has-hero .hero-full            position:sticky; top:0; z-index:0
+body.has-hero #contenido            position:relative; z-index:1; background:var(--surface)
+body.has-hero.past-hero .hero-full  position:relative
+```
+
+Whoop's markup is the same shape — a `sticky top:0 z-index:0` wrapper under opaque modules, released once passed. **What they do differently**: no scroll library at all (native scroll, `scroll-behavior:auto`, no Lenis/GSAP/Locomotive) and **no entry reveals** (every `module-content` sits at `opacity:1`). lowlabs keeps Lenis and `.rv`, so the gesture matches but the feel stays glossier than theirs.
+
+`.shell` already carries `isolation:isolate`, so this `z-index` never escapes the card — the footer, which sits outside `.shell`, is unaffected. The third rule is not cosmetic: without it the hero stays composited and its video keeps playing behind the whole page. At the switchover it is fully covered, so the change is invisible.
+
+### Thumbnail strip
+`dragScroll()` (app.js) makes `.gal-thumbs` drag-scrollable. It already scrolled — `overflow-x:auto` — but at 48px tall on a phone the browser had to decide within the first few pixels whether a gesture belonged to the track or to the page's vertical scroll, and on a band that thin it almost always chose the page. The `draggable` class, set **by the script and never in the HTML**, applies `touch-action:pan-y`: vertical stays with the browser, horizontal comes to us. Without `PointerEvent` the class is not set and the track keeps native scrolling. A drag over 4px swallows the click that follows it, otherwise letting go would change thumbnail. `galFollow()` centres the active thumb whenever the main image changes — before it, reaching image 12 by side-swipe left the strip showing the first six.
+
 ### Checkout behaviour
 The buy button adds the selected variant to the cart (`deploy/cart.js`) and opens the drawer. The drawer's checkout button builds a **Shopify cart permalink** — `{STORE}/cart/{variant}:{qty},…?locale=es&country=MX` plus `&discount=BUNDLE10` when the cart came from a bundle. Shopify rebuilds the cart, applies its own prices, stock and discounts, then opens its checkout.
 
@@ -386,11 +404,11 @@ Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not de
 | `catalog` | Renders the framed grids from `productCard()` (`[data-exclude]`, `[data-handles]`, `[data-category]`) **and** the floating tracks from `flyCard()` (`.fcards[data-handles]`) |
 | `cat-sort` | The aisle pages' sort chips. **Moves** the existing card nodes rather than re-rendering — a re-render would drop the observer that pauses product loops off-screen and restart every video |
 | `shop` | Builds `/tienda` aisles — one carousel per category, then **re-lands the URL fragment**: the aisles are born in JS, so the browser's own jump to `#wearables` fired on an anchor that did not exist yet. It re-lands on every layout shake (fonts, images, arrows folding) until a real gesture — wheel, touch, key, pointer — says the reader has taken over |
-| `goals` | The assistant: radiogroup, roving tabindex, recommendation rendering |
+| `goals` | The assistant: radiogroup, roving tabindex, recommendation rendering. The result card was cut down on 2026-08-22 (1000×750 → 640×325): one line of context instead of an eyebrow + title + paragraph, a thumbnail instead of a square panel, `g.why` alone instead of `why` + `p.tagline`, one CTA instead of two. The travel to it is `revealReco()` — `focus({preventScroll:true})` to kill the browser's instant jump, then `scrollToY()` over 1.1 s with a quintic ease-out; it does nothing when the card is already fully in view. |
 | `reveal` | `.rv` scroll reveal + failsafes |
 | `hero-video` | Autoplay/pause logic — **currently inert**, the hero is a still image |
 | `section-loops` | `data-autoloop` videos: play in view, pause out of view and on tab hide |
-| `past-hero` | Toggles `body.past-hero` |
+| `past-hero` | Toggles `body.past-hero`. **No longer an IntersectionObserver**: with the sheet scroll the hero is sticky and never leaves the viewport, so it can't be observed. The marker is now the top edge of `#contenido` (which begins exactly where the hero ends), read by position comparison — a root shrunk to a line does not notify reliably, and a sentinel small enough to be precise gets skipped by a fast fling. No new loop: Lenis already runs one and publishes its position; without Lenis (reduced motion) a passive `scroll` listener takes over. `sync()` reads no layout — the threshold is measured separately, on load and on resize. |
 | `dock-height` | Measures `--dock-h` and `--nav-h` |
 | `selection` | Product page colour/size radiogroups |
 | `checkout` | Shopify redirect or mailto fallback |
@@ -421,7 +439,9 @@ One instance, created in `smooth-scroll` with `autoRaf: true` — **Lenis's own 
 ```
 deploy/media/
 ├── productos/<handle>/     one folder per catalogue handle
-│   ├── cirqa/              cirqa-packshot.png, hero-cirqa.mp4 + poster
+│   ├── cirqa/              cirqa-malva-packshot.png (carrousels + tienda),
+│   │                       cirqa-packshot.png (Negra, retiré), 4 coloris ×3 vues,
+│   │                       hero-cirqa.mp4 + poster
 │   ├── venu-4/  venu-3s/  vivoactive-6/     packshots (mix-blend-mode: multiply)
 │   ├── creatina/           creatina.png, sup-creatina.mp4 + poster
 │   ├── promix-creatina/    promix-creatine-sticks.png

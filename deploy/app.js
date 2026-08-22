@@ -70,9 +70,17 @@
   /* Le seul point d'entrée pour amener la page quelque part : sans lui,
      un `window.scrollTo` pendant que Lenis anime laisserait les deux
      positions se contredire pendant une frame. */
-  function scrollToY(y, instant){
+  /* `opts` — `duration` en secondes et `easing` — pour les trajets qui
+     doivent se voir : Lenis prend alors le pas sur son lerp d'instance. */
+  function scrollToY(y, instant, opts){
     y = Math.max(0, Math.round(y));
-    if (lenis){ lenis.scrollTo(y, { immediate: !!instant }); return; }
+    if (lenis){
+      var o = { immediate: !!instant };
+      if (opts && opts.duration) o.duration = opts.duration;
+      if (opts && opts.easing) o.easing = opts.easing;
+      lenis.scrollTo(y, o);
+      return;
+    }
     try { window.scrollTo({ top: y, behavior: instant ? "instant" : (reduceMotion ? "auto" : "smooth") }); }
     catch(e){ window.scrollTo(0, y); }
   }
@@ -443,27 +451,31 @@
       if (!p) return;
       var also = (g.also || []).map(CATALOG.byHandle).filter(Boolean);
 
+      /* Trois retraits par rapport à la version longue, tous pour la même
+         raison — la carte disait deux fois la même chose :
+         · le titre reprenait l'objectif, déjà mis en avant juste au-dessus ;
+         · `p.tagline` doublait `g.why`, et c'est `why` qui est utile : il
+           dit pourquoi CE produit pour CET objectif ;
+         · « Ver toda la tienda » renvoyait ailleurs au moment précis où l'on
+           vient de répondre à la question posée.
+         Reste une ligne de contexte, une vignette, une raison, un prix, une
+         action. */
       out.innerHTML =
-        '<div class="reco-head">' +
+        '<p class="reco-head">' +
           '<span class="eyebrow">Tu recomendación</span>' +
-          '<h3>' + esc(g.label) + '</h3>' +
-          '<p>' + esc(g.why) + '</p>' +
-        '</div>' +
+          '<span class="reco-goal">' + esc(g.label) + '</span>' +
+        '</p>' +
         '<div class="reco-grid">' +
-          '<div class="reco-media"><img src="' + esc(p.image) + '" alt="" width="600" height="600"></div>' +
+          '<span class="reco-media"><img src="' + esc(p.image) + '" alt="" width="600" height="600"></span>' +
           '<div class="reco-body">' +
-            '<span class="prod-cat">Empieza por aquí · ' + esc(p.category) + '</span>' +
-            '<h4>' + esc(p.name) + '</h4>' +
-            '<p>' + esc(p.tagline) + '</p>' +
-            '<div class="reco-price price-num">' +
+            '<h3>' + esc(p.name) + '</h3>' +
+            '<p>' + esc(g.why) + '</p>' +
+            '<p class="reco-price price-num">' +
               '<b>' + CATALOG.money(p.price) + '</b>' +
               (p.compareAt ? '<s>' + CATALOG.money(p.compareAt) + '</s>' : "") +
               '<small>MXN · Envío gratis</small>' +
-            '</div>' +
-            '<div class="reco-cta">' +
-              '<a class="btn btn-ink" href="' + CATALOG.url(p.handle) + '">Ver ' + esc(p.short) + '</a>' +
-              '<a class="btn btn-quiet" href="/tienda">Ver toda la tienda</a>' +
-            '</div>' +
+            '</p>' +
+            '<a class="btn btn-ink btn-sm" href="' + CATALOG.url(p.handle) + '">Ver ' + esc(p.short) + '</a>' +
           '</div>' +
         '</div>' +
         (also.length
@@ -483,6 +495,23 @@
       out.hidden = false;
     }
 
+    /* Le résultat doit se poser, pas surgir : 1,1s au lieu des ~0,3s du saut
+       natif, avec une sortie en quintique — le trajet part franchement puis
+       s'amortit longuement sur la fin, ce qui donne le glissement lent
+       demandé sans allonger l'attente au départ. */
+    function revealReco(){
+      if (!out || out.hidden) return;
+      var box = out.getBoundingClientRect();
+      /* Le dégagement se mesure sur la pilule elle-même : elle est fixe,
+         change de hauteur sous 1024px et porte ses propres marges. */
+      var pill = document.querySelector(".nav-pill");
+      var haut = pill ? pill.getBoundingClientRect().bottom + 18 : 96;
+      /* Déjà en vue et en entier : bouger la page serait gratuit. */
+      if (box.top >= haut && box.bottom <= window.innerHeight) return;
+      scrollToY((window.pageYOffset || document.documentElement.scrollTop) + box.top - haut,
+        false, { duration: 1.1, easing: function(t){ return 1 - Math.pow(1 - t, 5); } });
+    }
+
     function select(btn, moveFocus){
       var g = CATALOG.byGoal(btn.getAttribute("data-goal"));
       if (!g) return;
@@ -496,8 +525,14 @@
       });
       render(g);
       /* Le focus ne part sur la recommandation qu'au clic : au clavier il
-         doit rester dans le groupe pour continuer à parcourir les choix. */
-      if (moveFocus) out.focus();
+         doit rester dans le groupe pour continuer à parcourir les choix.
+         `preventScroll` est la moitié qui compte : sans lui, le navigateur
+         saute d'un coup sur l'élément focalisé et c'est CE saut qu'on voyait,
+         pas un défilement. On le lui retire, puis on refait le trajet. */
+      if (moveFocus){
+        try { out.focus({ preventScroll: true }); } catch(e){ out.focus(); }
+        revealReco();
+      }
     }
 
     each(buttons, function(b){
@@ -705,14 +740,39 @@
        réserve haute de la carte, qui doit être bonne dès la première
        peinture — sinon le contenu saute au chargement du script. */
     var hero = $("hero");
-    if (!hero){ document.body.className += " past-hero"; return; }
-    if (!hasIO){ document.body.className += " past-hero"; return; }
-    new IntersectionObserver(function(entries){
-      var past = !entries[entries.length - 1].isIntersecting;
+    var flux = $("contenido");
+    if (!hero || !flux){ document.body.className += " past-hero"; return; }
+
+    /* Le repère est le bord haut de `main`, qui commence exactement là où
+       le hero finit. Pas un IntersectionObserver : depuis le défilement
+       « feuille » le hero est épinglé et ne quitte plus le cadre, et le
+       reporter sur `main` demanderait un cadre d'observation réduit à un
+       trait — un cadre d'aire nulle ne notifie pas de façon fiable, et un
+       témoin assez petit pour être précis se fait enjamber par un élan.
+       Une comparaison de position est exacte à tout moment. */
+    var seuil = 0;
+    function mesure(){
+      seuil = flux.getBoundingClientRect().top
+            + (window.pageYOffset || document.documentElement.scrollTop);
+    }
+    var etat = null;
+    function sync(){
+      var past = (window.pageYOffset || document.documentElement.scrollTop) >= seuil;
+      if (past === etat) return;
+      etat = past;
       document.body.className = past
         ? (document.body.className.replace(/\s*past-hero/g, "") + " past-hero")
         : document.body.className.replace(/\s*past-hero/g, "");
-    }, { threshold: 0 }).observe(hero);
+    }
+    mesure(); sync();
+
+    /* Aucune boucle nouvelle : Lenis en tient déjà une et publie sa
+       position à chaque image. Sans Lenis — mouvement réduit — on écoute le
+       défilement natif, en passif. `sync` ne lit rien de la mise en page :
+       c'est une comparaison de nombres, le seuil étant mesuré à part. */
+    if (lenis && lenis.on) lenis.on("scroll", sync);
+    else window.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", function(){ mesure(); sync(); }, { passive: true });
   });
 
   /* =====================================================================
@@ -845,6 +905,23 @@
     return Math.round(galStage.scrollLeft / galStage.clientWidth);
   }
 
+  /* Le bandeau suit la piste. Sans ça, arriver à la douzième image par le
+     geste latéral laissait la vignette active hors du cadre : le bandeau
+     montrait toujours les six premières, et rien ne disait où l'on en
+     était. La vignette est centrée quand la place le permet. */
+  var galFollowed = -1;
+  function galFollow(i){
+    var t = galThumbs && galThumbs[i];
+    if (!t) return;
+    var strip = t.parentNode;
+    if (!strip || strip.scrollWidth <= strip.clientWidth) return;
+    var left = t.offsetLeft - (strip.clientWidth - t.offsetWidth) / 2;
+    left = Math.max(0, Math.min(strip.scrollWidth - strip.clientWidth, left));
+    if (Math.abs(strip.scrollLeft - left) < 2) return;
+    try { strip.scrollTo({ left: left, behavior: reduceMotion ? "auto" : "smooth" }); }
+    catch(e){ strip.scrollLeft = left; }
+  }
+
   function galMark(i){
     each(galFrames, function(f, k){ flag(f, "on", k === i); });
     each(galThumbs, function(t, k){
@@ -854,6 +931,62 @@
     each(galDots ? galDots.children : [], function(d, k){
       d.className = k === i ? "on" : "";
     });
+    /* Seulement quand l'index CHANGE : appelé à chaque frame du défilement
+       de la piste, le recentrage se battrait avec le geste en cours. */
+    if (i !== galFollowed){ galFollowed = i; galFollow(i); }
+  }
+
+  /* Le bandeau de vignettes ne se faisait pas glisser. Il défile pourtant
+     — `overflow-x:auto` — mais il ne fait que 48px de haut sur téléphone :
+     le navigateur doit décider dès les premiers pixels si le geste revient
+     à la piste ou au défilement vertical de la page, et sur une bande aussi
+     mince il tranche presque toujours pour la page. La souris, elle, n'a
+     jamais su faire glisser une piste.
+     On lui retire donc l'arbitrage : la classe pose `touch-action:pan-y`,
+     qui lui laisse le vertical — la page continue de défiler depuis le
+     bandeau — et nous rend l'horizontal, piloté ici. La classe est posée
+     par le script et non dans le HTML : sans `PointerEvent` pour prendre le
+     relais, la piste doit garder son défilement natif. */
+  function dragScroll(track){
+    if (!track || !window.PointerEvent) return;
+    if (track.className.indexOf("draggable") < 0) track.className += " draggable";
+    var id = -1, startX = 0, startLeft = 0, dragged = false;
+
+    track.addEventListener("pointerdown", function(e){
+      if (e.button) return;
+      id = e.pointerId; startX = e.clientX; startLeft = track.scrollLeft; dragged = false;
+    }, false);
+
+    track.addEventListener("pointermove", function(e){
+      if (e.pointerId !== id) return;
+      var dx = e.clientX - startX;
+      /* Seuil : sous 4px c'est un appui, pas un glissement. Sans lui, le
+         moindre tremblement du doigt annulerait le choix de la vignette. */
+      if (!dragged){
+        if (Math.abs(dx) < 4) return;
+        dragged = true;
+        try { track.setPointerCapture(id); } catch(err){}
+      }
+      track.scrollLeft = startLeft - dx;
+    }, false);
+
+    function end(e){
+      if (e.pointerId !== id) return;
+      try { track.releasePointerCapture(id); } catch(err){}
+      id = -1;
+      /* Le clic ne part qu'APRÈS le relâchement : `dragged` doit rester vrai
+         le temps qu'il passe devant le garde ci-dessous. */
+      if (dragged) setTimeout(function(){ dragged = false; }, 0);
+    }
+    track.addEventListener("pointerup", end, false);
+    track.addEventListener("pointercancel", end, false);
+
+    /* Un glissement ne vaut pas choix de vignette : on l'arrête en capture,
+       avant que le bouton ne voie le clic. */
+    track.addEventListener("click", function(e){
+      if (!dragged) return;
+      e.preventDefault(); e.stopPropagation();
+    }, true);
   }
 
   function galGo(i){
@@ -908,6 +1041,8 @@
         galGo(i);
       }, false);
     });
+
+    dragScroll(document.querySelector(".gal-thumbs"));
 
     var ticking = false;
     galStage.addEventListener("scroll", function(){

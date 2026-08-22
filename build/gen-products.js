@@ -334,7 +334,11 @@ function page(p) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.shopify.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="${esc(p.image)}" fetchpriority="high">
+<!-- Le 1er cadre de la galerie, et non \`p.image\` : depuis que Sleep affiche
+     le sachet de 28 doses comme visuel principal tout en ouvrant sa fiche sur
+     l'étui de 7 sticks, les deux ne sont plus le même fichier — précharger
+     \`p.image\` y téléchargerait 209 ko qui ne sont pas à l'écran. -->
+<link rel="preload" as="image" href="${esc((galleryShots(p)[0] || {}).src || p.image)}" fetchpriority="high">
 <script>
 document.documentElement.className += " js";
 try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.className += " rm"; }catch(e){}

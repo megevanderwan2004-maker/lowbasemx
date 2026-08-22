@@ -30,9 +30,14 @@
       /* Rendus officiels Garmin, un par coloris (voir `colors`). */
       image: "/media/productos/cirqa/cirqa-negra.jpg",
       hero: CDN + "cirqa-hero-entrenamiento.jpg?v=1785272697",
-      /* Détouré : c'est cette vue qui sert au carrousel « Los más buscados »,
-         où les produits flottent sans cadre. */
-      packshot: "/media/productos/cirqa/cirqa-packshot.png",
+      /* Détouré : c'est cette vue qui sert au carrousel « Los más buscados »
+         ET aux cartes de la tienda, où les produits flottent sans cadre —
+         les deux passent par `flyMedia`, qui lit `packshot` avant `image`.
+         Malva depuis le 22/08/2026 ; `cirqa-packshot.png` est le détourage
+         Negra qu'elle remplace, conservé. Le détourage vient de
+         `cirqa-malva.jpg` : le rendu brut a un fond blanc, et sur une carte
+         sans cadre `drop-shadow` en ferait l'ombre d'un rectangle. */
+      packshot: "/media/productos/cirqa/cirqa-malva-packshot.png",
       video: "/media/productos/cirqa/hero-cirqa.mp4",
       poster: "/media/productos/cirqa/poster-hero-cirqa.jpg",
       shopify: { handle: "garmin-cirqa-smart-band", variants: {
@@ -312,9 +317,16 @@
       price: 499,
       badge: "Nuevo",
       category: "Suplementos",
-      image: "/media/productos/absorption-sleep/absorption-sleep.png",
-      hero: "/media/productos/absorption-sleep/absorption-sleep.png",
-      packshot: "/media/productos/absorption-sleep/absorption-sleep.png",
+      /* Visuel principal : le sachet de 28 doses, c'est-à-dire la 3e vue de
+         la fiche, détourée. Avant le 22/08/2026 c'était l'étui de 7 sticks
+         (`absorption-sleep.png`) — un PNG dont 76 % de la surface était un
+         rectangle blanc opaque, ce qui donnait au `drop-shadow` de la carte
+         l'ombre d'une boîte au lieu de celle du produit.
+         Attention : les trois formats gardent LEURS visuels dans `sizes`,
+         et c'est encore « 7 sticks » qui est sélectionné par défaut. */
+      image: "/media/productos/absorption-sleep/sleep-packshot.png",
+      hero: "/media/productos/absorption-sleep/sleep-packshot.png",
+      packshot: "/media/productos/absorption-sleep/sleep-packshot.png",
       highlights: [
         "Sin melatonina — descanso sin dependencia ni niebla matinal",
         "Azafrán liposomal Capsoil® y aceite de pasiflora Capsoil® para reducir el estrés",
@@ -394,6 +406,12 @@
       video: "/media/productos/promix-debloat/debloat-loop.mp4",
       poster: "/media/productos/promix-debloat/poster-debloat-loop.jpg",
       packshot: "/media/productos/promix-debloat/promix-debloat.png",
+      /* Le packshot est déjà détouré ; ce qui se voyait comme un fond, c'est
+         la plaque de la galerie. Sans `shotFit`, aucun cadre ne porte
+         `.contain`, la règle `.gal-stage:has(.gal-frame.contain)` ne prend
+         pas et le cadre garde `--surface-teal` : le PNG transparent se
+         posait donc sur du gris. */
+      shotFit: "contain",
       videoRatio: "portrait",
       /* Visuels de marque Promix. Le sachet liste 4 White Peach + 4 Florida
          Orange + 4 Tropical Mango : ce sont bien nos 12 sobres. */
@@ -444,7 +462,11 @@
       category: "Accesorios",
       image: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
       hero: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
-      packshot: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
+      /* Détourée : le rendu brut est un JPEG sur fond blanc, donc opaque de
+         bord à bord — sur la carte sans cadre, `drop-shadow` en dessinait
+         l'ombre du rectangle entier. La galerie, elle, garde le JPEG : son
+         cadre est blanc et `mix-blend-mode:multiply` y efface le fond. */
+      packshot: "/media/productos/banda-cirqa/banda-packshot.png",
       shotFit: "contain",
       colors: [
         { name: "Gris Lima",    dot: "#a8a98d", image: "/media/productos/banda-cirqa/banda-gris-lima.jpg",

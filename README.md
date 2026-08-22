@@ -64,7 +64,8 @@ deploy/media/
 │   ├── promix-creatina/        packshot 30 sticks
 │   ├── promix-debloat/         packshot, boucle + affiche
 │   ├── promix-relax/           packshot
-│   └── absorption-sleep/       packshot 7 sticks
+│   └── absorption-sleep/       sleep-packshot.png (28 doses, détouré) +
+│                               les visuels des trois formats
 │
 ├── landing/
 │   ├── hero/                   hero-desktop.mp4 + son affiche (au-dessus de
@@ -86,7 +87,20 @@ Conventions :
   (`landing/bandas/loop-brand.mp4` → `landing/bandas/poster-loop-brand.jpg`).
   `gen-products.js` s'appuie sur cette règle pour construire les bandeaux.
 - **`packshot`** = visuel détouré (PNG alpha) : c'est lui qui flotte dans les
-  carrousels. Sans packshot, un produit y apparaît avec un rectangle blanc.
+  carrousels ET sur les cartes de la tienda — les deux passent par `flyMedia`,
+  qui lit `packshot` avant `image`. Sans packshot, un produit y apparaît avec un
+  rectangle blanc.
+  Un PNG à canal alpha ne suffit pas : il faut qu'il soit **réellement** détouré.
+  `absorption-sleep.png` avait son alpha mais 76 % de sa surface était un
+  rectangle blanc opaque, et le `drop-shadow` de la carte, qui suit l'alpha,
+  dessinait donc l'ombre d'une boîte. `build/cutout.swift` fabrique ces
+  détourages : diffusion depuis les bords, bande de transition pour
+  l'anticrénelage, décontamination des pixels partiels. Deux clés, parce
+  qu'aucune ne suffit seule — l'écart colorimétrique au fond (`dist`), et la
+  luminance signée (`clair`) pour les rendus clairs dont l'ombre portée est plus
+  loin du fond que le produit lui-même. Un dernier couple d'arguments laisse la
+  diffusion traverser le gris neutre d'une ombre sans toucher à un produit
+  coloré. Les réglages retenus sont notés en tête des fiches concernées.
 - **Un portrait 9/16 dans un bandeau** (`.band`, trois fois plus large que haut)
   n'est visible qu'à un cinquième, et centré ce cinquième tombe sous le sujet.
   Les deux en-têtes de rayon corrigent le cadrage avec
@@ -289,6 +303,45 @@ L'en-tête de rayon tient lieu de hero : `.cat-head .band-inner` est à
 `clamp(440px,74vh,820px)`, contre `clamp(360px,58vh,620px)` pour un bandeau de
 milieu de page.
 
+## Défilement « feuille » — le hero ne défile pas
+
+Relevé sur **whoop.com** le 22/08/2026 et repris à l'identique, sur les deux
+formats. Le hero reste épinglé en haut de la fenêtre et c'est le contenu qui
+monte **par-dessus** lui, comme une feuille opaque qui le recouvre. On ne le
+voit pas partir : on le voit disparaître sous la page.
+
+Trois règles suffisent, toutes dans `styles.css` :
+
+```
+body.has-hero .hero-full     position:sticky; top:0; z-index:0
+body.has-hero #contenido     position:relative; z-index:1; background:var(--surface)
+body.has-hero.past-hero .hero-full   position:relative
+```
+
+Ce que Whoop fait exactement pareil : un conteneur `sticky top:0 z-index:0` sous
+des modules à fond opaque, et le relâchement du hero une fois dépassé. Ce qu'ils
+font autrement : **aucune bibliothèque de défilement** — leur page est en scroll
+natif, et **aucune révélation** à l'entrée dans le cadre (tous leurs blocs sont
+à `opacity:1`). lowlabs garde Lenis et ses `.rv` : le geste est donc le même, la
+sensation reste plus glissante que la leur.
+
+`.shell` porte déjà `isolation:isolate`, donc ce `z-index` ne sort pas de la
+carte — le pied de page, qui est hors de `.shell`, n'est pas concerné.
+
+La troisième règle n'est pas cosmétique : sans elle le hero resterait composé et
+sa vidéo en lecture derrière tout le reste de la page. Au moment du basculement
+il est entièrement recouvert, le changement ne se voit pas.
+
+**`past-hero` ne peut plus s'appuyer sur un `IntersectionObserver`.** Épinglé, le
+hero ne quitte jamais le cadre. Le repère est devenu le bord haut de `#contenido`,
+qui commence exactement là où le hero finit, et il est lu **par comparaison de
+position**, pas par observation : un cadre d'observation réduit à un trait ne
+notifie pas de façon fiable, et un témoin assez petit pour être précis se fait
+enjamber par un élan. Aucune boucle n'est ajoutée pour autant — c'est Lenis, qui
+en tient déjà une, qui publie la position ; sans Lenis (mouvement réduit) on
+écoute le défilement natif en passif. `sync()` ne lit rien de la mise en page :
+le seuil est mesuré à part, au chargement et au redimensionnement.
+
 ## Défilement fluide (Lenis)
 
 Une **seule** instance, créée par le module `smooth-scroll` de `app.js` après
@@ -315,7 +368,10 @@ Trois points d'attention si on y touche :
 2. **Défilements programmés** — tout passe par `scrollToY()` (retour de galerie
    après changement de couleur, atterrissage sur `/tienda#rayon`, liens
    d'ancrage). Un `window.scrollTo` direct laisserait Lenis et la page se
-   contredire le temps d'une image.
+   contredire le temps d'une image. Un troisième argument optionnel — `duration`
+   en secondes et `easing` — sert aux trajets qui doivent **se voir** : Lenis
+   prend alors le pas sur son lerp d'instance. C'est ce qui amène la
+   recommandation des objectifs, en 1,1s et en quintique sortante.
 3. **Tiroir du panier** — il pose `overflow:hidden` sur le corps ; `cart.js`
    appelle donc `LOWSCROLL.stop()` à l'ouverture et `.start()` à la fermeture,
    sinon Lenis avancerait sa position sur une page immobile et la rendrait d'un
@@ -412,6 +468,26 @@ qui glisse. Sous 980px la page revient d'elle-même sur le visuel.
 La fiche CIRQA déclare `shotFit: "contain"` : ce sont des rendus sur fond blanc,
 le générateur pose donc `.contain` sur leurs cadres et vignettes pour que le
 bracelet reste entier, jamais rogné.
+
+Ce drapeau fait une seconde chose, moins évidente : `.gal-stage:has(.gal-frame
+.contain)` passe le cadre au blanc. Sans lui le cadre garde `--surface-teal`, et
+un packshot transparent s'y pose sur une plaque grise — ce qui se lit comme un
+fond collé au produit. C'était le cas de Debloat jusqu'au 22/08/2026 : son PNG
+était déjà détouré, le gris venait de la fiche. Tout produit dont le visuel
+principal est un détourage doit donc déclarer `shotFit: "contain"`.
+
+**Le bandeau de vignettes se fait glisser** (`dragScroll` dans app.js). Il
+défilait déjà — `overflow-x:auto` — mais il ne fait que 48px de haut sur
+téléphone : le navigateur devait décider dès les premiers pixels si le geste
+revenait à la piste ou au défilement vertical de la page, et sur une bande aussi
+mince il tranchait presque toujours pour la page. La classe `draggable`, posée
+par le script et jamais dans le HTML, applique `touch-action:pan-y` — le vertical
+reste au navigateur, l'horizontal passe au script. Sans `PointerEvent` la classe
+n'est pas posée et la piste garde son défilement natif. Un glissement de plus de
+4px avale le clic qui le suit, sinon relâcher le doigt changerait de vignette.
+Le bandeau **suit aussi la piste** : `galFollow` centre la vignette active quand
+l'image principale change, sans quoi arriver à la douzième image laissait le
+bandeau sur les six premières.
 
 > **En-tête du checkout** — le nom affiché en haut du checkout est le *nom de la
 > boutique* Shopify, aujourd'hui « My Store ». Il se change dans
