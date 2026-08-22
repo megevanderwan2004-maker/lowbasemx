@@ -172,15 +172,31 @@ sachet Promix porte bien « 30 × 5 g Stick Packs », c'est notre SKU.
 npm run serve
 ```
 
-### Après toute modification de `deploy/catalog.js`
+### Après toute modification de `deploy/catalog.js`, `styles.css` ou `app.js`
 
 ```bash
 npm run build
 ```
 
-Les 10 fiches produit sont générées puis **commitées** (`buildCommand` est nul
-côté Vercel). Oublier cette commande laisse les fiches périmées sans aucun
-avertissement.
+Deux étapes enchaînées :
+
+1. `gen-products.js` régénère les 10 fiches produit ;
+2. `stamp-assets.js` colle `?v=<empreinte>` sur les assets partagés
+   (`styles.css`, `app.js`, `catalog.js`, `cart.js`, `lenis.min.js`) dans les
+   14 pages.
+
+Le tout est **commité** — `buildCommand` est nul côté Vercel. Oublier cette
+commande laisse les fiches périmées *et* les anciennes empreintes en place,
+sans aucun avertissement.
+
+**Pourquoi l'empreinte.** Les pages appelaient `/styles.css` tout court. Les
+en-têtes disent pourtant `max-age=0, must-revalidate` — mais Safari iOS ressert
+volontiers sa copie sans repasser par le réseau, surtout dans un onglet resté
+ouvert. Le 22/08/2026, trois déploiements corrects d'affilée sont restés
+invisibles sur un iPhone pour cette seule raison : le site était juste, le
+téléphone regardait autre chose. Une URL différente étant une autre entrée de
+cache, il suffit que l'adresse change quand le contenu change. Le script est
+idempotent : relancé, il remplace l'empreinte au lieu de l'empiler.
 
 ### Ajouter un produit
 

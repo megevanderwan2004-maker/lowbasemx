@@ -355,6 +355,13 @@ Two consequences, do not undo them:
 - **The top of the veil is gone**, here and on the hero — see below. `.cat-head .band.deep::after` keeps only its bottom floor.
 - **`.band-inner`'s bottom padding counts the dock** — at `100dvh` with bottom-aligned content the button was sliding under it.
 
+### Asset fingerprints — why a correct deploy can stay invisible
+Pages used to reference `/styles.css` and `/app.js` bare. The headers say `max-age=0, must-revalidate`, but iOS Safari happily reserves its own copy without hitting the network, especially in a tab left open. On 2026-08-22 three correct deployments in a row stayed invisible on an iPhone for that reason alone — the site was right, the phone was looking at something else.
+
+`build/stamp-assets.js` (chained after `gen-products.js` in `npm run build`) stamps `?v=<sha1[0:8]>` on `styles.css`, `app.js`, `catalog.js`, `cart.js` and `lenis.min.js` across all 14 pages. A different URL is a different cache entry, so the address changes whenever the content does. The script is idempotent — re-running replaces the fingerprint rather than stacking it. Product pages are regenerated unstamped by `gen-products.js` and re-stamped every build; that is why the second half always reports the 10 product pages as touched.
+
+**Run `npm run build` after touching `styles.css` or `app.js`, not only `catalog.js`** — otherwise the stamp goes stale and the old cache problem returns.
+
 ### The top of the video is no longer veiled
 The nav has no surface of its own, so its ink was made readable by a **42% white veil** over the hero's first 30% (`.hero-full::before`). Over a dark, flat video it was invisible. Over a video with bright areas at the top — the wooden ceiling on the wearables loop — it flattened the first ~250px into a uniform band: the page no longer read as a video starting at the top of the screen, but as **an empty area sitting above one**.
 

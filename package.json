@@ -3,7 +3,7 @@
   "private": true,
   "description": "Site statique lowlabs (deploy/). Aucun bundler : lenis est copié depuis node_modules vers deploy/lenis.min.js.",
   "scripts": {
-    "build": "node build/gen-products.js",
+    "build": "node build/gen-products.js && node build/stamp-assets.js",
     "serve": "node build/serve.js 4175",
     "vendor:lenis": "cp node_modules/lenis/dist/lenis.min.js deploy/lenis.min.js"
   },
