@@ -44,7 +44,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 **Recent history** (`git log`, newest first)
 | Commit | Date | What changed |
 |--------|------|--------------|
-| `—` | 08-22 | **Full page**: card identity removed (no max-width, radius or shadow), gutter zero everywhere, body paints the iPhone safe areas in the page's own opening colour, nav offset by the notch |
+| `5dd1b61` | 08-22 | **Full page**: card identity removed (no max-width, radius or shadow), gutter zero everywhere, body paints the iPhone safe areas in the page's own opening colour, nav offset by the notch |
 | `dd108fb` | 08-21 | **Venu 4 in 3 colours, Sleep in 3 formats, replacement band added** (Shopify variants created); shared variant/price resolver; 3 official views per CIRQA and Venu 4 colour; brand galleries on the supplements; lifestyle triptych on `/wearables` |
 | `9dc1daa` | 08-21 | **Full-bleed pass**: zero gutter on phones, 1500px container, bigger carousel/chapter/goal media, taller bands; **Lenis** smooth scroll; CIRQA colours switched to the official Garmin renders |
 | `b0f2669` | 08-18 | `/wearables` and `/suplementos` get their own header loop (treadmill / capsules) |
