@@ -375,10 +375,12 @@ Desktop was already correct (top margin resolves to 0 above 1024px, `padding-top
 Taken from **whoop.com** on 2026-08-22, on both breakpoints. The hero stays pinned to the top of the window and the content rises **over** it like an opaque sheet. Three rules:
 
 ```
-body.has-hero .hero-full            position:sticky; top:0; z-index:0
-body.has-hero #contenido            position:relative; z-index:1; background:var(--surface)
-body.has-hero.past-hero .hero-full  position:relative
+body.has-hero .hero-full, body.has-dark-top .cat-head    position:sticky; top:0; z-index:0
+body.has-hero #contenido, body.has-dark-top #contenido   position:relative; z-index:1; background:var(--surface)
+…same selector pair for the .past-hero release           position:relative
 ```
+
+It covers **all three pages that open on a visual** — the home and both aisles (since 2026-08-22). **Half the setup is in the HTML**: the opening visual sits OUTSIDE `<main>`, as its sibling inside `.shell`. That was always true of the home hero; the aisle banners used to be the first `<section>` *inside* `main`. Without moving them, the content would be their sibling inside `main` and every following section would need its own opaque background so none let the pinned banner show through. A `<header class="cat-head">` lifted out of `main` settles it in one move. No CSS rule depended on `.cat-head` being inside `main` — checked before moving it.
 
 Whoop's markup is the same shape — a `sticky top:0 z-index:0` wrapper under opaque modules, released once passed. **What they do differently**: no scroll library at all (native scroll, `scroll-behavior:auto`, no Lenis/GSAP/Locomotive) and **no entry reveals** (every `module-content` sits at `opacity:1`). lowlabs keeps Lenis and `.rv`, so the gesture matches but the feel stays glossier than theirs.
 

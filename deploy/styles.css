@@ -1240,13 +1240,22 @@ footer a{color:var(--ink)}
    `.shell` porte déjà `isolation:isolate`, donc ce z-index ne sort pas de la
    carte : le pied de page, qui est hors de `.shell`, n'est pas concerné.
    ========================================================================= */
-body.has-hero .hero-full{position:sticky;top:0;z-index:0}
-/* Une fois le hero dépassé il repasse dans le flux. Le laisser épinglé toute
-   la page garderait sa vidéo composée et en lecture derrière le contenu ;
-   à cet instant il est entièrement recouvert, le changement ne se voit pas. */
-body.has-hero.past-hero .hero-full{position:relative;top:auto}
-/* La feuille : sans fond opaque, le hero se verrait au travers. */
-body.has-hero #contenido{position:relative;z-index:1;background:var(--surface)}
+/* Les deux visuels d'ouverture du site sont montés pareil : le hero de la
+   home et, depuis le 22/08/2026, la bannière des deux rayons. Ils sont tous
+   deux placés HORS de `<main>` dans le HTML, ce qui est la moitié du montage
+   — sans cela le contenu serait leur frère à l'intérieur de `main` et il
+   faudrait rendre opaque chaque section une par une. */
+body.has-hero .hero-full,
+body.has-dark-top .cat-head{position:sticky;top:0;z-index:0}
+/* Une fois le visuel dépassé il repasse dans le flux. Le laisser épinglé
+   toute la page garderait sa vidéo composée et en lecture derrière le
+   contenu ; à cet instant il est entièrement recouvert, le changement ne se
+   voit pas. `past-hero` connaît les deux ouvertures (voir app.js). */
+body.has-hero.past-hero .hero-full,
+body.has-dark-top.past-hero .cat-head{position:relative;top:auto}
+/* La feuille : sans fond opaque, le visuel se verrait au travers. */
+body.has-hero #contenido,
+body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surface)}
 
 /* Deux planchers de contraste : en haut pour la nav en verre transparent,
    en bas pour les actions. Le milieu du visuel reste intact. */

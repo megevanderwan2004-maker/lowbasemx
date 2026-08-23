@@ -20,7 +20,7 @@
 document.documentElement.className += " js";
 try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.className += " rm"; }catch(e){}
 </script>
-<link rel="stylesheet" href="/styles.css?v=9cdcf15e">
+<link rel="stylesheet" href="/styles.css?v=f7a93389">
 </head>
 <body class="has-dark-top">
 
@@ -54,27 +54,28 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 </nav>
 
 <div class="shell">
-  <main id="contenido">
 
-    <!-- ===== En-tête de rayon : la bannière du rayon tient lieu de hero.
-         La nav flotte dessus, comme sur la home. ===== -->
-    <section class="cat-head" aria-labelledby="cat-t">
-      <div class="band deep">
-        <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
-               disablepictureinpicture disableremoteplayback
-               poster="/media/landing/bandas/poster-loop-suplementos-hero.jpg"
-               width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
-          <source src="/media/landing/bandas/loop-suplementos-hero.mp4" type="video/mp4">
-        </video>
-        <div class="band-inner">
-          <span class="eyebrow">Suplementos</span>
-          <h1 id="cat-t">Un gesto al día. Nada que aprender.</h1>
-          <p>Sobres líquidos y cápsulas de absorción mejorada, formulados por dietistas y científicos. Sin suscripción, sin letra chica.</p>
-          <a class="btn btn-smoke btn-lg" href="#lista">Ver la selección</a>
-        </div>
+  <!-- ===== En-tête de rayon : la bannière tient lieu de hero, et se monte
+       comme lui — HORS de <main>, pour que le contenu lui passe par-dessus au
+       défilement au lieu de la pousser. La nav flotte dessus. ===== -->
+  <header class="cat-head" aria-labelledby="cat-t">
+    <div class="band deep">
+      <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+             disablepictureinpicture disableremoteplayback
+             poster="/media/landing/bandas/poster-loop-suplementos-hero.jpg"
+             width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
+        <source src="/media/landing/bandas/loop-suplementos-hero.mp4" type="video/mp4">
+      </video>
+      <div class="band-inner">
+        <span class="eyebrow">Suplementos</span>
+        <h1 id="cat-t">Un gesto al día. Nada que aprender.</h1>
+        <p>Sobres líquidos y cápsulas de absorción mejorada, formulados por dietistas y científicos. Sin suscripción, sin letra chica.</p>
+        <a class="btn btn-smoke btn-lg" href="#lista">Ver la selección</a>
       </div>
-    </section>
+    </div>
+  </header>
 
+  <main id="contenido">
     <!-- ===== La grille : rien n'est écrit en dur, `data-category` suffit.
          app.js la remplit depuis catalog.js et tient le compte à jour. ===== -->
     <section class="cat-list" id="lista" aria-labelledby="lista-t">
@@ -213,7 +214,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
 <!-- Défilement fluide : une seule instance, démarrée par app.js. -->
 <script src="/lenis.min.js?v=daec1872" defer></script>
-<script src="/catalog.js?v=f8f6e588" defer></script>
+<script src="/catalog.js?v=441a1228" defer></script>
 <script src="/cart.js?v=5487c53c" defer></script>
 <script src="/app.js?v=bc6b61de" defer></script>
 </body>

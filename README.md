@@ -377,13 +377,26 @@ formats. Le hero reste épinglé en haut de la fenêtre et c'est le contenu qui
 monte **par-dessus** lui, comme une feuille opaque qui le recouvre. On ne le
 voit pas partir : on le voit disparaître sous la page.
 
-Trois règles suffisent, toutes dans `styles.css` :
+Trois règles suffisent, toutes dans `styles.css`, et elles couvrent **les trois
+pages qui ouvrent sur un visuel** — l'accueil et les deux rayons :
 
 ```
-body.has-hero .hero-full     position:sticky; top:0; z-index:0
-body.has-hero #contenido     position:relative; z-index:1; background:var(--surface)
-body.has-hero.past-hero .hero-full   position:relative
+body.has-hero .hero-full, body.has-dark-top .cat-head       position:sticky; top:0; z-index:0
+body.has-hero #contenido, body.has-dark-top #contenido      position:relative; z-index:1; background:var(--surface)
+…même paire de sélecteurs pour le relâchement en .past-hero  position:relative
 ```
+
+**La moitié du montage est dans le HTML** : le visuel d'ouverture est placé
+HORS de `<main>`, comme frère de celui-ci à l'intérieur de `.shell`. C'est vrai
+du hero de l'accueil depuis toujours, et des bannières de rayon depuis le
+22/08/2026 — elles étaient jusque-là la première `<section>` DANS `main`. Sans
+ce déplacement, le contenu serait leur frère à l'intérieur de `main` et il
+faudrait rendre opaque chaque section une par une pour qu'aucune ne laisse voir
+la bannière épinglée derrière elle. Un `<header class="cat-head">` sorti de
+`main` règle le tout d'un coup.
+
+Aucune règle CSS ne dépendait de la place de `.cat-head` dans `main` — vérifié
+avant le déplacement.
 
 Ce que Whoop fait exactement pareil : un conteneur `sticky top:0 z-index:0` sous
 des modules à fond opaque, et le relâchement du hero une fois dépassé. Ce qu'ils

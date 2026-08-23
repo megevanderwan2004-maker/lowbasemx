@@ -362,13 +362,27 @@
       tagline: "Creatina monohidratada micronizada, en sticks de 5 g.",
       price: 659,
       category: "Suplementos",
-      image: "/media/productos/promix-creatina/promix-creatine-sticks.png",
-      hero: "/media/productos/promix-creatina/promix-creatine-sticks.png",
-      packshot: "/media/productos/promix-creatina/promix-creatine-sticks.png",
+      /* Visuel principal : le sachet, c'est-à-dire la 2e vue de la fiche,
+         détourée de son fond crème. Avant le 23/08/2026 c'étaient les trois
+         sticks (`promix-creatine-sticks.png`) — un PNG dont plus de la moitié
+         de la surface était opaque, ce qui donnait au `drop-shadow` de la
+         carte l'ombre d'un rectangle au lieu de celle du produit.
+         Les sticks ne sont pas perdus : ils passent dans la galerie. */
+      image: "/media/productos/promix-creatina/promix-creatine-packshot.png",
+      hero: "/media/productos/promix-creatina/promix-creatine-packshot.png",
+      packshot: "/media/productos/promix-creatina/promix-creatine-packshot.png",
+      /* Sans ce drapeau, aucun cadre ne porte `.contain`, la règle
+         `.gal-stage:has(.gal-frame.contain)` ne prend pas, et le cadre de la
+         galerie garde `--surface-teal` : le détourage se poserait alors sur
+         une plaque grise. C'est le second fond à traiter, après celui de
+         l'image elle-même. */
+      shotFit: "contain",
       /* Visuels de marque Promix. Le sachet porte « 30 × 5 g Stick Packs » :
-         c'est l'emballage de nos 30 sticks, pas un autre format. */
+         c'est l'emballage de nos 30 sticks, pas un autre format.
+         `promix-creatine-bolsa.jpg` n'y est plus : c'est lui qui est devenu
+         le visuel principal, détouré. */
       gallery: [
-        "/media/productos/promix-creatina/promix-creatine-bolsa.jpg",
+        "/media/productos/promix-creatina/promix-creatine-sticks.png",
         "/media/productos/promix-creatina/promix-creatine-lifestyle.jpg"
       ],
       highlights: [
