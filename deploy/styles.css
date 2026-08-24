@@ -1354,6 +1354,27 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
 
 /* =========================================================================
    Assistant : choisir un objectif avant un produit
+
+   Le geste a changé le 24/08/2026 : ouvrir une carte ne pose plus une
+   recommandation SOUS les trois objectifs, elle EFFACE les deux autres et
+   prend leur place. Trois conséquences dans ce fichier :
+
+   1. Un plateau (`.goals-stage`) tient les deux états dans une seule
+      rangée, et sa boîte ne change JAMAIS de largeur : elle vaut très
+      exactement trois cartes plus deux gouttières. Fermé, la piste
+      l'occupe entièrement ; ouvert, la carte choisie garde son gabarit et
+      le panneau prend le rectangle libéré par les deux autres. C'est ce
+      qui permet de ne pas déplacer la page au clic — et c'est aussi ce qui
+      fait que la première carte ne bouge pratiquement pas quand c'est elle
+      qu'on ouvre.
+   2. Les cartes ne sont plus des boutons radio : le geste n'est plus
+      « choisir une option parmi trois » mais « ouvrir l'une des trois ».
+      D'où `aria-expanded` côté HTML, et plus aucune gestion de tabindex
+      tournant ici.
+   3. Toute la chorégraphie est décrite en CSS et seulement DÉCLENCHÉE en
+      JS (classes `.is-leaving`, `.is-open`, `.is-in`). Le seul calcul
+      confié au script est le FLIP de la carte choisie, qui a besoin de
+      mesures réelles.
    ========================================================================= */
 /* Fond blanc, celui de la carte : l'assistant se pose entre deux rayons,
    il ne doit plus se détacher comme un encart. */
@@ -1362,25 +1383,49 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
   background:var(--surface);
   padding:clamp(22px,3.2vw,40px) 0;
 }
-/* Les trois objectifs forment une piste, à tous les formats. Les cartes
+
+/* ---- Le plateau ---------------------------------------------------------
+   `--goals-gap` est lu par le plateau ET par la piste : la largeur du
+   plateau se calcule à partir de lui, les deux ne peuvent donc pas se
+   désaccorder. `--media-box` est le jeton partagé avec la boucle Garmin
+   Connect : ne pas le toucher ici (voir README). */
+.goals-stage{
+  --goals-gap:clamp(10px,1.6vw,18px);
+  /* Sortie franche puis amortie longue : le trajet part vite et se pose,
+     jamais l'inverse. C'est la même famille de courbe que le glissement
+     qui amène la recommandation en 1,1s. */
+  --goals-ease:cubic-bezier(.22,1,.36,1);
+  display:flex;align-items:stretch;
+  gap:var(--goals-gap);
+  max-width:min(calc(var(--media-box) * 3 + var(--goals-gap) * 2),100%);
+  margin:0 auto;
+}
+
+/* ---- La piste -----------------------------------------------------------
+   Les trois objectifs forment une piste, à tous les formats. Les cartes
    étant au gabarit de la boucle Garmin Connect (9/16, `--media-box`), les
-   trois tiennent à l'écran large et la piste s'y centre ; sur téléphone une
-   carte se lit en entier et la suivante dépasse, ce qui dit sans mot que
-   ça se fait glisser. `safe` ramène la piste au bord dès qu'elle déborde,
-   sinon son début deviendrait inatteignable. */
+   trois tiennent à l'écran large ; sur téléphone une carte se lit en entier
+   et la suivante dépasse, ce qui dit sans mot que ça se fait glisser.
+   `safe` ramène la piste au bord dès qu'elle déborde, sinon son début
+   deviendrait inatteignable.
+   `align-items:flex-start` est indispensable depuis le plateau : sans lui,
+   l'étirement de la rangée passerait par-dessus le `aspect-ratio` des
+   cartes le jour où le panneau serait plus haut qu'elles. */
 .goals{
-  display:flex;gap:clamp(10px,1.6vw,18px);
-  justify-content:safe center;
+  flex:1 1 auto;min-width:0;
+  display:flex;gap:var(--goals-gap);
+  justify-content:safe center;align-items:flex-start;
   overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
   scrollbar-width:none;-ms-overflow-style:none;
-  max-width:min(1500px,100%);margin:0 auto;padding-bottom:2px;
+  padding-bottom:2px;
 }
 .goals::-webkit-scrollbar{display:none}
+
 /* Carte objectif : le visuel occupe toute la carte, la nacelle de verre
    se pose dessus. Rien d'autre ne partage la place — c'est la photo qui
-   porte le choix. */
-/* Même boîte que `.chapter.editorial .chapter-media.portrait` : le 9/16
+   porte le choix.
+   Même boîte que `.chapter.editorial .chapter-media.portrait` : le 9/16
    natif des boucles, borné par `--media-box`. Les deux blocs doivent
    rester accordés — c'est la demande. */
 .goal{
@@ -1392,8 +1437,11 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
   box-shadow:var(--glass-hairline),var(--shadow-lift);
   transition:transform .18s ease-out,box-shadow .22s ease-out;
 }
+/* `display:block` ci-dessus l'emporterait sur le `display:none` que le
+   navigateur applique à `[hidden]` : il faut le redire nous-mêmes, sinon
+   les deux cartes écartées resteraient dans la rangée. */
+.goal[hidden]{display:none}
 .goal:hover{transform:translateY(-3px)}
-.goal.active{box-shadow:var(--shadow-lift),inset 0 0 0 2px var(--ink)}
 .goal-media{position:absolute;inset:0;display:block;overflow:hidden;z-index:1}
 .goal-media img,
 .goal-media video{
@@ -1407,6 +1455,7 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
 .goal::after{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
   background:linear-gradient(180deg,rgba(12,13,14,0) 46%,rgba(12,13,14,.42) 100%);
+  transition:background .3s ease-out;
 }
 .goal-body{
   position:absolute;left:0;right:0;bottom:0;z-index:var(--z-content);
@@ -1425,33 +1474,157 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
   font-family:var(--font-display);font-weight:600;font-size:.82rem;
   letter-spacing:-.01em;line-height:1.2;color:var(--ink);
 }
-.goal.active .goal-cta{background:var(--cta);color:#fff;box-shadow:none}
-@media(max-width:719px){
-  .goals{gap:10px}
-  .goal{border-radius:var(--radius-md)}
-  .goal-body{gap:8px;border-radius:0 0 var(--radius-md) var(--radius-md)}
-  .goal-cta{padding:8px 14px;font-size:.76rem}
+
+/* ---- Sortie des deux autres --------------------------------------------
+   Elles ne s'évanouissent pas sur place : elles partent vers l'extérieur,
+   chacune de son côté. `--goals-push` (le sens) et le retard sont posés en
+   ligne par le script, qui seul sait laquelle est à gauche de la choisie.
+   Placé APRÈS `.goal:hover`, à spécificité égale, pour qu'une carte qui
+   part sous le curseur ne reste pas soulevée. */
+.goal.is-leaving{
+  opacity:0;pointer-events:none;
+  transform:translateX(var(--goals-push,0)) scale(.96);
+  transition:opacity .24s ease-in,transform .24s ease-in;
+}
+/* Repli (téléphone) : la nacelle passe d'une colonne posée en bas à une
+   rangée qui occupe toute la boîte. `flex-direction` ne s'anime pas — elle
+   se croise donc en fondu au milieu du trajet, quand la carte est déjà
+   trop courte pour qu'on lise son contenu. La durée est celle du repli,
+   passée en ligne par le script : les deux ne peuvent pas se désaccorder. */
+.goal.is-folding .goal-body{
+  animation:goal-swap var(--goals-fold,.34s) ease-in-out both;
+}
+@keyframes goal-swap{
+  0%{opacity:1} 36%{opacity:0} 60%{opacity:0} 100%{opacity:1}
+}
+/* Le voile suit le même croisement : vertical d'un côté, latéral de
+   l'autre, il n'y a rien à interpoler entre les deux. */
+.goal.is-folding::after{opacity:.85}
+
+/* Retour : elles reviennent de l'extérieur, un peu plus vite qu'elles ne
+   sont parties. Un retour se joue toujours plus court qu'un aller. */
+.goal.is-coming{
+  animation:goal-come .28s var(--goals-ease) both;
+}
+@keyframes goal-come{
+  from{opacity:0;transform:translateX(var(--goals-push,0)) scale(.96)}
+  to  {opacity:1;transform:none}
 }
 
-/* Recommandation — n'existe pas tant que rien n'est choisi.
-   Resserrée le 22/08/2026 : elle faisait 1000 x 750px, soit plus de place
-   que le choix qui l'amène, et disait deux fois la même chose (la raison de
-   l'objectif PUIS l'accroche du produit). Elle tient maintenant en 640px,
-   avec une vignette au lieu d'un panneau carré, une seule raison, une seule
-   action. Le fond passe du verre à la surface pleine : à cette taille, un
-   dégradé et une ombre portée de 60px faisaient encart publicitaire. */
+/* ---- État ouvert --------------------------------------------------------
+   La piste cesse de défiler et cesse de rogner : le FLIP fait voyager la
+   carte choisie depuis sa place d'origine, qui peut être bien à droite de
+   la boîte réduite. */
+.goals-stage.is-open .goals{
+  flex:0 0 auto;overflow:visible;scroll-snap-type:none;
+  /* La réserve de 2px n'existe que pour ne pas rogner l'ombre dans le
+     conteneur de défilement. Ouvert, il n'y a plus de défilement — et si
+     on la gardait, le bas du panneau descendrait deux pixels sous celui
+     de la carte. À deux surfaces blanches côte à côte, ça se voit. */
+  padding-bottom:0;
+}
+/* Plus rien à choisir : la carte ouverte cesse de se soulever et de
+   zoomer. Elle reste cliquable — c'est une seconde façon de refermer. */
+.goals-stage.is-open .goal:hover{transform:none}
+.goals-stage.is-open .goal:hover .goal-media img,
+.goals-stage.is-open .goal:hover .goal-media video{transform:none}
+/* La pilule d'appel s'efface : le retour est au-dessus du panneau, le
+   redire ici ferait deux commandes pour un seul geste. Elle recule d'un
+   cheveu plutôt que de s'éteindre à plat — et sa place reste RÉSERVÉE,
+   volontairement : la retirer du flux ferait retomber le titre de la carte
+   au milieu du voyage, seul saut de la séquence. Le titre se retrouve
+   optiquement centré dans la bande basse, ce qui est exactement ce qu'on
+   veut d'une carte qui ne demande plus rien. */
+.goals-stage.is-open .goal-cta{
+  opacity:0;pointer-events:none;transform:translateY(5px) scale(.97);
+}
+.goal-cta{transition:opacity .18s ease-out,transform .26s var(--goals-ease)}
+/* Une seule carte : le repère de défilement n'a plus rien à repérer. */
+.goals-stage.is-open + .card-dots{display:none}
+
+/* ---- La colonne de droite ----------------------------------------------
+   Elle n'existe pas tant que rien n'est choisi. `:not([hidden])` plutôt
+   qu'une règle `[hidden]` séparée : à spécificité supérieure, la règle
+   d'ouverture l'emporterait sur elle et le panneau resterait visible. */
+.reco-wrap{
+  display:none;flex:1 1 0;min-width:0;
+  flex-direction:column;gap:clamp(8px,1vw,12px);
+}
+.goals-stage.is-open .reco-wrap:not([hidden]){display:flex}
+
+/* Le retour : un lien discret, posé au-dessus du panneau. Volontairement
+   pas une pilule pleine — la seule action colorée de la zone doit rester
+   « Ver CIRQA ». Sa surface de clic reste large (padding), sa flèche
+   recule d'un cheveu au survol : c'est tout ce qu'il faut pour dire
+   « en arrière ». */
+.reco-back{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px 6px 8px;margin-left:-8px;
+  border:none;background:none;cursor:pointer;
+  font-family:var(--font-display);font-weight:500;font-size:.82rem;
+  letter-spacing:-.01em;line-height:1.3;color:var(--teal-700);
+  border-radius:var(--radius-pill);
+  transition:color .2s ease-out,background .2s ease-out;
+}
+.reco-back:hover{color:var(--ink);background:var(--surface-teal)}
+.reco-back:focus-visible{outline:3px solid var(--teal-600);outline-offset:2px}
+.reco-back-arrow{display:inline-block;transition:transform .22s var(--goals-ease)}
+.reco-back:hover .reco-back-arrow{transform:translateX(-3px)}
+
+/* ---- Le panneau ---------------------------------------------------------
+   Il remplit toute la hauteur de la carte, et son contenu se centre
+   verticalement : à cette largeur, le contenu ne remplit pas la colonne et
+   le caler en haut laisserait un creux franc sous les compléments. Le fond
+   reste la surface pleine — à cette taille, un dégradé et une ombre portée
+   de 60px feraient encart publicitaire. */
 .reco{
-  margin:clamp(18px,2.4vw,26px) auto 0;max-width:640px;
-  border-radius:var(--radius-lg);padding:clamp(18px,2.2vw,24px);
+  flex:1 1 auto;min-height:0;
+  display:flex;flex-direction:column;justify-content:center;
+  border-radius:var(--radius-lg);padding:clamp(18px,2.6vw,34px);
   background:var(--surface);
   box-shadow:var(--glass-hairline),0 8px 30px rgba(23,25,27,.08);
 }
 .reco:focus-visible{outline:3px solid var(--teal-600);outline-offset:3px}
+
+/* ---- Ouverture du panneau ----------------------------------------------
+   Deux mouvements superposés : le panneau s'ouvre en essuyage depuis la
+   gauche (il vient de la carte, pas de nulle part), et ses lignes montent
+   l'une après l'autre. Le retard est écrit ligne par ligne plutôt que
+   calculé : quatre valeurs, lisibles d'un coup d'œil. */
+.reco{
+  clip-path:inset(0 100% 0 0 round var(--radius-lg));
+  transition:clip-path .42s var(--goals-ease);
+}
+.reco-wrap.is-in .reco{clip-path:inset(0 0 0 0 round var(--radius-lg))}
+.reco-back,
+.reco-head,
+.reco-grid,
+.reco-also{
+  opacity:0;transform:translateY(10px);
+  transition:opacity .3s ease-out,transform .34s var(--goals-ease);
+}
+.reco-wrap.is-in .reco-back,
+.reco-wrap.is-in .reco-head,
+.reco-wrap.is-in .reco-grid,
+.reco-wrap.is-in .reco-also{opacity:1;transform:none}
+.reco-wrap.is-in .reco-back{transition-delay:.02s}
+.reco-wrap.is-in .reco-head{transition-delay:.08s}
+.reco-wrap.is-in .reco-grid{transition-delay:.14s}
+.reco-wrap.is-in .reco-also{transition-delay:.2s}
+/* Fermeture : la colonne entière s'efface d'un bloc et repart vers la
+   droite, d'où elle est venue. Un essuyage inverse ligne par ligne
+   ferait durer une sortie qui doit être immédiate. */
+.reco-wrap.is-out{
+  opacity:0;transform:translateX(14px);
+  transition:opacity .16s ease-in,transform .16s ease-in;
+  pointer-events:none;
+}
+
 /* Une seule ligne de contexte : l'objectif choisi est déjà mis en avant
-   juste au-dessus, le répéter en titre ne disait rien de neuf. */
+   dans la carte à gauche, le répéter en titre ne dirait rien de neuf. */
 .reco-head{
   display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
-  margin-bottom:clamp(12px,1.6vw,16px);
+  margin-bottom:clamp(14px,2vw,20px);
 }
 .reco-goal{
   font-family:var(--font-display);font-weight:600;font-size:.82rem;
@@ -1459,11 +1632,12 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
 }
 /* L'espace d'un `content` est avalé : c'est la marge qui l'écarte. */
 .reco-goal::before{content:"\00b7";margin-right:.42em;color:var(--teal-600)}
-/* Vignette + texte sur une rangée. La vignette est bornée en pixels et non
-   en ratio : c'est ce qui l'empêche de regonfler avec la largeur de carte. */
+/* Vignette + texte sur une rangée. La vignette a grossi le 24/08/2026 avec
+   la colonne : elle reste bornée en pixels et non en ratio, c'est ce qui
+   l'empêche de regonfler indéfiniment avec la largeur du panneau. */
 .reco-grid{
-  display:grid;gap:clamp(14px,2vw,20px);align-items:center;
-  grid-template-columns:clamp(88px,22vw,116px) minmax(0,1fr);
+  display:grid;gap:clamp(16px,2.2vw,26px);align-items:center;
+  grid-template-columns:clamp(112px,17vw,200px) minmax(0,1fr);
 }
 .reco-media{
   position:relative;border-radius:var(--radius-md);overflow:hidden;aspect-ratio:1;
@@ -1473,22 +1647,22 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
   position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
   padding:10px;mix-blend-mode:multiply;
 }
-.reco-body{display:grid;gap:7px;min-width:0}
+.reco-body{display:grid;gap:8px;min-width:0}
 .reco-body h3{
-  font-family:var(--font-display);font-size:clamp(1rem,1.7vw,1.18rem);
+  font-family:var(--font-display);font-size:clamp(1.05rem,1.9vw,1.32rem);
   font-weight:600;letter-spacing:-.022em;line-height:1.25;
 }
-.reco-body>p{color:var(--ink-soft);font-size:.88rem;line-height:1.55;max-width:46ch}
-.reco-price{display:flex;align-items:baseline;gap:8px;margin-top:1px}
-.reco-price b{font-family:var(--font-display);font-size:1.2rem;font-weight:600;letter-spacing:-.03em}
+.reco-body>p{color:var(--ink-soft);font-size:.9rem;line-height:1.6;max-width:48ch}
+.reco-price{display:flex;align-items:baseline;gap:8px;margin-top:2px}
+.reco-price b{font-family:var(--font-display);font-size:1.24rem;font-weight:600;letter-spacing:-.03em}
 .reco-price s{color:var(--teal-600);font-size:.82rem}
 .reco-price small{font-size:.7rem;color:var(--teal-700);letter-spacing:.04em}
-.reco-body .btn{justify-self:start;margin-top:4px}
+.reco-body .btn{justify-self:start;margin-top:6px}
 /* Les compléments sont une note de bas de carte, pas une seconde grille :
    des pastilles en ligne, jamais une colonne par produit. */
 .reco-also{
-  margin-top:clamp(14px,1.8vw,18px);padding-top:14px;
-  border-top:1px solid var(--border);display:grid;gap:9px;
+  margin-top:clamp(16px,2.2vw,24px);padding-top:16px;
+  border-top:1px solid var(--border);display:grid;gap:10px;
 }
 .reco-also-t{
   font-family:var(--font-display);font-size:.66rem;font-weight:600;
@@ -1506,10 +1680,85 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
 .reco-chip span{display:flex;align-items:baseline;gap:7px;min-width:0}
 .reco-chip b{font-family:var(--font-display);font-weight:600;font-size:.84rem;letter-spacing:-.015em;line-height:1.3}
 .reco-chip small{font-size:.72rem;color:var(--teal-700)}
-/* Sous 520px la vignette passerait sous 88px : la rangée se déplie. */
+
+/* =========================================================================
+   Téléphone — le plateau se déplie en colonne
+
+   Le côte-à-côte ne tient pas sous 720px : la carte choisie se replie en
+   bandeau (92px, la boucle en fond, recadrée par `object-fit:cover` donc
+   jamais déformée) et le panneau prend toute la largeur dessous. Le script
+   anime la seule hauteur de la carte : un élément, une propriété, un
+   enfant absolu à replacer — c'est assez peu pour tenir la fréquence
+   d'images sur téléphone.
+   ========================================================================= */
+@media(max-width:719px){
+  .goals-stage{flex-direction:column;gap:12px}
+  .goals{gap:10px}
+  .goal{border-radius:var(--radius-md)}
+  .goal-body{gap:8px;border-radius:0 0 var(--radius-md) var(--radius-md)}
+  .goal-cta{padding:8px 14px;font-size:.76rem}
+
+  /* Le bandeau. `aspect-ratio:auto` rend la main sur la hauteur, que le
+     script fait descendre depuis la hauteur mesurée de la carte. */
+  .goals-stage.is-open .goals{flex:0 0 auto;width:100%}
+  /* `flex:0 0 auto` et non `1 1 auto` : pendant le repli, le script pose
+     une largeur en ligne image par image, et un `flex-grow` la
+     reprendrait aussitôt pour réoccuper la rangée. La carte ne grandirait
+     jamais — elle sauterait. */
+  .goals-stage.is-open .goal{
+    flex:0 0 auto;width:100%;height:92px;aspect-ratio:auto;
+    scroll-snap-align:none;border-radius:var(--radius-md);
+  }
+  /* Un voile latéral au lieu du voile bas : sur 92px de haut, un dégradé
+     vertical ne couvre plus rien et le titre passerait sur l'image nue. */
+  .goals-stage.is-open .goal::after{
+    background:linear-gradient(90deg,rgba(12,13,14,.66) 0%,rgba(12,13,14,.34) 62%,rgba(12,13,14,.2) 100%);
+  }
+  .goals-stage.is-open .goal-body{
+    inset:0;flex-direction:row;align-items:center;justify-content:flex-start;
+    gap:12px;padding:0 16px;text-align:left;border-radius:var(--radius-md);
+  }
+  .goals-stage.is-open .goal-txt b{font-size:1rem}
+  /* Le retour se glisse entre le bandeau et le panneau : même place dans
+     le flux qu'au large, en haut de la colonne de droite. */
+  .reco-wrap{flex:1 1 auto}
+  .reco{padding:clamp(16px,4.4vw,22px)}
+}
+/* Sous 520px la rangée se déplie : le produit se pose au-dessus de son
+   texte, tout se centre. C'est plus beau qu'une vignette de 90px collée
+   à gauche d'un texte étranglé, et c'est la composition du reste du site.
+   Le prix de cette mise en page, c'est la hauteur — d'où le resserrement
+   ci-dessous. L'objectif n'est PAS de tout faire tenir au-dessus de la
+   ligne de flottaison : le nom, la raison, le prix et l'action doivent y
+   être, les compléments doivent seulement dépasser assez pour dire qu'il
+   y a une suite. */
 @media(max-width:519px){
-  .reco-grid{grid-template-columns:1fr}
-  .reco-media{width:104px}
+  .reco-grid{
+    grid-template-columns:1fr;justify-items:center;text-align:center;
+    gap:13px;
+  }
+  .reco-media{width:116px}
+  .reco-body{justify-items:center}
+  .reco-body>p{max-width:38ch}
+  .reco-price{justify-content:center}
+  .reco-body .btn{justify-self:center}
+  .reco-also{margin-top:14px;padding-top:14px;justify-items:center}
+  .reco-also-list{justify-content:center}
+  /* Les pastilles se resserrent : à cette largeur elles se rangent une
+     par ligne, et trois compléments coûtent alors trois rangées pleines. */
+  .reco-chip{padding:5px 12px 5px 6px;gap:8px}
+  .reco-chip img{width:24px;height:24px}
+}
+
+/* Mouvement réduit : aucune chorégraphie. Les cartes écartées disparaissent
+   net, le panneau est là ou n'est pas là. La règle générale du bas de
+   fichier ramène déjà toutes les durées à 0,01ms ; ce qu'il reste à
+   neutraliser, c'est l'essuyage — un `clip-path` sans transition resterait
+   figé sur son état fermé. */
+@media(prefers-reduced-motion:reduce){
+  .reco{clip-path:none}
+  .reco-back,.reco-head,.reco-grid,.reco-also{opacity:1;transform:none}
+  .goal.is-coming,.goal.is-folding .goal-body{animation:none}
 }
 
 /* =========================================================================

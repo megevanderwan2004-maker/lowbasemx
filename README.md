@@ -250,7 +250,11 @@ idempotent : relancé, il remplace l'empreinte au lieu de l'empiler.
 - Ne pas dissocier les cartes d'objectif de la boucle Garmin Connect : les deux
   lisent le **même jeton**, `--media-box` (`clamp(260px,25vw,380px)`, 9/16).
   C'est une demande explicite du propriétaire — retoucher l'une sans l'autre
-  casse l'accord.
+  casse l'accord. Depuis le 24/08/2026 la largeur du plateau des objectifs
+  (`.goals-stage`) se **calcule** à partir de ce jeton — `3 × --media-box +
+  2 × --goals-gap`, soit exactement trois cartes — pour que la boîte soit la
+  même carrousel fermé et panneau ouvert. Changer `--media-box` reste donc
+  légitime, mais le plateau suivra.
 - **Le site est en pleine page depuis le 22/08/2026** : `--gutter` vaut zéro à
   toutes les largeurs, `.shell` et `footer` n'ont plus ni largeur maximale, ni
   coins arrondis, ni ombre. La « carte blanche posée sur une toile grise » a
@@ -474,7 +478,10 @@ Trois points d'attention si on y touche :
    contredire le temps d'une image. Un troisième argument optionnel — `duration`
    en secondes et `easing` — sert aux trajets qui doivent **se voir** : Lenis
    prend alors le pas sur son lerp d'instance. C'est ce qui amène la
-   recommandation des objectifs, en 1,1s et en quintique sortante.
+   recommandation des objectifs, en 1,1s et en quintique sortante. Depuis le
+   24/08/2026 ce trajet est **conditionnel** : le plateau des objectifs garde
+   la même boîte ouvert et fermé, il n'y a donc le plus souvent rien à
+   rattraper au large et la page ne bouge pas.
 3. **Tiroir du panier** — il pose `overflow:hidden` sur le corps ; `cart.js`
    appelle donc `LOWSCROLL.stop()` à l'ouverture et `.start()` à la fermeture,
    sinon Lenis avancerait sa position sur une page immobile et la rendrait d'un

@@ -420,7 +420,33 @@ Three goals in `catalog.js`, each with `id`, `label`, `icon`, `video`, `poster`,
 
 The `icon` field is still in the data but no longer rendered. Nothing is stored or sent — a pure client-side lookup. The result block stays out of the DOM until a goal is chosen, then receives focus on click (but not on arrow-key navigation).
 
-**The cards are deliberately the same box as the Garmin Connect chapter loop** — `aspect-ratio:9/16`, `flex:0 0 min(62vw,230px)` — and the track scrolls at **every** width, not just on mobile. Above 900px the three fit and the track centres itself; on a phone one card reads whole and the next peeks by about a third, which is what says it slides. The radiogroup and its roving tabindex are untouched; only the rendering changes.
+**The cards are deliberately the same box as the Garmin Connect chapter loop** — `aspect-ratio:9/16`, `flex:0 0 clamp(230px,68vw,var(--media-box))` — and the track scrolls at **every** width, not just on mobile. Above 900px the three fit and the track centres itself; on a phone one card reads whole and the next peeks by about a third, which is what says it slides.
+
+### The open state — rewritten 2026-08-24
+
+Opening a goal no longer lays a recommendation **under** the three cards: it **removes the other two and takes their place**. Everything hangs off one wrapper, `.goals-stage`, whose box never changes width:
+
+```
+max-width: min(calc(var(--media-box) * 3 + var(--goals-gap) * 2), 100%)
+```
+
+That is exactly three cards plus two gutters, so the closed track and the open pair occupy the **same rectangle**. Two consequences worth keeping: the chosen card lands precisely where card 1 was (measured at 1440px: card 3 travels 918 → 162, the panel occupies 540 → 1278, which is card 2's left edge to card 3's right edge), and the page does not have to move when a goal is chosen.
+
+| Piece | Closed | Open |
+|-------|--------|------|
+| `.goals` | `flex:1 1 auto`, scrolls, snaps | `flex:0 0 auto`, `overflow:visible`, no snap, no bottom padding |
+| `.goal` × 2 | in the row | `.is-leaving` (240 ms, 40 ms stagger, outward), then `hidden` |
+| `.goal` chosen | — | FLIP to card 1's slot (400 ms) — or folds to a 92 px banner below 720px |
+| `.reco-wrap` | `display:none` | `display:flex`, fills the vacated rectangle |
+| `.card-dots` | shown when the track overflows | hidden via `.goals-stage.is-open + .card-dots` |
+
+**Semantics changed with the gesture.** The cards were `role="radio"` in a `radiogroup` with roving tabindex; the act is no longer "tick one of three" but "open one of three", so they are now plain buttons carrying `aria-expanded` / `aria-controls="reco"`. Arrow keys therefore only **move focus** — they used to select, which would now fire three panel openings just to cross the track. Enter/Space opens, Escape closes and returns focus to the card.
+
+**Four ways back**, all landing in the same `closeGoal()`: the `← Volver a los objetivos` link above the panel, Escape, a click anywhere outside `.goals-stage`, and clicking the open card itself (it is a disclosure button, it toggles).
+
+**The URL carries the choice** — `#objetivo=dormir` via `replaceState`, so a link is shareable and a campaign can land straight on one goal, without a visitor who tries all three needing four presses of Back to leave the site. On a direct landing the module takes `history.scrollRestoration` to `manual` for that load (the browser restores the previous scroll position **after** the first settle, which would otherwise swallow it) and hands it back on `load`.
+
+**Motion tokens** live on `.goals-stage`: `--goals-gap: clamp(10px,1.6vw,18px)` and `--goals-ease: cubic-bezier(.22,1,.36,1)`. The return is deliberately shorter than the outbound trip — 160 + 260 ms against 280 + 400 ms.
 
 ## 9. `app.js` — 17 modules
 
@@ -432,7 +458,7 @@ Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not de
 | `catalog` | Renders the framed grids from `productCard()` (`[data-exclude]`, `[data-handles]`, `[data-category]`) **and** the floating tracks from `flyCard()` (`.fcards[data-handles]`) |
 | `cat-sort` | The aisle pages' sort chips. **Moves** the existing card nodes rather than re-rendering — a re-render would drop the observer that pauses product loops off-screen and restart every video |
 | `shop` | Builds `/tienda` aisles — one carousel per category, then **re-lands the URL fragment**: the aisles are born in JS, so the browser's own jump to `#wearables` fired on an anchor that did not exist yet. It re-lands on every layout shake (fonts, images, arrows folding) until a real gesture — wheel, touch, key, pointer — says the reader has taken over |
-| `goals` | The assistant: radiogroup, roving tabindex, recommendation rendering. The result card was cut down on 2026-08-22 (1000×750 → 640×325): one line of context instead of an eyebrow + title + paragraph, a thumbnail instead of a square panel, `g.why` alone instead of `why` + `p.tagline`, one CTA instead of two. The travel to it is `revealReco()` — `focus({preventScroll:true})` to kill the browser's instant jump, then `scrollToY()` over 1.1 s with a quintic ease-out; it does nothing when the card is already fully in view. |
+| `goals` | The assistant. Disclosure buttons (`aria-expanded`), open/close choreography, recommendation rendering, `#objetivo=<id>` in the URL. All the animation is **declared in CSS** (`.is-leaving`, `.is-open`, `.is-in`, `.is-coming`, `.is-folding`) and only **triggered** here; the sole thing JS computes is the FLIP, which needs real measurements — `travel()` above 720px (position changes, size does not), `fold()` below (size changes, position does not). Landing is `settle()`: it aligns the **section** so the question stays readable above its answer, falls back to the stage alone when the section will not fit, and **does nothing when the stage is already fully in view** — since the stage keeps the same box open and closed, there is usually nothing to catch up. 1.1 s, quintic ease-out, `focus({preventScroll:true})` first to kill the browser's instant jump. |
 | `reveal` | `.rv` scroll reveal + failsafes |
 | `hero-video` | Autoplay/pause logic — **currently inert**, the hero is a still image |
 | `section-loops` | `data-autoloop` videos: play in view, pause out of view and on tab hide |
@@ -593,7 +619,7 @@ vercel --prod
 - **Do not call `window.scrollTo` directly** in `app.js` — use `scrollToY()`, or `LOWSCROLL` from another file.
 - **Do not hand-edit `deploy/lenis.min.js`** — it is a copy; run `npm run vendor:lenis`.
 - **Keep all customer-facing copy in Spanish** (es-MX).
-- **Preserve accessibility**: skip link, ARIA radiogroups with roving tabindex, `sr-only` price context, ≥44px tap targets, `prefers-reduced-motion` fallbacks.
+- **Preserve accessibility**: skip link, ARIA radiogroups with roving tabindex (product colour/size — the goal cards are disclosure buttons, see §8), `sr-only` price context, ≥44px tap targets, `prefers-reduced-motion` fallbacks.
 
 ### Adding a product
 1. Append an entry to `PRODUCTS` in `deploy/catalog.js` (`handle`, `name`, `short`, `brand`, `tagline`, `price`, `category`, `image`, `highlights`, `specs`; optional `badge`, `compareAt`, `colors`, `sizes`, `shopify`, `packshot`, `video`, `poster`, `videoRatio`, `story`).

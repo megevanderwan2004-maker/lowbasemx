@@ -423,16 +423,35 @@
   }
 
   module("goals", function(){
-    var host = $("goals"), out = $("reco");
-    if (!host || !out || !CATALOG.goals) return;
+    var stage = $("goals-stage"),
+        host  = $("goals"),
+        wrap  = $("reco-wrap"),
+        out   = $("reco"),
+        back  = $("reco-back");
+    if (!stage || !host || !wrap || !out || !back || !CATALOG.goals) return;
 
-    /* Le visuel occupe toute la carte ; la nacelle de verre se pose dessus,
-       titre et affordance à l'intérieur. Le pseudo-bouton « Ver selección »
-       est un span : la carte est déjà un bouton radio, un bouton imbriqué
-       serait invalide. */
-    host.innerHTML = CATALOG.goals.map(function(g, i){
-      return '<button class="goal" type="button" role="radio" aria-checked="false" ' +
-          'tabindex="' + (i === 0 ? "0" : "-1") + '" data-goal="' + esc(g.id) + '">' +
+    /* Même seuil que la feuille de style. Au-dessus, le plateau est une
+       rangée : la carte choisie VOYAGE jusqu'à la place de la première.
+       En dessous il est une colonne : elle SE REPLIE en bandeau. Deux
+       gestes différents, un seul état — c'est le format qui décide, pas
+       le script. */
+    function narrow(){
+      return window.matchMedia
+        ? window.matchMedia("(max-width: 719px)").matches
+        : window.innerWidth <= 719;
+    }
+
+    /* Les cartes ne sont plus des boutons radio. Le geste a changé : il ne
+       s'agit plus de cocher une option parmi trois mais d'en OUVRIR une,
+       et `aria-expanded` le dit exactement. Conséquence directe : plus de
+       tabindex tournant — les trois cartes sont trois boutons ordinaires,
+       la tabulation les parcourt, les flèches ne font que déplacer le
+       focus (voir plus bas), et l'ouverture demande Entrée ou Espace.
+       Le pseudo-bouton « Ver selección » reste un span : la carte est déjà
+       un bouton, un bouton imbriqué serait invalide. */
+    host.innerHTML = CATALOG.goals.map(function(g){
+      return '<button class="goal" type="button" aria-expanded="false" aria-controls="reco" ' +
+          'data-goal="' + esc(g.id) + '">' +
           goalMedia(g) +
           /* La nacelle est transparente : c'est le voile en dégradé de la
              carte (.goal::after) qui porte la lisibilité, et seul le
@@ -445,6 +464,14 @@
     }).join("");
 
     var buttons = Array.prototype.slice.call(host.querySelectorAll(".goal"));
+    var openBtn = null;   /* la carte ouverte, ou null */
+    var timers  = [];     /* les étapes en attente — toutes annulables */
+
+    function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+    /* Un second clic pendant qu'une chorégraphie se joue ne doit pas
+       empiler deux séquences : chaque entrée commence par tout annuler.
+       C'est ce qui rend l'aller-retour rapide inoffensif. */
+    function cancel(){ while (timers.length) clearTimeout(timers.pop()); }
 
     function render(g){
       var p = CATALOG.byHandle(g.pick);
@@ -453,13 +480,16 @@
 
       /* Trois retraits par rapport à la version longue, tous pour la même
          raison — la carte disait deux fois la même chose :
-         · le titre reprenait l'objectif, déjà mis en avant juste au-dessus ;
+         · le titre reprenait l'objectif, déjà porté par la carte restée à
+           gauche ;
          · `p.tagline` doublait `g.why`, et c'est `why` qui est utile : il
            dit pourquoi CE produit pour CET objectif ;
          · « Ver toda la tienda » renvoyait ailleurs au moment précis où l'on
            vient de répondre à la question posée.
          Reste une ligne de contexte, une vignette, une raison, un prix, une
-         action. */
+         action. Ces trois blocs — `.reco-head`, `.reco-grid`, `.reco-also` —
+         sont aussi les trois lignes que la CSS fait monter l'une après
+         l'autre à l'ouverture : les renommer casserait le décalé. */
       out.innerHTML =
         '<p class="reco-head">' +
           '<span class="eyebrow">Tu recomendación</span>' +
@@ -491,65 +521,366 @@
               '</div>' +
             '</div>'
           : "");
-
-      out.hidden = false;
     }
 
-    /* Le résultat doit se poser, pas surgir : 1,1s au lieu des ~0,3s du saut
-       natif, avec une sortie en quintique — le trajet part franchement puis
-       s'amortit longuement sur la fin, ce qui donne le glissement lent
-       demandé sans allonger l'attente au départ. */
-    function revealReco(){
-      if (!out || out.hidden) return;
-      var box = out.getBoundingClientRect();
+    /* -------------------------------------------------------------------
+       FLIP — la seule chose que la CSS ne peut pas faire seule
+
+       Le principe : on mesure AVANT (`first`), on laisse le navigateur
+       poser la mise en page d'arrivée, on mesure APRÈS, puis on repousse
+       l'élément à sa position de départ d'un coup et on le relâche. Il
+       n'anime donc jamais une mise en page, seulement une transformée —
+       et la place qu'il occupe dans la rangée est la bonne dès la
+       première image.
+       ------------------------------------------------------------------- */
+    /* Au large : la carte change de place, jamais de taille. */
+    function travel(el, first, ms, done){
+      var last = el.getBoundingClientRect();
+      var dx = first.left - last.left, dy = first.top - last.top;
+      if (Math.abs(dx) < .5 && Math.abs(dy) < .5){ if (done) done(); return; }
+      el.style.transition = "none";
+      el.style.transform  = "translate(" + Math.round(dx) + "px," + Math.round(dy) + "px)";
+      /* Lire une valeur calculée force le navigateur à APPLIQUER l'état de
+         départ avant qu'on pose celui d'arrivée. Sans cette lecture les
+         deux seraient regroupés dans la même image et rien ne bougerait. */
+      void el.offsetWidth;
+      el.style.transition = "transform " + ms + "ms var(--goals-ease)";
+      el.style.transform  = "";
+      later(function(){
+        el.style.transition = ""; el.style.transform = "";
+        if (done) done();
+      }, ms);
+    }
+
+    /* Sur téléphone : la carte change de taille, jamais de place. Deux
+       propriétés animées sur UN élément dont l'unique enfant est en
+       position absolue — c'est assez peu pour tenir la fréquence d'images.
+       `object-fit:cover` sur la boucle fait le reste : elle est recadrée,
+       jamais déformée. */
+    function fold(el, first, ms, done){
+      var last = el.getBoundingClientRect();
+      if (Math.abs(first.height - last.height) < .5 &&
+          Math.abs(first.width  - last.width)  < .5){ if (done) done(); return; }
+      el.style.setProperty("--goals-fold", ms + "ms");
+      flag(el, "is-folding", true);
+      el.style.transition = "none";
+      el.style.width  = first.width  + "px";
+      el.style.height = first.height + "px";
+      void el.offsetWidth;
+      el.style.transition = "width " + ms + "ms var(--goals-ease),height " + ms + "ms var(--goals-ease)";
+      el.style.width  = last.width  + "px";
+      el.style.height = last.height + "px";
+      later(function(){
+        el.style.transition = ""; el.style.width = ""; el.style.height = "";
+        el.style.removeProperty("--goals-fold");
+        flag(el, "is-folding", false);
+        if (done) done();
+      }, ms);
+    }
+
+    /* -------------------------------------------------------------------
+       Le glissement de la page
+
+       Il ne se déclenche plus systématiquement. Depuis que le plateau
+       garde exactement la même boîte ouvert et fermé, il n'y a le plus
+       souvent RIEN à rattraper sur grand écran : bouger la page serait un
+       mouvement gratuit, et franchement agaçant pour qui essaie les trois
+       objectifs l'un après l'autre. On ne glisse donc que si le plateau
+       déborde vraiment de l'écran — en pratique sur téléphone et sur les
+       petits portables.
+       Quand il glisse, il se pose : 1,1s en quintique sortante, le trajet
+       part franchement puis s'amortit longuement sur la fin.
+       ------------------------------------------------------------------- */
+    function settle(instant, landing){
+      var box = stage.getBoundingClientRect();
       /* Le dégagement se mesure sur la pilule elle-même : elle est fixe,
          change de hauteur sous 1024px et porte ses propres marges. */
       var pill = document.querySelector(".nav-pill");
       var haut = pill ? pill.getBoundingClientRect().bottom + 18 : 96;
-      /* Déjà en vue et en entier : bouger la page serait gratuit. */
-      if (box.top >= haut && box.bottom <= window.innerHeight) return;
-      scrollToY((window.pageYOffset || document.documentElement.scrollTop) + box.top - haut,
-        false, { duration: 1.1, easing: function(t){ return 1 - Math.pow(1 - t, 5); } });
-    }
+      /* Déjà en vue, et en entier : il n'y a rien à rattraper. Un
+         atterrissage, lui, se cale toujours — la page vient de s'ouvrir,
+         personne n'a encore rien lu. */
+      if (!landing && box.top >= haut && box.bottom <= window.innerHeight) return;
 
-    function select(btn, moveFocus){
-      var g = CATALOG.byGoal(btn.getAttribute("data-goal"));
-      if (!g) return;
-      each(buttons, function(b){
-        var on = b === btn;
-        b.className = on
-          ? (b.className.replace(/\s*active/g, "") + " active")
-          : b.className.replace(/\s*active/g, "");
-        b.setAttribute("aria-checked", on ? "true" : "false");
-        b.tabIndex = on ? 0 : -1;
-      });
-      render(g);
-      /* Le focus ne part sur la recommandation qu'au clic : au clavier il
-         doit rester dans le groupe pour continuer à parcourir les choix.
-         `preventScroll` est la moitié qui compte : sans lui, le navigateur
-         saute d'un coup sur l'élément focalisé et c'est CE saut qu'on voyait,
-         pas un défilement. On le lui retire, puis on refait le trajet. */
-      if (moveFocus){
-        try { out.focus({ preventScroll: true }); } catch(e){ out.focus(); }
-        revealReco();
+      /* On préfère caler la SECTION plutôt que le seul plateau : l'amorce
+         et la question restent alors lisibles au-dessus de leur réponse,
+         ce qui vaut mieux qu'un panneau qui arrive seul avec son titre
+         coupé par le haut de l'écran. On ne se rabat sur le plateau que si
+         la section entière ne tient pas sous la nav — sur téléphone,
+         essentiellement.
+         `landing` lève cette réserve : quelqu'un qui arrive par
+         `#objetivo=rendimiento`, depuis une campagne par exemple, doit
+         d'abord lire la question. Que la réponse dépasse sous la ligne de
+         flottaison n'est pas un problème, c'est une invitation à
+         descendre — alors qu'un gros titre tronqué en haut d'écran est un
+         accident. */
+      var cible = stage, sec = $("objetivo");
+      if (sec){
+        var haine = sec.getBoundingClientRect().top;
+        if (landing || haut + (box.bottom - haine) <= window.innerHeight) cible = sec;
       }
+      var cb = cible.getBoundingClientRect();
+      scrollToY((window.pageYOffset || document.documentElement.scrollTop) + cb.top - haut,
+        !!instant, { duration: 1.1, easing: function(t){ return 1 - Math.pow(1 - t, 5); } });
     }
 
+    /* L'objectif ouvert s'écrit dans l'URL : le lien devient partageable,
+       et une campagne qui parle de sommeil peut faire atterrir directement
+       sur la recommandation « dormir ». `replaceState` et non `pushState` :
+       celui qui essaie les trois objectifs ne doit pas avoir à appuyer
+       quatre fois sur « précédent » pour quitter le site. Le retour reste
+       donc « ← Volver », Échap, et le clic hors du plateau. */
+    function stamp(id){
+      if (!window.history || !history.replaceState) return;
+      try {
+        history.replaceState(null, "",
+          location.pathname + location.search +
+          (id ? "#objetivo=" + encodeURIComponent(id) : "#objetivo"));
+      } catch(e){}
+    }
+
+    /* Le sens dans lequel une carte écartée sort — et revient : vers
+       l'extérieur, chacune de son côté de la carte ouverte. */
+    function push(j, i){ return (j < i ? "-28px" : "28px"); }
+
+    /* -------------------------------------------------------------------
+       Ouvrir
+       ------------------------------------------------------------------- */
+    function openGoal(btn, opts){
+      opts = opts || {};
+      var g = CATALOG.byGoal(btn.getAttribute("data-goal"));
+      if (!g || openBtn === btn) return;
+      cancel();
+
+      var i = buttons.indexOf(btn);
+      var first = btn.getBoundingClientRect();
+      var small = narrow();
+
+      /* Le basculement d'état lui-même : les deux autres quittent la
+         rangée POUR DE BON — c'est ce retrait, et lui seul, qui libère la
+         place que le panneau vient prendre. */
+      function place(){
+        each(buttons, function(b){
+          if (b === btn) return;
+          b.hidden = true;
+          flag(b, "is-leaving", false);
+          b.style.transitionDelay = "";
+          b.style.removeProperty("--goals-push");
+        });
+        btn.setAttribute("aria-expanded", "true");
+        flag(stage, "is-open", true);
+        wrap.hidden = false;
+        render(g);
+        openBtn = btn;
+        stamp(g.id);
+      }
+
+      function focusPanel(){
+        /* `preventScroll` est la moitié qui compte : sans lui, le
+           navigateur saute d'un coup sur l'élément focalisé et c'est CE
+           saut qu'on voyait, pas un défilement. On le lui retire, puis on
+           refait le trajet nous-mêmes s'il y a lieu. */
+        try { out.focus({ preventScroll: true }); } catch(e){ out.focus(); }
+      }
+
+      /* Mouvement réduit, ou ouverture directe depuis l'URL : pas de
+         chorégraphie du tout. On arrive, c'est ouvert. */
+      if (reduceMotion || opts.instant){
+        place();
+        flag(wrap, "is-in", true);
+        if (opts.focus) focusPanel();
+        settle(!!opts.instant, !!opts.landing);
+        return;
+      }
+
+      /* 1. Les deux autres partent vers l'extérieur, à 40ms d'écart. */
+      var k = 0;
+      each(buttons, function(b, j){
+        if (b === btn) return;
+        b.style.setProperty("--goals-push", push(j, i));
+        b.style.transitionDelay = (k++ * 40) + "ms";
+        flag(b, "is-leaving", true);
+      });
+
+      /* 2. 240ms de sortie + 40ms de retard pour la seconde : la place est
+            libre, la carte choisie peut la rejoindre. */
+      later(function(){
+        place();
+        if (small) fold(btn, first, 340, function(){ settle(false); });
+        else { travel(btn, first, 400, null); settle(false); }
+
+        /* 3. Le panneau s'ouvre PENDANT que la carte finit son trajet.
+              Ce recouvrement est le détail qui empêche la séquence de se
+              lire comme trois étapes distinctes : à l'œil, c'est un seul
+              mouvement qui se transforme. */
+        later(function(){ flag(wrap, "is-in", true); }, 100);
+        if (opts.focus) later(focusPanel, 140);
+      }, 280);
+    }
+
+    /* -------------------------------------------------------------------
+       Refermer — le miroir exact, en plus court. Un retour ne se contemple
+       pas : 160 + 260ms là où l'aller en prend 280 + 400.
+       ------------------------------------------------------------------- */
+    function closeGoal(opts){
+      opts = opts || {};
+      if (!openBtn) return;
+      cancel();
+
+      var btn = openBtn, i = buttons.indexOf(btn), small = narrow();
+      var first = btn.getBoundingClientRect();
+
+      function restore(){
+        each(buttons, function(b){
+          b.hidden = false;
+          flag(b, "is-leaving", false);
+          b.style.transitionDelay = "";
+        });
+        btn.setAttribute("aria-expanded", "false");
+        flag(stage, "is-open", false);
+        flag(wrap, "is-in",  false);
+        flag(wrap, "is-out", false);
+        wrap.hidden = true;
+        openBtn = null;
+        stamp(null);
+        /* Sur téléphone la piste redéfile dès qu'elle a de nouveau trois
+           cartes : on la ramène sur celle qu'on vient de quitter, sinon
+           elle réapparaîtrait hors de l'écran, à droite. */
+        if (small){
+          host.scrollLeft = Math.max(0,
+            btn.offsetLeft - (host.clientWidth - btn.offsetWidth) / 2);
+        }
+      }
+
+      function giveBack(){
+        if (!opts.focus) return;
+        try { btn.focus({ preventScroll: true }); } catch(e){ btn.focus(); }
+      }
+
+      if (reduceMotion || opts.instant){ restore(); giveBack(); return; }
+
+      /* 1. La colonne s'efface d'un bloc et repart vers la droite, d'où
+            elle était venue. Un essuyage inverse ligne par ligne ferait
+            durer une sortie qui doit être immédiate. */
+      flag(wrap, "is-out", true);
+
+      later(function(){
+        restore();
+        if (small) fold(btn, first, 260, null);
+        else travel(btn, first, 260, null);
+
+        /* 2. Les deux autres reviennent de l'extérieur, dans l'ordre où
+              elles étaient parties. `both` sur l'animation les tient
+              invisibles pendant leur retard : sans lui, elles
+              apparaîtraient une image avant de commencer. */
+        var k = 0;
+        each(buttons, function(b, j){
+          if (b === btn) return;
+          b.style.setProperty("--goals-push", push(j, i));
+          b.style.animationDelay = (60 + k++ * 40) + "ms";
+          flag(b, "is-coming", true);
+        });
+        later(function(){
+          each(buttons, function(b){
+            flag(b, "is-coming", false);
+            b.style.animationDelay = "";
+            b.style.removeProperty("--goals-push");
+          });
+        }, 420);
+
+        giveBack();
+      }, 160);
+    }
+
+    /* -------------------------------------------------------------------
+       Commandes
+       ------------------------------------------------------------------- */
     each(buttons, function(b){
-      b.addEventListener("click", function(){ select(b, true); }, false);
+      b.addEventListener("click", function(){
+        /* La carte ouverte referme : c'est un bouton d'ouverture, il se
+           comporte comme tel dans les deux sens. Une seconde façon de
+           revenir, en plus du lien au-dessus du panneau. */
+        if (openBtn === b) closeGoal({ focus: true });
+        else openGoal(b, { focus: true });
+      }, false);
     });
 
+    back.addEventListener("click", function(){ closeGoal({ focus: true }); }, false);
+
+    /* Échap ferme, où que soit le focus dans le plateau — y compris dans
+       le panneau, où il atterrit à l'ouverture. */
+    stage.addEventListener("keydown", function(e){
+      if (!openBtn) return;
+      if (e.key !== "Escape" && e.key !== "Esc") return;
+      e.preventDefault();
+      closeGoal({ focus: true });
+    }, false);
+
+    /* Un clic hors du plateau ferme aussi. En phase de bouillonnement, et
+       donc APRÈS le gestionnaire des cartes : le clic qui vient d'ouvrir
+       remonte bien jusqu'ici, mais sa cible est dans le plateau et la
+       remontée s'arrête là. */
+    document.addEventListener("click", function(e){
+      if (!openBtn) return;
+      var n = e.target;
+      while (n && n !== document){
+        if (n === stage) return;
+        n = n.parentNode;
+      }
+      closeGoal({});
+    }, false);
+
+    /* Les flèches ne font plus que DÉPLACER le focus. Avant, elles
+       cochaient l'option suivante — c'était juste pour un groupe de
+       boutons radio ; maintenant qu'un choix ouvre un panneau, elles
+       déclencheraient trois ouvertures pour traverser la piste. */
     host.addEventListener("keydown", function(e){
-      var i = buttons.indexOf(document.activeElement);
-      if (i < 0) return;
-      var d = (e.key === "ArrowRight" || e.key === "ArrowDown") ? 1
+      var d = (e.key === "ArrowRight" || e.key === "ArrowDown") ?  1
             : (e.key === "ArrowLeft"  || e.key === "ArrowUp")   ? -1 : 0;
       if (!d) return;
+      var libres = [];
+      each(buttons, function(b){ if (!b.hidden) libres.push(b); });
+      var i = libres.indexOf(document.activeElement);
+      /* Ouvert, il ne reste qu'une carte : la flèche n'a nulle part où
+         aller et la page doit garder son défilement au clavier. */
+      if (i < 0 || libres.length < 2) return;
       e.preventDefault();
-      var next = buttons[(i + d + buttons.length) % buttons.length];
-      select(next, false);
-      next.focus();
+      libres[(i + d + libres.length) % libres.length].focus();
     }, false);
+
+    /* Ouverture directe : `#objetivo=dormir`. Aucun élément ne porte cet
+       identifiant, le navigateur ne sait donc pas résoudre l'ancre — c'est
+       à nous d'amener la page sur la section, et sans animation : à
+       l'arrivée sur une page on atterrit, on ne glisse pas. Le court
+       décalage laisse Lenis démarrer avant qu'on lui demande un trajet. */
+    var direct = /^#objetivo=(.+)$/.exec(location.hash || "");
+    if (direct){
+      var vise = null;
+      each(buttons, function(b){
+        if (b.getAttribute("data-goal") === decodeURIComponent(direct[1])) vise = b;
+      });
+      if (vise){
+        /* Au RECHARGEMENT, le navigateur repose la page où elle était à la
+           visite précédente — et il le fait APRÈS ce premier calage, qui
+           passerait donc à la trappe. On lui retire la main le temps de
+           l'atterrissage, puis on la lui rend une fois `load` passé pour
+           que les rechargements suivants retrouvent leur comportement
+           normal. La seconde passe de `settle` est la ceinture : si la
+           restauration a malgré tout eu lieu, elle la corrige. */
+        var garde = null;
+        try {
+          garde = history.scrollRestoration;
+          history.scrollRestoration = "manual";
+        } catch(e){}
+        setTimeout(function(){ openGoal(vise, { instant: true, landing: true }); }, 60);
+        window.addEventListener("load", function(){
+          setTimeout(function(){
+            if (openBtn === vise) settle(true, true);
+            try { if (garde) history.scrollRestoration = garde; } catch(e){}
+          }, 0);
+        }, false);
+      }
+    }
   });
 
   /* =====================================================================
