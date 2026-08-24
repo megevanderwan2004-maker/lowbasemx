@@ -36,7 +36,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   "currenciesAccepted": "MXN"
 }
 </script>
-<link rel="stylesheet" href="/styles.css?v=f7a93389">
+<link rel="stylesheet" href="/styles.css?v=7ef727b1">
 </head>
 <body class="has-hero">
 
@@ -101,21 +101,24 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       <source src="/media/landing/hero/hero-mobile.mp4" type="video/mp4">
     </video>
     <h1 class="sr-only">lowlabs — curated wellness and technology</h1>
-    <!-- La photo portait le wordmark et la baseline incrustés ; la vidéo,
-         non. Ils reviennent donc en HTML, au-dessus de 760px seulement :
-         sous ce seuil c'est la boucle mobile qui porte le wordmark, et la
-         baseline est déjà reprise par .hero-tagline. Décoratifs — le h1
-         hors écran ci-dessus dit déjà les mêmes mots. -->
+    <!-- Le wordmark seul. La photo le portait incrusté avec sa baseline ; la
+         vidéo, non. Depuis le 23/08/2026 la baseline est descendue rejoindre
+         les actions, et passe SOUS elles : ce sont les deux portes d'entrée
+         qu'on vient chercher, la baseline n'est qu'une signature. Décoratif —
+         le h1 hors écran ci-dessus dit déjà les mêmes mots. Masqué sous 760px,
+         où la boucle mobile porte encore son wordmark incrusté. -->
     <div class="hero-mark rv" aria-hidden="true">
       <p class="wordmark">lowlabs</p>
-      <p class="wordmark-sub" lang="en">Curated <b>wellness</b> and <b>technology</b></p>
     </div>
     <div class="hero-full-inner">
-      <p class="hero-tagline rv" lang="en">Curated <b>wellness</b> and <b>technology</b></p>
+      <!-- Les deux rayons, et non les ancres de la page : depuis qu'ils sont
+           des pages à part entière, y envoyer directement épargne au visiteur
+           un défilement pour retrouver ce qu'il vient de demander. -->
       <div class="hero-actions rv">
-        <a class="btn btn-smoke btn-lg" href="#suplementos">Suplementos</a>
-        <a class="btn btn-smoke btn-lg" href="#wearables">Wearables</a>
+        <a class="btn btn-smoke btn-lg" href="/suplementos">Suplementos</a>
+        <a class="btn btn-smoke btn-lg" href="/wearables">Wearables</a>
       </div>
+      <p class="hero-tagline rv" lang="en">Curated <b>wellness</b> and <b>technology</b></p>
     </div>
   </header>
 
@@ -145,6 +148,32 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       <!-- Repère de défilement : rempli par app.js, retiré s'il n'y a
            qu'une page à voir. -->
       <div class="card-dots" aria-hidden="true"></div>
+    </section>
+
+    <!-- ===== Assistant : commencer par l'objectif, pas par le produit.
+         Remonté juste sous « Los más buscados » le 23/08/2026 : qui n'a rien
+         reconnu dans le premier carrousel doit trouver l'autre entrée tout de
+         suite, pas quatre sections plus bas. La numérotation des amorces le
+         suivait déjà — 01 puis 02 sont enfin voisines. ===== -->
+    <section class="goals-sec" id="objetivo" aria-labelledby="objetivo-t">
+      <div class="container">
+        <div class="section-head center rv">
+          <div>
+            <span class="eyebrow">02 — Compra por objetivo</span>
+            <h2 id="objetivo-t">Empieza por cómo quieres sentirte.</h2>
+            <p>Dinos qué buscas y te decimos con qué empezar. Sin cuestionarios largos, sin correo.</p>
+          </div>
+        </div>
+
+        <div class="goals rv" id="goals" role="radiogroup" aria-label="¿Qué buscas?"></div>
+        <!-- Même repère que sous les carrousels : présent seulement là où
+             la piste défile, donc sur mobile. -->
+        <div class="card-dots" aria-hidden="true"></div>
+
+        <!-- La recommandation est injectée ici : elle n'existe pas tant que
+             l'utilisateur n'a pas choisi, et le focus s'y déplace au clic. -->
+        <div class="reco" id="reco" hidden tabindex="-1" aria-live="polite"></div>
+      </div>
     </section>
 
 
@@ -229,30 +258,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
     <!-- Venu® 4 et Vívoactive® 6 n'ont plus de chapitre ici : la home garde
          la CIRQA et les suppléments. Les deux montres restent au catalogue,
          donc en boutique, dans le pied de page et sur leur fiche. -->
-
-    <!-- ===== Assistant : commencer par l'objectif, pas par le produit.
-         Posé entre le rayon wearables et le rayon suppléments : il fait
-         la charnière entre les deux, plutôt que de conclure la page. ===== -->
-    <section class="goals-sec" id="objetivo" aria-labelledby="objetivo-t">
-      <div class="container">
-        <div class="section-head center rv">
-          <div>
-            <span class="eyebrow">02 — Compra por objetivo</span>
-            <h2 id="objetivo-t">Empieza por cómo quieres sentirte.</h2>
-            <p>Dinos qué buscas y te decimos con qué empezar. Sin cuestionarios largos, sin correo.</p>
-          </div>
-        </div>
-
-        <div class="goals rv" id="goals" role="radiogroup" aria-label="¿Qué buscas?"></div>
-        <!-- Même repère que sous les carrousels : présent seulement là où
-             la piste défile, donc sur mobile. -->
-        <div class="card-dots" aria-hidden="true"></div>
-
-        <!-- La recommandation est injectée ici : elle n'existe pas tant que
-             l'utilisateur n'a pas choisi, et le focus s'y déplace au clic. -->
-        <div class="reco" id="reco" hidden tabindex="-1" aria-live="polite"></div>
-      </div>
-    </section>
 
     <!-- ===== Suppléments — bannière vidéo dorée ===== -->
     <section id="suplementos" style="padding-bottom:0" aria-labelledby="sup-t">
@@ -396,7 +401,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
 <!-- Défilement fluide : une seule instance, démarrée par app.js. -->
 <script src="/lenis.min.js?v=daec1872" defer></script>
-<script src="/catalog.js?v=441a1228" defer></script>
+<script src="/catalog.js?v=3db17903" defer></script>
 <script src="/cart.js?v=5487c53c" defer></script>
 <script src="/app.js?v=bc6b61de" defer></script>
 </body>

@@ -106,6 +106,19 @@ Conventions :
   Les deux en-têtes de rayon corrigent le cadrage avec
   `.cat-head .band>video{object-position:center 30%}` — à retenir avant d'y
   poser une nouvelle source verticale.
+- **Un visuel de marque en `_160x` est une vignette, pas une source.** Les
+  boutiques Shopify servent leurs images sous plusieurs tailles, et un clic
+  droit sur une page produit attrape souvent la vignette de 160px — six fois
+  trop petite pour une galerie, qui affiche jusqu'à 900. L'original s'obtient
+  du catalogue public de la boutique :
+
+  ```bash
+  curl -s "https://<boutique>/products/<handle>.json" | python3 -m json.tool
+  ```
+
+  `images[].src` y donne l'adresse pleine taille, et `width`/`height` la
+  vérifient avant téléchargement. C'est ainsi que les trois vues de Relax ont
+  été récupérées en 1200x1500 le 23/08/2026, à la place de vignettes 160x200.
 - **`archivo/`** ne se supprime pas à la légère : ce sont les visuels des
   sections retirées (bannière Ritual, anciens objectifs, suppléments Cymbiotika
   remplacés), gardés au cas où une section reviendrait.
@@ -277,8 +290,18 @@ Deux boucles vidéo, deux comportements :
   son clipping le temps de le laisser passer. La vidéo est en 9/16 : un écran
   plus étroit la rogne sur les côtés, le wordmark **y est toujours incrusté** et
   survit au recadrage. C'est pourquoi `.hero-mark` est masquée sous 760px : elle
-  dédoublerait le wordmark. La baseline, elle, sort du cadre et est reprise par
-  `.hero-tagline`, qui ne vit que sous ce seuil.
+  dédoublerait le wordmark.
+
+**Ordre du hero depuis le 23/08/2026** : wordmark, puis les **deux actions**,
+puis la baseline. Elles étaient sous elle ; ce sont pourtant elles qu'on vient
+chercher, la baseline n'est qu'une signature. `.hero-mark` ne porte donc plus
+que le wordmark, `.wordmark-sub` a quitté le hero, et `.hero-tagline` porte la
+baseline **aux deux formats** — elle était masquée au-dessus de 760px et reprend
+maintenant la graduation de `.wordmark-sub` dans cette requête média.
+
+Les deux actions mènent à **`/suplementos`** et **`/wearables`**, les pages, et
+non aux ancres `#suplementos` / `#wearables` de l'accueil. Les sections gardent
+leurs identifiants pour qui arrive par un lien profond.
 
 Aucune des deux boucles n'a **d'`autoplay` ni de `poster`** : les deux
 déclenchent le téléchargement même quand l'élément est masqué, et chaque format

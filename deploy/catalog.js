@@ -265,6 +265,23 @@
       image: "/media/productos/promix-relax/promix-relax.png",
       hero: "/media/productos/promix-relax/promix-relax.png",
       packshot: "/media/productos/promix-relax/promix-relax.png",
+      /* Le visuel principal est un détourage : sans ce drapeau, aucun cadre ne
+         porte `.contain`, la règle `.gal-stage:has(.gal-frame.contain)` ne
+         prend pas, et le bocal se posait sur la plaque grise du cadre. */
+      shotFit: "contain",
+      /* Trois vues ajoutées le 23/08/2026, là où la fiche n'en avait qu'une et
+         aucune vignette. Ce sont les originaux 1200x1500 du site Promix,
+         recadrés au carré ici plutôt que rognés par le `cover` du cadre — le
+         cadrage se choisit, il ne se subit pas.
+         Deux autres vues existent chez Promix et sont volontairement écartées :
+         « supplement facts » et « key benefits » sont des panneaux de texte EN
+         ANGLAIS. La fiche est en espagnol et porte déjà ces informations dans
+         `highlights` et `specs`. */
+      gallery: [
+        "/media/productos/promix-relax/relax-bote.jpg",
+        "/media/productos/promix-relax/relax-ritual.jpg",
+        "/media/productos/promix-relax/relax-capsulas.jpg"
+      ],
       highlights: [
         "Apoya un sueño reparador¹",
         "Favorece la relajación muscular¹",

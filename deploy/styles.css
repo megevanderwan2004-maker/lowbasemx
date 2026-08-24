@@ -1287,11 +1287,15 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
   position:absolute;left:0;right:0;bottom:0;z-index:var(--z-content);
   display:flex;flex-direction:column;align-items:center;
   text-align:center;gap:14px;
-  padding:0 clamp(14px,4vw,40px) calc(clamp(18px,3vw,26px) + var(--dock-h));
+  /* La réserve basse a grandi le 23/08/2026 : la baseline est passée sous les
+     actions, donc c'est elle qui longe le dock désormais, et 18px n'en
+     laissaient plus que 6 entre les deux. */
+  padding:0 clamp(14px,4vw,40px) calc(clamp(30px,4.5vw,38px) + var(--dock-h));
 }
-/* La baseline reprend en HTML ce que le recadrage mobile fait sortir du
-   cadre. Au-delà de 760px la version incrustée est visible : on masque
-   celle-ci pour ne pas la dédoubler. */
+/* La baseline, désormais SOUS les actions et présente aux deux formats.
+   Elle était masquée au-dessus de 760px, où `.wordmark-sub` la reprenait
+   dans le bloc centré ; depuis le 23/08/2026 il n'y a plus qu'un seul
+   porteur, celui-ci, et `.wordmark-sub` a quitté le hero. */
 .hero-tagline{
   color:#fff;font-family:var(--font-display);font-weight:500;
   font-size:clamp(1rem,4.6vw,1.3rem);line-height:1.3;letter-spacing:-.01em;
@@ -1305,18 +1309,24 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
   .hero-full-inner .btn{flex:1 1 0;min-width:0;padding:12px 10px;font-size:.85rem;min-height:46px}
 }
 @media(min-width:760px){
-  /* Les deux actions sont centrées sous .hero-mark, lui aussi centré. La
-     baseline y est reprise : celle-ci ne sert plus qu'au mobile. */
+  /* Les actions et la baseline sont centrées sous .hero-mark, lui aussi
+     centré. La baseline reprend ici la graduation que portait
+     `.wordmark-sub` : `4.6vw` est calibré pour un téléphone et retomberait
+     à sa borne basse sur un grand écran. */
   .hero-full-inner{
     align-items:center;
     padding:0 clamp(18px,4vw,40px) calc(clamp(28px,4vw,56px) + var(--dock-h));
   }
-  .hero-tagline{display:none}
+  .hero-tagline{
+    font-size:clamp(1.05rem,2.2vw,1.6rem);line-height:1.4;
+    font-weight:400;max-width:26ch;color:rgba(255,255,255,.94);
+  }
+  .hero-tagline b{font-weight:600}
 }
-/* Le wordmark et la baseline étaient incrustés dans la photo. La vidéo ne
-   les porte pas : ils reviennent en HTML, et seulement au-dessus de 760px —
-   sous ce seuil la boucle mobile porte encore son wordmark incrusté, et la
-   baseline est déjà reprise par .hero-tagline.
+/* Le wordmark était incrusté dans la photo. La vidéo ne le porte pas : il
+   revient en HTML, et seulement au-dessus de 760px — sous ce seuil la boucle
+   mobile porte encore le sien. La baseline, elle, a quitté ce bloc le
+   23/08/2026 pour descendre sous les actions.
    Le bloc est optiquement centré, là où le wordmark de la photo se trouvait.
    La réserve basse retire le dock du calcul : sans elle, le centre
    géométrique place le wordmark trop bas dans l'espace réellement visible. */
@@ -1336,13 +1346,11 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
   letter-spacing:-.05em;font-size:clamp(3rem,8vw,6.4rem);
   text-shadow:0 6px 60px rgba(12,13,14,.4);
 }
-.hero-full .wordmark-sub{
-  color:rgba(255,255,255,.94);max-width:26ch;font-weight:400;
-  font-size:clamp(1.05rem,2.2vw,1.6rem);line-height:1.4;letter-spacing:-.01em;
-  text-shadow:0 1px 20px rgba(12,13,14,.6);
-}
-.hero-full .wordmark-sub b{font-weight:600}
-.hero-full .hero-actions{margin-top:12px}
+/* `.hero-full .wordmark-sub` a été retiré ici : le hero n'a plus de
+   sous-titre dans son bloc centré, c'est `.hero-tagline` qui le porte, sous
+   les actions. La règle de base `.wordmark-sub` reste pour `.hero-split`.
+   `.hero-full .hero-actions{margin-top:12px}` part avec : les actions sont
+   maintenant le PREMIER enfant de la pile, ce retrait ne poussait plus rien. */
 
 /* =========================================================================
    Assistant : choisir un objectif avant un produit
