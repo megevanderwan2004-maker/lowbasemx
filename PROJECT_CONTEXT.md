@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-08-18 (aisle pages, goal video cards, aisle hero loops)
+> Last updated: 2026-08-24 (goal assistant reworked: opening one card removes the other two)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -15,13 +15,13 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 
 ## 2. Current state
 
-`deploy/` is **canonical and the only actively maintained variant.** It is a static site of 13 HTML pages plus a shared CSS/JS/catalogue triplet. No build step at request time; product pages are generated ahead of time by a Node script (section 4).
+`deploy/` is **canonical and the only actively maintained variant.** It is a static site of 14 HTML pages plus a shared CSS/JS/catalogue triplet. No build step at request time; product pages are generated ahead of time by a Node script (section 4).
 
 **What works today**
-- 13 pages: home, `/tienda`, the two aisle pages `/wearables` and `/suplementos`, and 9 product pages, all internally linked and verified.
+- 14 pages: home, `/tienda`, the two aisle pages `/wearables` and `/suplementos`, and 10 product pages, all internally linked and verified.
 - Home opens on the "Los más buscados" carousel, then alternates video band → compact carousel → editorial chapter, with the goal assistant hinging between the wearables and supplements runs.
 - Three home carousels, all on the same compact card (`#mas-buscados`, `#wear-grid`, `#sup-grid`).
-- **Goal assistant**: three cards carrying a muted 9/16 loop (`deploy/media/landing/objetivos/goal-*.mp4`, declared as `video`/`poster` on `GOALS` in `catalog.js`). The cards are deliberately the **same box as the Garmin Connect chapter loop** — both read the `--media-box` token, `clamp(260px,25vw,380px)` in 9/16 — and the track scrolls at every width, so on a phone one card reads whole and the next peeks. Section background is plain white, not the old sand gradient.
+- **Goal assistant**: three cards carrying a muted 9/16 loop (`deploy/media/landing/objetivos/goal-*.mp4`, declared as `video`/`poster` on `GOALS` in `catalog.js`). The cards are deliberately the **same box as the Garmin Connect chapter loop** — both read the `--media-box` token, `clamp(260px,25vw,380px)` in 9/16 — and the track scrolls at every width, so on a phone one card reads whole and the next peeks. Section background is plain white, not the old sand gradient. **Since 2026-08-24, opening a goal removes the other two and takes their place** rather than laying a recommendation underneath: the chosen card travels to card 1's slot and the panel fills the exact rectangle the other two vacated. Full mechanics in section 8.
 - Carousel cards carry a **price button** in the same glass language as "Comprar", and discreet **dots** signal that a track scrolls. A track that already fits drops its arrows and its whole `.head-aside` row, so nothing empty is left under the title.
 - Editorial chapters (Garmin Connect, Cymbiotika): visual on one side, copy on the other, **side by side on mobile too**. Since 08-21 the two columns are sized rather than stretched (`--media-box` + `46ch`) and the pair is centred, so the copy no longer leaves a hole on one flank.
 - **Full page (08-22)**: `.shell` and `footer` lost their 1680px cap, their radius and their shadow; the gutter is zero everywhere. The document background moved from `<html>` to `<body>` so a page class can set it — it is what paints the iPhone's safe areas, so it takes the colour of whatever opens the page (ink on the home and the two aisles, white elsewhere). The floating nav and the no-hero pages offset themselves by `env(safe-area-inset-top)`.
@@ -109,15 +109,15 @@ lowlabs-cirqa-context/
 │   │   ├── cirqa.html  venu-4.html  venu-3s.html  vivoactive-6.html
 │   │   ├── creatina.html  promix-creatina.html  promix-debloat.html
 │   │   └── promix-relax.html  absorption-sleep.html
-│   ├── catalog.js             ★ Single source of truth: products + goals (406 lines)
-│   ├── app.js                 All behaviour, 16 isolated modules (1258 lines)
-│   ├── styles.css             Full design system (2189 lines)
-│   └── media/                 86 MB, 73 files — see section 10
+│   ├── catalog.js             ★ Single source of truth: products + goals (651 lines)
+│   ├── app.js                 All behaviour, 17 isolated modules (1857 lines)
+│   ├── styles.css             Full design system (2701 lines)
+│   └── media/                 92 MB, 125 files — see section 10
 │
 ├── site/                      ⚠️ ABANDONED — single-file version, many revisions behind
 ├── shopify-theme/             ⚠️ ABANDONED — Liquid theme, matches the old single-product page
 │
-├── assets/                    150 MB source uploads, one folder per product
+├── assets/                    202 MB source uploads, one folder per product
 └── assets-hd/                 59 MB processed assets + CDN URL maps
 ```
 
@@ -144,7 +144,7 @@ node build/gen-products.js
 | `/` | `deploy/index.html` | Homepage. Carries `class="has-hero"` on `<body>` — this drives the top spacing (section 6). |
 | `/tienda` | `deploy/tienda.html` | Shop. `<div id="shop-sections">` is filled by the `shop` module, one carousel aisle per category. |
 | `/wearables`, `/suplementos` | `deploy/wearables.html`, `deploy/suplementos.html` | Aisle pages, reached from the top nav. Same chrome as `/tienda`; the grid is a `.cat-grid[data-category]` filled by the `catalog` module from `catalog.js`, so **no product is written in their HTML** — adding or removing one from the catalogue updates both pages, count included (`data-count-for`). Each page opens on **its own** `.band` loop (`bandas/loop-wearables-hero.mp4`, `bandas/loop-suplementos-hero.mp4`) and closes on a cross-link band re-using the home loops. Sort chips are the `cat-sort` module. |
-| `/productos/{handle}` | generated | 9 pages. `<body data-product="{handle}">` is how `app.js` knows which catalogue entry to bind. |
+| `/productos/{handle}` | generated | 10 pages — the nine products plus `banda-cirqa`, the replacement band. `<body data-product="{handle}">` is how `app.js` knows which catalogue entry to bind. |
 
 `cleanUrls: true` in `vercel.json` is what makes `/tienda` and `/productos/cirqa` resolve without `.html`. `build/serve.js` reproduces that locally.
 
@@ -488,7 +488,7 @@ One instance, created in `smooth-scroll` with `autoRaf: true` — **Lenis's own 
 
 ## 10. Media
 
-### `deploy/media/` (86 MB, 73 files, committed)
+### `deploy/media/` (92 MB, 125 files, committed)
 
 ```
 deploy/media/
@@ -524,7 +524,7 @@ deploy/media/
 - `archivo/` holds the visuals of removed sections. Do not delete without asking — they are the only copies of the Ritual banner and the dropped Cymbiotika supplements.
 - CIRQA photography still comes from the **Shopify CDN**; `assets-hd/cdn-urls.json` is the source of truth for those URLs.
 
-### `assets/` (150 MB, sources, never served)
+### `assets/` (202 MB, sources, never served)
 
 One folder per product handle, mirroring `deploy/media/productos/`:
 

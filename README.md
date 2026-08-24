@@ -363,6 +363,105 @@ Deux conséquences à ne pas défaire :
 - **La réserve basse de `.band-inner`** compte le dock : à `100dvh` avec un
   contenu calé en bas, le bouton passait sous lui.
 
+## L'assistant par objectif — `#objetivo`
+
+Trois cartes, une boucle muette chacune, au gabarit de la boucle Garmin Connect
+(`--media-box`, 9/16). C'est la **seconde entrée** de la home : qui n'a rien
+reconnu dans « Los más buscados » part de ce qu'il veut ressentir, pas d'un
+produit.
+
+**Depuis le 24/08/2026, ouvrir une carte retire les deux autres et prend leur
+place.** Avant, la recommandation se posait *sous* les trois cartes, qui
+restaient là : on répondait à la question sans jamais refermer la question.
+
+### La boîte ne change jamais
+
+Tout tient à un plateau, `.goals-stage`, dont la largeur se calcule :
+
+```css
+max-width: min(calc(var(--media-box) * 3 + var(--goals-gap) * 2), 100%);
+```
+
+Soit exactement trois cartes plus deux gouttières. Fermé, la piste l'occupe
+entièrement ; ouvert, la carte choisie garde son gabarit et le panneau prend le
+rectangle libéré par les deux autres. Mesuré à 1440px : la carte 3 voyage de
+918 à **162**, la place exacte de la carte 1, et le panneau occupe **540 →
+1278**, du bord gauche de la carte 2 au bord droit de la carte 3.
+
+C'est ce qui permet de **ne pas déplacer la page au clic** — et c'est aussi
+pour ça que la première carte ne bouge pratiquement pas quand c'est elle qu'on
+ouvre.
+
+### La chorégraphie
+
+Elle est **décrite en CSS** (`.is-leaving`, `.is-open`, `.is-in`, `.is-coming`,
+`.is-folding`) et seulement **déclenchée** en JS. La seule chose que le script
+calcule est le FLIP, qui a besoin de mesures réelles.
+
+| | Aller | Retour |
+|---|---|---|
+| les deux autres | sortent vers l'extérieur, 240 ms, décalage 40 ms | reviennent de l'extérieur, 280 ms |
+| la carte choisie | FLIP jusqu'à la place de la première, 400 ms | 260 ms |
+| le panneau | essuyage + lignes en cascade, démarre **pendant** le trajet | s'efface d'un bloc, 160 ms |
+
+Le recouvrement de l'aller — le panneau s'ouvre avant que la carte soit arrivée
+— est ce qui empêche la séquence de se lire comme trois étapes. Le retour est
+plus court que l'aller : un retour ne se contemple pas.
+
+Sous 720px la carte ne voyage pas, elle **se replie** : 340 ms de la carte
+portrait à un bandeau de 92px, la boucle recadrée par `object-fit:cover` donc
+jamais déformée, et le panneau prend toute la largeur dessous. Deux propriétés
+animées sur un seul élément dont l'unique enfant est en position absolue —
+c'est assez peu pour tenir la fréquence d'images sur téléphone.
+
+### Ce que le geste a changé dans le balisage
+
+Les cartes **ne sont plus des boutons radio**. Cocher une option parmi trois et
+en ouvrir une ne sont pas le même acte : elles portent maintenant
+`aria-expanded` et `aria-controls`, et le tabindex tournant a disparu.
+
+Conséquence directe : **les flèches ne font plus que déplacer le focus.** Elles
+sélectionnaient, ce qui déclencherait aujourd'hui trois ouvertures pour
+traverser la piste. Entrée ou Espace ouvre.
+
+### Quatre façons de revenir
+
+Toutes passent par le même `closeGoal()` :
+
+1. le lien « ← Volver a los objetivos », au-dessus du panneau ;
+2. la touche Échap, où que soit le focus dans le plateau ;
+3. un clic n'importe où hors du plateau ;
+4. la carte ouverte elle-même — c'est un bouton d'ouverture, il bascule dans
+   les deux sens.
+
+Le focus repart sur la carte à la fermeture, y compris quand il était sur le
+lien de retour au moment où celui-ci disparaît.
+
+### L'URL porte le choix
+
+`#objetivo=dormir`, posé en **`replaceState`** : le lien est partageable et une
+campagne peut viser un objectif, sans que celui qui les essaie tous les trois
+doive appuyer quatre fois sur « précédent » pour quitter le site.
+
+À l'atterrissage direct, le module prend `history.scrollRestoration` en
+`manual` le temps du calage puis la rend sur `load` — le navigateur repose la
+page où elle était **après** le premier calage, et l'avalait.
+
+### Le glissement de page est devenu conditionnel
+
+`settle()` cale la **section** plutôt que le seul plateau, pour que la question
+reste lisible au-dessus de sa réponse ; il se rabat sur le plateau seul quand
+la section ne tient pas sous la nav, ce qui n'arrive guère qu'au téléphone. Et
+surtout : **il ne fait rien quand le plateau est déjà entièrement à l'écran.**
+Puisque la boîte ne change pas, il n'y a le plus souvent rien à rattraper au
+large — bouger la page serait gratuit, et agaçant pour qui essaie les trois
+objectifs l'un après l'autre.
+
+Un arbitrage assumé : sur téléphone, le nom, la raison, le prix et le bouton
+tiennent au-dessus de la ligne de flottaison, mais les compléments dépassent
+d'environ 80px. C'est voulu — ce dépassement dit qu'il y a une suite. Tout
+faire tenir demanderait de sacrifier la mise en page centrée du panneau mobile.
+
 ## Le haut de la vidéo n'est plus voilé
 
 La nav n'ayant pas de surface propre, son encre était rendue lisible par un
