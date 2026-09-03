@@ -380,7 +380,11 @@ ${JSON.stringify(jsonld, null, 2)}
 <script>
 (function(d){
   var h = d.documentElement;
-  try { if (sessionStorage.getItem("lowlabs-booted")) return; } catch(e){}
+  /* Aucune mémoire de session : l'écran revient à CHAQUE chargement, donc
+     aussi à chaque rechargement et à chaque passage d'une page à l'autre
+     (Tienda, Wearables, Suplementos). C'est demandé — et c'est cohérent :
+     chaque page a ses propres visuels et sa propre boucle à préparer, il
+     n'y a rien qu'une page précédente aurait déjà chargé pour elle. */
   h.className += " booting";
   setTimeout(function(){
     h.className = h.className.replace(/\s*booting/g, "");

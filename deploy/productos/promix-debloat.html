@@ -61,7 +61,11 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <script>
 (function(d){
   var h = d.documentElement;
-  try { if (sessionStorage.getItem("lowlabs-booted")) return; } catch(e){}
+  /* Aucune mémoire de session : l'écran revient à CHAQUE chargement, donc
+     aussi à chaque rechargement et à chaque passage d'une page à l'autre
+     (Tienda, Wearables, Suplementos). C'est demandé — et c'est cohérent :
+     chaque page a ses propres visuels et sa propre boucle à préparer, il
+     n'y a rien qu'une page précédente aurait déjà chargé pour elle. */
   h.className += " booting";
   setTimeout(function(){
     h.className = h.className.replace(/s*booting/g, "");
@@ -410,6 +414,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <script src="/lenis.min.js?v=daec1872" defer></script>
 <script src="/catalog.js?v=34170873" defer></script>
 <script src="/cart.js?v=f3d8c0c3" defer></script>
-<script src="/app.js?v=bcd053a5" defer></script>
+<script src="/app.js?v=f7f8e191" defer></script>
 </body>
 </html>

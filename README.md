@@ -378,12 +378,14 @@ deux d'affiche fixe puis un démarrage sec. L'écran d'ouverture existe pour que
 pendant qu'il est là, la boucle visible soit réellement chargée puis **lancée
 en coulisses** : au moment où il s'efface, la vidéo tourne déjà.
 
-**Il se déclenche une fois par session**, jamais en navigation interne : un
-script en ligne et synchrone dans le `<head>` (donc AVANT la première peinture
-— posé dans `app.js`, qui est `defer`, la page aurait eu le temps de se
-peindre puis d'être recouverte) pose `html.className += " booting"` sauf si
-`sessionStorage["lowlabs-booted"]` existe déjà, et se munit d'un filet de
-5 secondes : si `app.js` ne démarrait pas, l'écran ne doit jamais retenir le
+**Il se déclenche à CHAQUE chargement** — rechargement compris, et à chaque
+passage d'une page à l'autre. Il n'y a plus de mémoire de session : chaque
+page a ses propres visuels et sa propre boucle à préparer, il n'y a rien
+qu'une page précédente aurait déjà chargé pour elle. Un script en ligne et
+synchrone dans le `<head>` (donc AVANT la première peinture — posé dans
+`app.js`, qui est `defer`, la page aurait eu le temps de se peindre puis
+d'être recouverte) pose `html.className += " booting"`, et se munit d'un
+filet de 5 secondes : si `app.js` ne démarrait pas, l'écran ne doit jamais retenir le
 site. Il est dupliqué sur les cinq gabarits de page (`index.html`,
 `tienda.html`, `wearables.html`, `suplementos.html`, `gen-products.js`) — pas
 un seul point d'entrée, puisqu'il doit s'exécuter avant tout script externe.
@@ -403,9 +405,26 @@ Le module `boot` d'`app.js` fait le reste :
   restent la preuve d'un vrai chargement terminé plutôt qu'une convention.
 - **Elle ne retient jamais plus de 5 secondes**, quoi qu'il arrive — un réseau
   lent doit dégrader l'écran, pas bloquer l'accès au site.
-- **La boucle est lancée AVANT que l'écran ne s'efface** (`loop.play()`,
-  muette, autorisée sans geste car `muted` + `playsinline`) : c'est le point
-  de tout le dispositif.
+- **La boucle est lancée AVANT que l'écran ne s'efface, et on attend qu'elle
+  joue vraiment.** C'est le point de tout le dispositif — et c'est là que le
+  premier jet se trompait. `play()` renvoie une promesse qui peut être
+  **rejetée**, et elle l'était en silence : sur Safari iOS l'écran se levait
+  sur une image fixe, définitivement. Rien ne réessayait, parce que
+  `section-loops` observe l'intersection et que celle-ci n'avait pas changé —
+  la boucle était déjà dans le cadre, simplement recouverte par l'écran
+  blanc. Trois filets désormais : on attend l'événement `playing` (plafonné à
+  900 ms) avant de lever ; on relance jusqu'à huit fois toutes les 450 ms
+  après la levée, pour le cas d'un réseau lent ; et on relance une dernière
+  fois **au premier geste**, seule issue en mode économie d'énergie iOS, où
+  toute lecture automatique est refusée même muette.
+- **Les images du premier écran passent en `eager`.** Second défaut rapporté
+  depuis iOS : des visuels apparaissaient encore après la levée. Ce ne sont
+  pas des images lentes, ce sont les cartes des carrousels, injectées en
+  `loading="lazy"` — et sous l'écran d'ouverture, personne ne s'en approche
+  pour déclencher leur chargement. Ce qui tient dans les **1,4 écran** du
+  haut (14 images au plus) est donc forcé en `eager` et attendu ; au-delà, la
+  paresse reste souhaitable, le reste du catalogue n'a pas à être payé à
+  l'ouverture.
 
 **Mouvement réduit : pas de théâtre.** Toute la mise en scène — barre amortie,
 plancher de temps, lancement différé — n'existe que pour cacher le démarrage

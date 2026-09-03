@@ -976,12 +976,9 @@
 
     var boot = $("boot"), fill = $("boot-fill");
 
-    function seal(){
-      try { sessionStorage.setItem("lowlabs-booted", "1"); } catch(e){}
-    }
     function reveal(){
-      seal();
       if (window.LOWSCROLL) window.LOWSCROLL.start();
+      if (typeof keepTrying === "function") keepTrying(typeof loop === "undefined" ? null : loop);
       if (!boot){ flag(html, "booting", false); return; }
       flag(boot, "done", true);
       setTimeout(function(){
@@ -1035,10 +1032,45 @@
                                 function(){ fonts.done = true; });
     } else fonts.done = true;
 
-    /* ---- Étape 2 : la page et ses images de premier écran. */
+    /* ---- Étape 2 : la page. `load` attend les ressources déclarées, mais
+       PAS les images en `loading="lazy"` — c'est tout leur intérêt. */
     var loaded = job(1);
     if (document.readyState === "complete") loaded.done = true;
     else window.addEventListener("load", function(){ loaded.done = true; }, false);
+
+    /* ---- Étape 2 bis : les images du premier écran et du suivant.
+       C'est le second défaut rapporté depuis Safari iOS — l'écran se
+       levait et des visuels apparaissaient encore après coup. La cause
+       n'est pas la lenteur : ce sont les cartes des carrousels, injectées
+       en `loading="lazy"`, qui ne commencent à se charger qu'une fois
+       approchées. Sous l'écran d'ouverture, personne n'approche rien.
+
+       On force donc en `eager` ce qui se trouve dans les 1,4 écran du
+       haut — la hauteur qu'un premier geste de défilement découvre — et on
+       attend ces images-là. Au-delà, la paresse reste souhaitable : le
+       reste du catalogue n'a aucune raison d'être payé à l'ouverture. */
+    (function(){
+      var limite = window.innerHeight * 1.4, urgentes = [];
+      each(document.images, function(img){
+        if (urgentes.length >= 14) return;
+        var r = img.getBoundingClientRect();
+        if (r.top > limite || r.bottom < -60) return;
+        try { img.loading = "eager"; } catch(e){}
+        if (!img.complete) urgentes.push(img);
+      });
+      if (!urgentes.length) return;
+      var shots = job(1);
+      var reste = urgentes.length;
+      function une(){ if (--reste <= 0) shots.done = true; }
+      each(urgentes, function(img){
+        img.addEventListener("load", une, false);
+        /* Une image qui échoue ne doit pas retenir le site : la carte a
+           son fond de tuile, la page est complète sans elle. */
+        img.addEventListener("error", une, false);
+      });
+      /* Plafond propre aux images, comme pour la boucle. */
+      setTimeout(function(){ shots.done = true; }, 3800);
+    })();
 
     /* ---- Étape 3 : la boucle du premier écran, celle qui compte.
        On ne cherche que celle qui est RÉELLEMENT affichée : le hero en
@@ -1076,6 +1108,71 @@
       setTimeout(ready, 4200);
     }
 
+    /* ---- Lancer la boucle, et s'assurer qu'elle joue -------------------
+
+       Safari iOS a montré le défaut : `play()` renvoie une promesse qui
+       peut être REJETÉE, et elle l'était en silence. La lecture ne partait
+       pas, et rien ne réessayait — `section-loops` observe l'intersection,
+       or l'intersection n'avait pas changé (la boucle était déjà dans le
+       cadre, simplement recouverte par l'écran blanc), donc son
+       observateur ne se redéclenchait jamais. L'écran se levait sur une
+       image fixe, définitivement.
+
+       Trois filets, du plus probable au dernier recours :
+       1. on attend l'événement `playing`, seul témoin qu'une image a bougé,
+          avant de lever l'écran — plafonné, pour ne pas retenir le site ;
+       2. après la levée, on réessaie quelques fois à intervalle : sur un
+          réseau lent la première tentative arrive avant les données ;
+       3. au premier geste de l'utilisateur, on réessaie une dernière fois.
+          C'est la seule issue en mode économie d'énergie iOS, où TOUTE
+          lecture automatique est refusée, même muette. Le geste, lui, la
+          réautorise. */
+    function playable(v){
+      v.muted = true; v.defaultMuted = true;
+      try { v.playsInline = true; } catch(e){}
+      try {
+        var pr = v.play();
+        if (pr && typeof pr["catch"] === "function") pr["catch"](function(){});
+      } catch(e){}
+    }
+
+    function startLoop(v, then){
+      if (!v){ then(); return; }
+      var partie = false;
+      function go(){
+        if (partie) return;
+        partie = true;
+        v.removeEventListener("playing", go, false);
+        then();
+      }
+      v.addEventListener("playing", go, false);
+      playable(v);
+      /* Elle joue peut-être déjà — `playing` ne se redéclencherait pas. */
+      if (!v.paused && v.currentTime > 0) go();
+      /* On n'attend pas indéfiniment une lecture qui ne viendra peut-être
+         jamais : les relances d'après la levée prendront le relais. */
+      setTimeout(go, 900);
+    }
+
+    /* Relances après la levée. Elles s'arrêtent dès que ça joue, et de
+       toute façon au bout de huit essais : au-delà, c'est un refus ferme
+       du navigateur, pas un retard. */
+    function keepTrying(v){
+      if (!v) return;
+      var essais = 0;
+      var t = setInterval(function(){
+        if (!v.paused || ++essais > 8){ clearInterval(t); return; }
+        playable(v);
+      }, 450);
+      function auGeste(){
+        document.removeEventListener("touchstart", auGeste, true);
+        document.removeEventListener("pointerdown", auGeste, true);
+        if (v.paused) playable(v);
+      }
+      document.addEventListener("touchstart", auGeste, true);
+      document.addEventListener("pointerdown", auGeste, true);
+    }
+
     /* ---- La barre ------------------------------------------------------
        Deux valeurs : `real`, l'avancement vrai, et `shown`, ce qu'on peint.
        `shown` rejoint `real` par amortissement — une barre qui saute d'un
@@ -1105,17 +1202,11 @@
 
       if (done && shown === 1){
         over = true;
-        /* La boucle est lancée AVANT que l'écran ne s'efface : c'est le
-           point de tout le dispositif. Muette et `playsinline`, elle est
-           autorisée à démarrer sans geste de l'utilisateur. */
-        if (loop){
-          loop.muted = true; loop.defaultMuted = true;
-          try {
-            var pr = loop.play();
-            if (pr && typeof pr["catch"] === "function") pr["catch"](function(){});
-          } catch(e){}
-        }
-        reveal();
+        /* La boucle est lancée AVANT que l'écran ne s'efface, et on attend
+           qu'elle joue VRAIMENT — voir `startLoop`. C'est le point de tout
+           le dispositif, et c'est précisément ce qui manquait : on lançait
+           la lecture sans jamais vérifier qu'elle avait pris. */
+        startLoop(loop, reveal);
         return;
       }
       requestAnimationFrame(frame);
