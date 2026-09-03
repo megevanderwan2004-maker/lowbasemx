@@ -29,9 +29,13 @@ SOURCES = {
     "venu-4":           "venu-4/venu-4-crema.jpg",
     "venu-3s":          "venu-3s/venu-3s.png",
     "vivoactive-6":     "vivoactive-6/vivoactive-6.png",
-    "creatina":         "creatina/creatina.png",
+    # Le sachet seul, et non le duo sachet + boite : une carte de 210px
+    # ne peut pas montrer deux objets lisiblement.
+    "creatina":         "creatina/creatina-sachet.png",
     "promix-relax":     "promix-relax/promix-relax.png",
-    "absorption-sleep": "absorption-sleep/sleep-packshot.png",
+    # Les sticks, pas la pochette de 28 dosis : c'est le format
+    # d'entree, celui dont le dock annonce le prix.
+    "absorption-sleep": "absorption-sleep/absorption-sleep.png",
     "promix-creatina":  "promix-creatina/promix-creatine-trio.png",
     # Image 3 de la galerie : le trio des trois parfums — mangue, pêche
     # blanche, orange. Le trio « debloat-trio.jpg » ne montrait que

@@ -259,7 +259,17 @@
          le rayon. */
       badge: "",
       category: "Suplementos",
-      image: "/media/productos/creatina/creatina.png",
+      /* Le sachet seul est la première image depuis le 03/09/2026 : c'est
+         le produit lui-même, là où `creatina.png` montrait le sachet ET sa
+         boîte, donc deux objets pour une fiche. Il sert aussi de visuel de
+         carte. Détourage officiel Cymbiotika (CreatinePacket.png), ramené à
+         1400px de haut et quantifié — 168 ko au lieu de 3,3 Mo, sans
+         toucher au canal alpha. */
+      image: "/media/productos/creatina/creatina-sachet.png",
+      /* Un rendu sur fond transparent : le cadre doit le CONTENIR, pas le
+         rogner. Sans ça, un 678x1400 dans un cadre carré perd la moitié du
+         sachet. */
+      shotFit: "contain",
       hero: "/media/productos/creatina/creatina.png",
       highlights: [
         "5 g de creatina por sobre, sabor Tangerine Vanilla",
@@ -281,7 +291,7 @@
       /* Visuels de marque Cymbiotika. La boîte porte bien « 24 x 30 mL
          Liquid Packets » : c'est le format que nous vendons. */
       gallery: [
-        "/media/productos/creatina/creatina-caja.jpg",
+        /* `creatina-caja.jpg` (la boîte) retirée le 03/09/2026. */
         "/media/productos/creatina/creatina-sobre.jpg",
         "/media/productos/creatina/creatina-bolsa.jpg",
         "/media/productos/creatina/creatina-textura.jpg"
@@ -375,9 +385,13 @@
           image: "/media/productos/absorption-sleep/absorption-sleep.png" },
         { name: "14 sticks", note: "dos semanas", price: 899,
           image: "/media/productos/absorption-sleep/sleep-14-sticks.jpg" },
-        { name: "28 dosis",  note: "un mes",      price: 1599,
-          image: "/media/productos/absorption-sleep/sleep-28-dosis.jpg",
-          views: ["/media/productos/absorption-sleep/sleep-28-dosis-vaso.jpg"] }
+        /* Le format 28 dosis n'a plus de visuel propre depuis le
+           03/09/2026 : ses deux photos — la pochette seule et la nature
+           morte au verre et au mousseur — ont été retirées. Sans `image`,
+           le générateur retombe sur celle de la fiche (`s.image || p.image`
+           dans gen-products.js), c'est-à-dire le packshot détouré. Le
+           format reste donc achetable et illustré, sans ses deux photos. */
+        { name: "28 dosis",  note: "un mes",      price: 1599 }
       ],
       shotFit: "contain",
       name: "The Absorption Company Sleep",
@@ -395,6 +409,7 @@
          Attention : les trois formats gardent LEURS visuels dans `sizes`,
          et c'est encore « 7 sticks » qui est sélectionné par défaut. */
       image: "/media/productos/absorption-sleep/sleep-packshot.png",
+
       hero: "/media/productos/absorption-sleep/sleep-packshot.png",
       packshot: "/media/productos/absorption-sleep/sleep-packshot.png",
       highlights: [
