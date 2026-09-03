@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-09-03 (desktop hero and two home bands are photos now, full-grey product cards with quick add-to-cart, smart search, recommendation rules, first-visit loading screen, hero preload fix)
+> Last updated: 2026-09-03 (desktop hero + aisle headers are photos, one home band is, full-grey product cards with quick add-to-cart, smart search, recommendation rules, first-visit loading screen, hero preload fix)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -252,8 +252,21 @@ Full-bleed, `object-fit: cover`. **One format is a photo, the other a video** �
 - **The mobile loop has no `autoplay` or `poster`** — both trigger a download even when the element is `display:none`. `section-loops` starts playback on intersection and its poster is a CSS background declared next to it. The desktop side no longer has a loop to guard this way — see the loading-screen section below for how it avoids the same class of bug on mobile.
 - Above 760px the two CTAs are **centred** (`.hero-full-inner{align-items:center}`) and stay anchored to the bottom of the hero; `.hero-mark` sits in the middle, above them.
 
-### The two home bands are photos too (2026-09-03)
-`#wearables` and `#suplementos` in `index.html` — **not** the aisle-page headers or the closing cross-link band, which stay video (see §Page inventory). Each is now `.band.band-shot` with a plain `<img fetchpriority="low" loading="lazy">` instead of `<video autoplay>`: `bandas/banda-wearables.jpg` (person on a yoga mat, `object-position:center 34%` — a band is far wider than tall, a centred crop cut her head off) and `bandas/banda-suplementos.jpg` (face centred, default crop). `.band>img` reuses the `object-fit:cover` rule already written for `.band>video`; the gradient veil (`.band::after`) and the overlaid copy are unchanged. `loop-wearables.mp4` / `loop-capsulas.mp4` are **not** orphaned — the aisle pages' closing cross-link bands still use them (see `README.md` for the "do not merge" note).
+### Bands and aisle headers: which is photo, which is video (2026-09-03)
+Settled in two passes the same day. Final state:
+
+| Surface | Desktop | Mobile |
+|---|---|---|
+| Home `#wearables` band | `bandas/banda-wearables.jpg` | same photo |
+| Home `#suplementos` band | `loop-capsulas.mp4` | same video |
+| `/suplementos` header | `bandas/cat-suplementos.jpg` | `loop-suplementos-hero.mp4` |
+| `/wearables` header | `bandas/cat-wearables.jpg` | `loop-wearables-hero.mp4` |
+| Closing cross-link bands | `loop-wearables.mp4` / `loop-capsulas.mp4` | same |
+
+- **Home `#wearables`** is `.band.band-shot` with a plain `<img fetchpriority="low" loading="lazy">`, `object-position:center 34%` — a band is far wider than tall and a centred crop cut the subject's head off. `.band>img` reuses the `object-fit:cover` rule already written for `.band>video`.
+- **Home `#suplementos` kept its video.** A photo sat there for a few hours on 09-03 before being moved to the `/suplementos` header, where it has more room.
+- **The two aisle headers are photo on desktop, video on phone** — the hero's mechanism, for the hero's reason. The photo is a **CSS background** on `.cat-head .band-photo`, never an `<img>`, because an `<img>` in `display:none` is still downloaded. Symmetrically the loop lost its `autoplay` and `poster`, which were fetching it on desktop where it is hidden; `section-loops` starts it on intersection and its poster is a CSS background declared only inside the `max-width:759px` query. Measured: a desktop load of `/suplementos` fetches the 190 kB photo and nothing else — the 5 MB loop stays at `readyState 0`, `buffered 0`.
+- **`band-photo`, not `band-shot`.** The latter already exists on the home as a **modifier** of the band itself (`.band.band-shot`), not as a child. Two roles under one name always end up colliding in a stylesheet this size.
 
 ### Loading screen — `#boot`, module `boot` in `app.js`
 **New 2026-09-03.** Exists to fix one specific bug: every loop on the site is `preload="none"`, so the hero's loop only started fetching once it was actually looked at — on a phone, a second or two of frozen poster then a hard start. The screen buys that fetch (and a `loop.play()`) time in the background, so the loop is already running the instant the screen lifts.
@@ -538,10 +551,11 @@ deploy/media/
 │   │                       superseded by the photo, nothing referenced them
 │   ├── objetivos/          goal-dormir / -rendimiento / -salud .mp4 (+ posters)
 │   ├── bandas/             loop-wearables, loop-capsulas, loop-brand,
-│   │                       loop-wearables-hero, loop-suplementos-hero (+ posters),
-│   │                       banda-wearables.jpg + banda-suplementos.jpg (09/03,
-│   │                       the two HOME bands only — the aisle-page and
-│   │                       cross-link videos above are unaffected)
+│   │                       loop-wearables-hero, loop-suplementos-hero (+ posters;
+│   │                       the two -hero loops are MOBILE-ONLY since 09/03),
+│   │                       banda-wearables.jpg (home #wearables band),
+│   │                       cat-suplementos.jpg + cat-wearables.jpg (the two
+│   │                       aisle headers, DESKTOP only) — see the table in §6
 │   └── capitulos/          loop-vertical, cymbiotika-shot (+ posters)
 └── archivo/                30 files kept but referenced by nothing
     ├── cirqa/              app screens, rock/tan/sensor shots, wrist-negra

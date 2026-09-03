@@ -41,7 +41,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   "currenciesAccepted": "MXN"
 }
 </script>
-<link rel="stylesheet" href="/styles.css?v=d75b932f">
+<link rel="stylesheet" href="/styles.css?v=e7932e71">
 <!-- ===== Écran d'ouverture — décidé AVANT la première peinture.
      Le script est en ligne et synchrone à dessein : posé dans app.js, qui
      est en `defer`, la page aurait le temps de se peindre une fois avant
@@ -345,12 +345,17 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           </div>
         </div>
       </div>
-      <div class="band band-shot rv">
-        <!-- Photo depuis le 03/09/2026, en remplacement de la boucle vidéo.
-             Le visage est au centre du cadre : on garde donc un cadrage
-             centré, contrairement au bandeau wearables juste au-dessus. -->
-        <img src="/media/landing/bandas/banda-suplementos.jpg" alt=""
-             width="1366" height="769" fetchpriority="low" loading="lazy">
+      <div class="band rv">
+        <!-- La boucle des capsules est revenue le 03/09/2026 : la photo qui
+             l'avait remplacée quelques heures est partie servir d'en-tête au
+             rayon /suplementos, sur ordinateur. Ce bandeau-ci retrouve donc
+             sa vidéo d'origine, inchangée. -->
+        <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+               disablepictureinpicture disableremoteplayback
+               poster="/media/landing/bandas/poster-loop-capsulas.jpg"
+               width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
+          <source src="/media/landing/bandas/loop-capsulas.mp4" type="video/mp4">
+        </video>
         <div class="band-inner">
           <span class="eyebrow">Cymbiotika</span>
           <h2>Formulados por dietistas y científicos</h2>

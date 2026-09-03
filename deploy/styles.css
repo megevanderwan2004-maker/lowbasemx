@@ -2063,6 +2063,44 @@ html.booting .boot.done{opacity:0;pointer-events:none}
    cinquième, et centré ce cinquième tombe sous la taille du sujet. On
    remonte le cadre pour qu'il le prenne en entier. */
 .cat-head .band>video{object-position:center 30%}
+
+/* ---- En-tête de rayon : photo sur ordinateur, boucle sur téléphone -------
+   Depuis le 03/09/2026. Deux visuels, un par format, et le format décide
+   lequel EXISTE — pas seulement lequel se voit.
+
+   La photo est un fond CSS et non une balise `img` : un `<img>` en
+   `display:none` est tout de même téléchargé par le navigateur, un fond
+   CSS sur un élément masqué ne l'est jamais. Le téléphone ne paie donc
+   rien pour une photo qu'il n'affiche pas — et l'ordinateur rien pour la
+   boucle, qui est masquée chez lui et dont l'affiche n'est déclarée que
+   dans la requête média du téléphone.
+
+   C'est exactement le mécanisme du hero de la home, pour la même raison. */
+/* `band-photo` et non `band-shot` : ce dernier existe déjà sur la home, mais
+   comme MODIFICATEUR du bandeau lui-même (`.band.band-shot`), pas comme
+   enfant. Deux rôles différents sous un même nom finissent toujours par se
+   croiser dans une feuille de cette taille. */
+.cat-head .band-photo{
+  position:absolute;inset:0;z-index:1;
+  background-color:#111214;
+  background-repeat:no-repeat;
+  background-size:cover;
+  /* Le sujet est dans la moitié haute des deux photos, et la bannière est
+     bien plus large que haute : `cover` rogne donc le haut et le bas. */
+  background-position:50% 38%;
+}
+.cat-head .band-cat-sup  .band-photo{background-image:url("/media/landing/bandas/cat-suplementos.jpg")}
+.cat-head .band-cat-wear .band-photo{background-image:url("/media/landing/bandas/cat-wearables.jpg")}
+/* Sur ordinateur la boucle n'existe pas : masquée, `section-loops` ne la
+   croise jamais et son `preload="none"` lui évite tout téléchargement. */
+.cat-head .band-cat>video{display:none}
+@media(max-width:759px){
+  .cat-head .band-photo{display:none}
+  .cat-head .band-cat>video{display:block}
+  /* L'affiche n'est demandée que par les écrans qui voient la boucle. */
+  .cat-head .band-cat-sup>video{background:#111214 url("/media/landing/bandas/poster-loop-suplementos-hero.jpg") center/cover no-repeat}
+  .cat-head .band-cat-wear>video{background:#111214 url("/media/landing/bandas/poster-loop-wearables-hero.jpg") center/cover no-repeat}
+}
 /* La bannière tient lieu de hero : elle prend la hauteur d'écran, comme
    le hero de la home, au lieu des 58vh d'un bandeau de milieu de page. */
 .cat-head .band-inner{min-height:clamp(440px,74vh,820px)}

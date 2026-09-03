@@ -20,7 +20,7 @@
 document.documentElement.className += " js";
 try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.className += " rm"; }catch(e){}
 </script>
-<link rel="stylesheet" href="/styles.css?v=d75b932f">
+<link rel="stylesheet" href="/styles.css?v=e7932e71">
 <!-- ===== Écran d'ouverture — décidé AVANT la première peinture.
      Le script est en ligne et synchrone à dessein : posé dans app.js, qui
      est en `defer`, la page aurait le temps de se peindre une fois avant
@@ -113,10 +113,18 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
        comme lui — HORS de <main>, pour que le contenu lui passe par-dessus au
        défilement au lieu de la pousser. La nav flotte dessus. ===== -->
   <header class="cat-head" aria-labelledby="cat-t">
-    <div class="band deep">
-      <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
+    <div class="band deep band-cat band-cat-sup">
+      <!-- Ordinateur : photo, depuis le 03/09/2026. Elle est posée en FOND CSS
+           (voir styles.css) et non dans une balise `img` : un `<img>` en
+           `display:none` est tout de même téléchargé, un fond CSS ne l'est
+           jamais — le téléphone, qui garde la boucle, ne paie donc rien pour
+           elle. Symétriquement la boucle perd `autoplay` et `poster`, qui
+           déclenchaient son chargement sur ordinateur alors qu'elle y est
+           masquée ; c'est `section-loops` qui la lance à l'entrée dans le
+           cadre, et son affiche est un fond CSS déclaré sous 760px. -->
+      <div class="band-photo" aria-hidden="true"></div>
+      <video muted loop playsinline webkit-playsinline preload="none"
              disablepictureinpicture disableremoteplayback
-             poster="/media/landing/bandas/poster-loop-suplementos-hero.jpg"
              width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
         <source src="/media/landing/bandas/loop-suplementos-hero.mp4" type="video/mp4">
       </video>

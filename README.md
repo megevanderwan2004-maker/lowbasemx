@@ -76,12 +76,15 @@ deploy/media/
 │   │                           second supprimé le 03/09/2026 avec son affiche
 │   ├── objetivos/              les 3 boucles de l'assistant + leurs affiches
 │   ├── bandas/                 boucles des bandeaux pleine largeur + affiches
-│   │                           (dont les deux en-têtes `loop-*-hero` des rayons) ;
-│   │                           banda-wearables.jpg + banda-suplementos.jpg, les
-│   │                           deux bandeaux de la home, en photo depuis le
-│   │                           03/09/2026 — les vidéos qu'ils remplacent
-│   │                           (`loop-wearables.mp4`, `loop-capsulas.mp4`)
-│   │                           restent utilisées ailleurs, voir plus bas
+│   │                           (dont les deux en-têtes `loop-*-hero` des rayons,
+│   │                           servies au TÉLÉPHONE seulement depuis le
+│   │                           03/09/2026) ; banda-wearables.jpg, le bandeau
+│   │                           #wearables de la home ; cat-suplementos.jpg et
+│   │                           cat-wearables.jpg, les en-têtes des deux rayons
+│   │                           sur ORDINATEUR. loop-wearables.mp4 et
+│   │                           loop-capsulas.mp4 restent utilisées : la première
+│   │                           par les passerelles de clôture, la seconde par le
+│   │                           bandeau #suplementos de la home
 │   └── capitulos/              boucles des chapitres éditoriaux + affiches
 │
 └── archivo/                    médias conservés mais plus référencés
@@ -335,15 +338,33 @@ son téléchargement même masquée. C'est `section-loops` qui lance sa lecture 
 l'entrée dans le cadre, et son affiche est un fond CSS posé à côté d'elle —
 jamais demandée sur desktop, qui ne voit pas cette vidéo.
 
-### Les deux bandeaux de la home sont aussi passés à la photo (03/09/2026)
+### Les bandeaux et en-têtes en photo (03/09/2026)
 
-`#wearables` et `#suplementos` sur `index.html` — pas les en-têtes des pages de
-rayon, ni la passerelle de clôture qui les relie, qui restent en vidéo (voir
-plus bas). Chaque bandeau est un `.band.band-shot` avec une simple `<img
+**Sur la home, un seul bandeau est passé à la photo : `#wearables`.**
+`#suplementos` a repris sa boucle des capsules (`loop-capsulas.mp4`) le soir
+même — la photo qui l'occupait quelques heures est partie servir d'en-tête au
+rayon `/suplementos`, où elle a plus de place.
+
+**Sur les deux pages de rayon, l'en-tête est une photo sur ordinateur et
+reste une boucle sur téléphone** : `cat-suplementos.jpg` (la femme au
+supplément) et `cat-wearables.jpg` (la salle de spinning). Le mécanisme est
+celui du hero, pour la même raison — la photo est un **fond CSS** sur
+`.cat-head .band-photo`, jamais une balise `img`, parce qu'un `<img>` en
+`display:none` est tout de même téléchargé ; et la boucle a perdu son
+`autoplay` et son `poster`, qui déclenchaient son chargement sur ordinateur
+alors qu'elle y est masquée. Vérifié : sur ordinateur la page ne demande que
+les 190 ko de la photo, la boucle de 5 Mo reste à `readyState 0`.
+
+`band-photo` et non `band-shot` : ce dernier existe déjà sur la home comme
+**modificateur** du bandeau (`.band.band-shot`), pas comme enfant.
+
+Ce qui suit ne concerne donc plus que le bandeau `#wearables` de la home :
+
+`#wearables` sur `index.html` — pas la passerelle de clôture des rayons, qui
+reste en vidéo. C'est un `.band.band-shot` avec une simple `<img
 fetchpriority="low" loading="lazy">` à la place du `<video autoplay>` :
-`banda-wearables.jpg` (la personne sur son tapis, cadrée à `center 34%` — un
-cadrage centré lui coupait la tête, le bandeau étant bien plus large que haut)
-et `banda-suplementos.jpg` (le visage au centre du cadre, cadrage par défaut).
+`banda-wearables.jpg`, la personne sur son tapis, cadrée à `center 34%` — un
+cadrage centré lui coupait la tête, le bandeau étant bien plus large que haut.
 `.band>img` réutilise la règle `object-fit:cover` déjà écrite pour
 `.band>video` ; le voile en dégradé (`.band::after`) et le texte par-dessus
 n'ont pas changé.
