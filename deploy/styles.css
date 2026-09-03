@@ -1980,6 +1980,58 @@ body.search-open{overflow:hidden}
 }
 
 /* =========================================================================
+   Écran d'ouverture
+
+   Blanc plein, le wordmark, une barre. Rien d'autre : c'est un seuil, pas
+   une page. Il est déclaré ICI et non en ligne dans le HTML parce que
+   `styles.css` est un `<link>` bloquant du `<head>` — il est donc appliqué
+   dès la première peinture, ce qui est la seule contrainte réelle.
+
+   `html.booting` est posé par un script en ligne du `<head>`, avant que le
+   corps ne soit analysé : l'écran est donc là d'emblée, jamais après un
+   éclair de page.
+   ========================================================================= */
+.boot{display:none}
+html.booting{overflow:hidden}
+html.booting .boot{
+  display:flex;align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:calc(var(--z-skip) + 50);
+  background:#fff;
+  /* La sortie : le voile s'efface, il ne coulisse pas. Un écran
+     d'ouverture qui part sur le côté raconte une transition ; celui-ci ne
+     doit raconter que la fin de l'attente. */
+  opacity:1;transition:opacity .42s ease-out;
+}
+html.booting .boot.done{opacity:0;pointer-events:none}
+.boot-inner{
+  display:flex;flex-direction:column;align-items:center;gap:clamp(18px,2.4vw,26px);
+  padding:24px;
+}
+.boot-mark{
+  font-family:var(--font-display);font-weight:600;
+  font-size:clamp(1.6rem,5vw,2.2rem);letter-spacing:-.045em;line-height:1;
+  color:var(--ink);
+}
+/* La barre est volontairement fine et courte : à cette largeur, elle se lit
+   d'un seul regard, et son remplissage reste perceptible du début à la fin.
+   Plus large, la fin du trajet ne se voyait plus. */
+.boot-bar{
+  width:clamp(128px,34vw,178px);height:2px;border-radius:2px;
+  background:rgba(23,25,27,.12);overflow:hidden;
+}
+.boot-fill{
+  display:block;width:0;height:100%;border-radius:2px;
+  background:var(--ink);
+  /* Aucune transition ici : la progression est peinte image par image par
+     le module `boot`, qui l'amortit lui-même. Une transition CSS par-dessus
+     ajouterait un second lissage et la barre traînerait derrière le vrai
+     état du chargement. */
+}
+@media(prefers-reduced-motion:reduce){
+  html.booting .boot{transition:none}
+}
+
+/* =========================================================================
    Boutique — rayons par catégorie
    ========================================================================= */
 .shop-jump{display:flex;gap:10px;flex-wrap:wrap}
@@ -2188,6 +2240,13 @@ body.search-open{overflow:hidden}
   margin-inline:calc(-1 * var(--gutter));
 }
 .band>video,.band>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+/* Les deux bandeaux de la home sont passés de la boucle vidéo à la photo le
+   03/09/2026. Un bandeau est bien plus large que haut : `cover` rogne donc
+   le haut et le bas d'une source 16/9. Le sujet du bandeau wearables — la
+   personne sur son tapis — occupe la moitié supérieure du cadre, un
+   cadrage centré lui coupait la tête. Celui des suppléments a son visage
+   au centre et garde donc le cadrage par défaut. */
+#wearables .band-shot>img{object-position:center 34%}
 .band::after{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
   background:linear-gradient(180deg,rgba(12,13,14,.3) 0%,rgba(12,13,14,.12) 45%,rgba(12,13,14,.72) 100%);

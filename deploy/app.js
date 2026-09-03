@@ -945,6 +945,189 @@
   });
 
 
+
+  /* =====================================================================
+     Écran d'ouverture
+
+     Le problème qu'il règle est précis. Les boucles du site sont en
+     `preload="none"` — c'est ce qui évite au téléphone de télécharger la
+     boucle desktop et réciproquement. Mais celle du hero commençait donc à
+     se charger AU MOMENT où on la regardait : sur téléphone, on ouvrait le
+     site et on voyait l'affiche fixe pendant une seconde ou deux, puis un
+     démarrage sec. C'est ce à-coup qu'on supprime.
+
+     Le principe : pendant que l'écran blanc est là, on charge vraiment la
+     boucle visible, on la LANCE en coulisses, et on ne s'efface qu'ensuite.
+     Au moment où le site apparaît, la vidéo tourne déjà.
+
+     Trois règles que la barre respecte :
+     · elle suit de VRAIES étapes — polices prêtes, page chargée, boucle
+       jouable — pondérées, pas un simple minuteur ;
+     · elle avance quand même. Un plancher lié au temps la fait progresser
+       même si rien ne se résout, parce qu'une barre immobile se lit comme
+       une panne. Il est plafonné à 88 % : la fin du trajet reste la
+       récompense d'un vrai chargement ;
+     · elle ne retient jamais le site plus de 5 secondes, quoi qu'il
+       arrive. Un réseau lent doit dégrader l'animation, pas l'accès.
+     ===================================================================== */
+  module("boot", function(){
+    var html = document.documentElement;
+    if (html.className.indexOf("booting") === -1) return;
+
+    var boot = $("boot"), fill = $("boot-fill");
+
+    function seal(){
+      try { sessionStorage.setItem("lowlabs-booted", "1"); } catch(e){}
+    }
+    function reveal(){
+      seal();
+      if (window.LOWSCROLL) window.LOWSCROLL.start();
+      if (!boot){ flag(html, "booting", false); return; }
+      flag(boot, "done", true);
+      setTimeout(function(){
+        flag(html, "booting", false);
+        boot.hidden = true;
+      }, reduceMotion ? 0 : 440);
+    }
+    if (!boot || !fill){ reveal(); return; }
+
+    /* Mouvement réduit : tout l'appareil — barre amortie, plancher de
+       temps, lancement de la boucle juste avant la levée — n'existe que
+       pour cacher le démarrage d'une vidéo qui, ici, ne va de toute façon
+       pas jouer. Le maintenir imposerait une attente sans aucune
+       contrepartie à des visiteurs qui ont explicitement demandé moins
+       d'animation, pas plus d'attente. On révèle donc dès que la page et
+       les polices sont prêtes, sans barre ni délai plancher. */
+    if (reduceMotion){
+      if (document.readyState === "complete") reveal();
+      else window.addEventListener("load", reveal, false);
+      return;
+    }
+
+    /* Lenis avance sa position même si le corps est bloqué : sans cette
+       pause, la page se serait déplacée derrière l'écran et rendrait le
+       décalage d'un bloc à la levée. Même contrainte que le tiroir du
+       panier et le panneau de recherche. */
+    if (window.LOWSCROLL) window.LOWSCROLL.stop();
+
+    var jobs = [];
+    function job(weight){
+      var j = { done: false, w: weight || 1 };
+      jobs.push(j);
+      return j;
+    }
+    function ratio(){
+      var total = 0, got = 0;
+      for (var i = 0; i < jobs.length; i++){
+        total += jobs[i].w;
+        if (jobs[i].done) got += jobs[i].w;
+      }
+      return total ? got / total : 1;
+    }
+
+    /* ---- Étape 1 : les polices. Révéler le site avant elles montrerait
+       le wordmark et les titres dans une police de repli, puis les ferait
+       sauter — exactement le genre de saut que cet écran existe pour
+       cacher. */
+    var fonts = job(1);
+    if (document.fonts && document.fonts.ready){
+      document.fonts.ready.then(function(){ fonts.done = true; },
+                                function(){ fonts.done = true; });
+    } else fonts.done = true;
+
+    /* ---- Étape 2 : la page et ses images de premier écran. */
+    var loaded = job(1);
+    if (document.readyState === "complete") loaded.done = true;
+    else window.addEventListener("load", function(){ loaded.done = true; }, false);
+
+    /* ---- Étape 3 : la boucle du premier écran, celle qui compte.
+       On ne cherche que celle qui est RÉELLEMENT affichée : le hero en
+       déclare deux, une par format, et l'autre est en `display:none`.
+       `offsetParent` est le test le plus court pour ça. */
+    function firstLoop(){
+      var vids = document.querySelectorAll("video[data-autoloop]");
+      for (var i = 0; i < vids.length; i++){
+        var v = vids[i];
+        if (v.offsetParent === null) continue;
+        var r = v.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < window.innerHeight) return v;
+      }
+      return null;
+    }
+
+    var loop = reduceMotion ? null : firstLoop();
+    if (loop){
+      /* La boucle porte `preload="none"` : il faut donc lui demander
+         explicitement de se charger, sinon on attendrait un événement qui
+         ne viendrait jamais. */
+      var media = job(2);
+      function ready(){ media.done = true; }
+      if (loop.readyState >= 3) ready();
+      else {
+        loop.addEventListener("canplay", ready, false);
+        loop.addEventListener("loadeddata", ready, false);
+        /* Une boucle qui échoue ne doit pas retenir le site : l'affiche
+           reste, et la section est complète sans elle. */
+        loop.addEventListener("error", ready, false);
+      }
+      try { loop.preload = "auto"; loop.load(); } catch(e){ ready(); }
+      /* Plafond propre à la vidéo : au-delà, on ouvre avec ce qui est
+         chargé plutôt que de faire attendre sur un réseau lent. */
+      setTimeout(ready, 4200);
+    }
+
+    /* ---- La barre ------------------------------------------------------
+       Deux valeurs : `real`, l'avancement vrai, et `shown`, ce qu'on peint.
+       `shown` rejoint `real` par amortissement — une barre qui saute d'un
+       quart d'un coup se lit moins bien qu'une barre qui glisse. */
+    var t0 = Date.now(), shown = 0, over = false;
+    var MIN = 850;      /* durée minimale d'affichage : en dessous, l'écran
+                           clignote au lieu de s'annoncer */
+    var MAX = 5000;     /* durée maximale, tous cas confondus */
+
+    function frame(){
+      if (over) return;
+      var elapsed = Date.now() - t0;
+      var real = ratio();
+      /* Le plancher : la barre bouge même si rien ne se résout. Plafonné à
+         88% pour que les derniers pour-cent restent la marque d'un vrai
+         chargement terminé. */
+      var floor = Math.min(.88, elapsed / 3400);
+      var target = Math.max(real, floor);
+
+      var done = real >= 1 && elapsed >= MIN;
+      if (elapsed >= MAX) done = true;
+      if (done) target = 1;
+
+      shown += (target - shown) * (done ? .3 : .12);
+      if (done && shown > .995) shown = 1;
+      fill.style.width = (shown * 100).toFixed(2) + "%";
+
+      if (done && shown === 1){
+        over = true;
+        /* La boucle est lancée AVANT que l'écran ne s'efface : c'est le
+           point de tout le dispositif. Muette et `playsinline`, elle est
+           autorisée à démarrer sans geste de l'utilisateur. */
+        if (loop){
+          loop.muted = true; loop.defaultMuted = true;
+          try {
+            var pr = loop.play();
+            if (pr && typeof pr["catch"] === "function") pr["catch"](function(){});
+          } catch(e){}
+        }
+        reveal();
+        return;
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    /* Dernier filet, indépendant de la boucle d'animation : si celle-ci
+       était gelée (onglet en arrière-plan au chargement, par exemple),
+       l'écran se lève quand même. */
+    setTimeout(function(){ if (!over){ over = true; reveal(); } }, MAX + 900);
+  });
+
   /* =====================================================================
      Ajouter au panier depuis une carte
 

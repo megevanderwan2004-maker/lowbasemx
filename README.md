@@ -68,13 +68,20 @@ deploy/media/
 │                               les visuels des trois formats
 │
 ├── landing/
-│   ├── hero/                   hero-desktop.mp4 + son affiche (au-dessus de
-│   │                           760px), hero-mobile.mp4 + son affiche (plein
-│   │                           écran sous 760px). hero-runners.jpg : l'ancien
-│   │                           visuel desktop, conservé, plus référencé
+│   ├── hero/                   hero-desktop.jpg, la photo (au-dessus de 760px,
+│   │                           depuis le 03/09/2026), hero-mobile.mp4 + son
+│   │                           affiche (plein écran sous 760px). hero-runners.jpg
+│   │                           et hero-desktop.mp4 : anciens visuels desktop,
+│   │                           le premier conservé mais plus référencé, le
+│   │                           second supprimé le 03/09/2026 avec son affiche
 │   ├── objetivos/              les 3 boucles de l'assistant + leurs affiches
 │   ├── bandas/                 boucles des bandeaux pleine largeur + affiches
-│   │                           (dont les deux en-têtes `loop-*-hero` des rayons)
+│   │                           (dont les deux en-têtes `loop-*-hero` des rayons) ;
+│   │                           banda-wearables.jpg + banda-suplementos.jpg, les
+│   │                           deux bandeaux de la home, en photo depuis le
+│   │                           03/09/2026 — les vidéos qu'ils remplacent
+│   │                           (`loop-wearables.mp4`, `loop-capsulas.mp4`)
+│   │                           restent utilisées ailleurs, voir plus bas
 │   └── capitulos/              boucles des chapitres éditoriaux + affiches
 │
 └── archivo/                    médias conservés mais plus référencés
@@ -282,23 +289,35 @@ idempotent : relancé, il remplace l'empreinte au lieu de l'empiler.
 
 ## Le hero
 
-Deux boucles vidéo, deux comportements :
+Un format par écran, et depuis le 03/09/2026 les deux ne sont plus de la même
+nature :
 
-- **Desktop** — `hero-desktop.mp4` (736×414, 6 s, 416 ko), en `object-fit:cover`
-  sur toute la hauteur disponible. Depuis le 22/08/2026 : c'était
-  `hero-runners.jpg` avant, une photo qui portait le wordmark et la baseline
-  **incrustés**. La vidéo ne les porte pas — ils sont repris en HTML dans
-  `.hero-mark`, un bloc optiquement centré qui n'existe qu'au-dessus de 760px.
-  Le fichier source est en 736 px de large : il est **agrandi 2 à 3,4 fois**
-  selon l'écran, ce que son étalonnage sombre et son flou de profondeur rendent
-  acceptable, mais qui reste un plafond de qualité.
-- **Mobile (< 760px)** — `hero-mobile.mp4` en **plein écran** : `100dvh` avec
-  `100svh` en repli pour suivre la barre d'adresse, bord à bord grâce à
+- **Desktop** — `hero-desktop.jpg` (1366×911), posée en **fond CSS** sur
+  `.hero-shot-desktop` et non en balise `<img>` : sous 760px, un `<img>` en
+  `display:none` est tout de même téléchargé, alors qu'un fond CSS sur un
+  élément masqué ne l'est jamais — le téléphone ne paie donc rien pour elle.
+  `object-position` est remontée à **50% 42%** : le sujet (deux têtes) est dans
+  le premier quart du cadre, `cover` sur un cadre plus large que haut aurait
+  sinon rogné le haut. C'était une boucle vidéo jusqu'au 03/09/2026
+  (`hero-desktop.mp4`, retirée avec son affiche `poster-hero-desktop.jpg`,
+  devenues orphelines) ; avant elle, `hero-runners.jpg`, une photo qui portait
+  le wordmark et la baseline **incrustés** — ni la vidéo ni la photo actuelle
+  ne les portent, ils sont repris en HTML dans `.hero-mark`, un bloc
+  optiquement centré qui n'existe qu'au-dessus de 760px.
+- **Mobile (< 760px)** — reste `hero-mobile.mp4`, en **plein écran** : `100dvh`
+  avec `100svh` en repli pour suivre la barre d'adresse, bord à bord grâce à
   `margin-inline:-gutter`, la carte renonçant à sa marge haute, à son coin et à
   son clipping le temps de le laisser passer. La vidéo est en 9/16 : un écran
   plus étroit la rogne sur les côtés, le wordmark **y est toujours incrusté** et
   survit au recadrage. C'est pourquoi `.hero-mark` est masquée sous 760px : elle
   dédoublerait le wordmark.
+
+**Le `<link rel="preload">` du `<head>` doit cibler `hero-desktop.jpg`, pas
+`poster-hero-desktop.jpg`.** Le second est l'affiche de l'ancienne boucle : le
+lien continuait à le viser après le passage à la photo, si bien que le vrai
+visuel n'était découvert qu'à la lecture de la feuille de style — retardant le
+LCP — pendant que 43 ko partaient sur un fichier que plus personne n'affiche.
+Corrigé le 03/09/2026 ; à vérifier après tout futur changement du hero desktop.
 
 **Ordre du hero depuis le 23/08/2026** : wordmark, puis les **deux actions**,
 puis la baseline. Elles étaient sous elle ; ce sont pourtant elles qu'on vient
@@ -311,11 +330,75 @@ Les deux actions mènent à **`/suplementos`** et **`/wearables`**, les pages, e
 non aux ancres `#suplementos` / `#wearables` de l'accueil. Les sections gardent
 leurs identifiants pour qui arrive par un lien profond.
 
-Aucune des deux boucles n'a **d'`autoplay` ni de `poster`** : les deux
-déclenchent le téléchargement même quand l'élément est masqué, et chaque format
-paierait la vidéo de l'autre. C'est `section-loops` qui lance la lecture à
-l'entrée dans le cadre — donc jamais pour la boucle en `display:none` — et
-chaque affiche est un fond CSS déclaré à côté de sa boucle.
+La boucle mobile n'a **ni `autoplay` ni `poster`** : les deux déclencheraient
+son téléchargement même masquée. C'est `section-loops` qui lance sa lecture à
+l'entrée dans le cadre, et son affiche est un fond CSS posé à côté d'elle —
+jamais demandée sur desktop, qui ne voit pas cette vidéo.
+
+### Les deux bandeaux de la home sont aussi passés à la photo (03/09/2026)
+
+`#wearables` et `#suplementos` sur `index.html` — pas les en-têtes des pages de
+rayon, ni la passerelle de clôture qui les relie, qui restent en vidéo (voir
+plus bas). Chaque bandeau est un `.band.band-shot` avec une simple `<img
+fetchpriority="low" loading="lazy">` à la place du `<video autoplay>` :
+`banda-wearables.jpg` (la personne sur son tapis, cadrée à `center 34%` — un
+cadrage centré lui coupait la tête, le bandeau étant bien plus large que haut)
+et `banda-suplementos.jpg` (le visage au centre du cadre, cadrage par défaut).
+`.band>img` réutilise la règle `object-fit:cover` déjà écrite pour
+`.band>video` ; le voile en dégradé (`.band::after`) et le texte par-dessus
+n'ont pas changé.
+
+## Écran de chargement — `#boot`
+
+**Nouveau le 03/09/2026.** Il règle un problème précis : les boucles du site
+sont en `preload="none"` (voir plus haut), donc celle du hero ne commençait à
+se charger qu'au moment où on la regardait — sur téléphone, une seconde ou
+deux d'affiche fixe puis un démarrage sec. L'écran d'ouverture existe pour que,
+pendant qu'il est là, la boucle visible soit réellement chargée puis **lancée
+en coulisses** : au moment où il s'efface, la vidéo tourne déjà.
+
+**Il se déclenche une fois par session**, jamais en navigation interne : un
+script en ligne et synchrone dans le `<head>` (donc AVANT la première peinture
+— posé dans `app.js`, qui est `defer`, la page aurait eu le temps de se
+peindre puis d'être recouverte) pose `html.className += " booting"` sauf si
+`sessionStorage["lowlabs-booted"]` existe déjà, et se munit d'un filet de
+5 secondes : si `app.js` ne démarrait pas, l'écran ne doit jamais retenir le
+site. Il est dupliqué sur les cinq gabarits de page (`index.html`,
+`tienda.html`, `wearables.html`, `suplementos.html`, `gen-products.js`) — pas
+un seul point d'entrée, puisqu'il doit s'exécuter avant tout script externe.
+
+Le module `boot` d'`app.js` fait le reste :
+
+- **Trois étapes pondérées**, pas un minuteur : polices prêtes
+  (`document.fonts.ready` — les révéler avant ferait sauter les titres d'une
+  police de repli vers la bonne), page + images de premier écran chargées
+  (`load`), et **la boucle réellement affichée** rendue jouable
+  (`canplay`/`loadeddata`, avec `preload="auto"` demandé explicitement
+  puisqu'elle est en `"none"` par défaut). `firstLoop()` ne cible que la vidéo
+  dont `offsetParent` n'est pas nul — le hero en déclare deux, une par format,
+  l'autre est en `display:none`.
+- **La barre avance quand même** si une étape traîne : un plancher lié au
+  temps la fait progresser, plafonné à 88 % pour que les derniers pour-cent
+  restent la preuve d'un vrai chargement terminé plutôt qu'une convention.
+- **Elle ne retient jamais plus de 5 secondes**, quoi qu'il arrive — un réseau
+  lent doit dégrader l'écran, pas bloquer l'accès au site.
+- **La boucle est lancée AVANT que l'écran ne s'efface** (`loop.play()`,
+  muette, autorisée sans geste car `muted` + `playsinline`) : c'est le point
+  de tout le dispositif.
+
+**Mouvement réduit : pas de théâtre.** Toute la mise en scène — barre amortie,
+plancher de temps, lancement différé — n'existe que pour cacher le démarrage
+d'une vidéo qui ne va de toute façon pas jouer pour ces visiteurs
+(`section-loops` les fige sur l'affiche). La maintenir imposerait une attente
+sans contrepartie à qui a demandé explicitement moins d'animation, pas plus
+de patience. Le module révèle donc dès que la page et les polices sont prêtes,
+sans barre ni délai plancher — voir `if (reduceMotion){ ... return; }` en tête
+du module, avant que la barre n'existe.
+
+`html.booting` bloque le défilement (`overflow:hidden`) et met Lenis en pause
+(`LOWSCROLL.stop()` / `.start()`) — même précaution que le tiroir du panier et
+le panneau de recherche : sans elle, la page aurait avancé derrière l'écran et
+rendrait le décalage d'un bloc à la levée.
 
 ## Les pages de rayon — `/wearables` et `/suplementos`
 

@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-09-03 (new desktop hero, full-grey product cards with quick add-to-cart, smart search, recommendation rules)
+> Last updated: 2026-09-03 (desktop hero and two home bands are photos now, full-grey product cards with quick add-to-cart, smart search, recommendation rules, first-visit loading screen, hero preload fix)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -110,7 +110,7 @@ lowlabs-cirqa-context/
 │   │   ├── creatina.html  promix-creatina.html  promix-debloat.html
 │   │   └── promix-relax.html  absorption-sleep.html
 │   ├── catalog.js             ★ Single source of truth: products + goals (651 lines)
-│   ├── app.js                 All behaviour, 17 isolated modules (1857 lines)
+│   ├── app.js                 All behaviour, 20 isolated modules (2326 lines)
 │   ├── styles.css             Full design system (2701 lines)
 │   └── media/                 92 MB, 125 files — see section 10
 │
@@ -242,15 +242,27 @@ Ink-to-ink gaps between home sections now sit in a **74–79px band on desktop**
 `body.has-hero` (static in `index.html`) decides whether the shell starts under the nav or lets the hero run beneath it.
 
 ### Hero
-Full-bleed, `object-fit: cover`. **Two video loops, one per format** — since 2026-08-22 the desktop side is a video too, not a photo:
-- **Above 760px**: `hero-desktop.mp4` (`736×414`, 6.26 s, 24 fps, no audio track, 416 kB), `.hero-loop-desktop`, cropped `center`. It replaced `hero-runners.jpg`, which carried the wordmark and the tagline **baked in**. The video does not carry them, so they came back as HTML in `.hero-mark` — a `position:absolute; inset:0` flex column, optically centred, `pointer-events:none`, `display:flex` **only** above 760px. It reuses the `.hero-full .wordmark` / `.wordmark-sub` rules that had been dead CSS since the wordmark was baked in.
-- The source is only 736 px wide, so it is **upscaled 2×–3.4×** depending on the screen. Its dark grading and shallow depth of field hide most of it, but that is the ceiling: a higher-resolution master is the only way to raise it.
-- **Below 760px the hero is a full-screen video**: `hero-mobile.mp4` (720×1280, wordmark baked in by the owner), `height:100dvh` with `100svh` as fallback so it follows the address bar on recent phones. It escapes the card's gutter with `margin-inline:-gutter`, and `body.has-hero .shell` drops its top margin, its top radius and its clipping to let it through — the rest of the card keeps its gutter and corners. The 9/16 video is wider than a phone screen, so `cover` trims the sides; the wordmark is centred and survives.
+Full-bleed, `object-fit: cover`. **One format is a photo, the other a video** — this changed again on 2026-09-03:
+- **Above 760px**: `hero-desktop.jpg` (1366×911), painted as a **CSS background** on `.hero-shot-desktop`, not an `<img>` — an `<img>` in `display:none` is still downloaded by the browser, a CSS background on a hidden element never is, so the phone pays nothing for it. `object-position` is `50% 42%`: the subject (two heads) sits in the top quarter of a frame that is much wider than tall, and a centred crop clipped them. It was a video loop from 2026-08-22 to 2026-09-03 (`hero-desktop.mp4`, `.hero-loop-desktop`, cropped `center`) — that file and its poster (`poster-hero-desktop.jpg`) are gone, both now unreferenced. Before the video, `hero-runners.jpg` carried the wordmark and tagline **baked in**; neither the old video nor the current photo does, so they live as HTML in `.hero-mark` — a `position:absolute; inset:0` flex column, optically centred, `pointer-events:none`, `display:flex` **only** above 760px.
+- **The `<link rel="preload">` in `<head>` must target `hero-desktop.jpg`.** It kept pointing at `poster-hero-desktop.jpg` (the old video's poster, 43 kB) through the 09/03 switch — a real LCP regression: the actual background image was only discovered once the stylesheet was parsed, while 43 kB preloaded a file nothing displays. Fixed 2026-09-03; re-check after any future hero-desktop change.
+- **Below 760px the hero is still a full-screen video**: `hero-mobile.mp4` (720×1280, wordmark baked in by the owner), `height:100dvh` with `100svh` as fallback so it follows the address bar on recent phones. It escapes the card's gutter with `margin-inline:-gutter`, and `body.has-hero .shell` drops its top margin, its top radius and its clipping to let it through — the rest of the card keeps its gutter and corners. The 9/16 video is wider than a phone screen, so `cover` trims the sides; the wordmark is centred and survives.
 - **`.hero-mark` is hidden below 760px on purpose**: the mobile loop still has its own wordmark baked in, and showing the HTML one would double it.
 - **Hero order since 2026-08-23**: wordmark, then the two CTAs, then the tagline. The CTAs used to sit under it; they are what the visitor came for, the tagline is only a signature. `.hero-mark` now carries the wordmark alone, `.wordmark-sub` has left the hero, and `.hero-tagline` carries the tagline at **both** breakpoints, taking over `.wordmark-sub`'s scale above 760px. The bottom reserve grew from 18 to 30px: the tagline is what skirts the dock now, and 18 left only 6.
-- `hero-runners.jpg` (1366×768) and `hero-runners-mobile.jpg` (384×768) are the previous desktop visual and its mobile crop — kept, referenced by nothing.
-- **Neither loop has `autoplay` or `poster`** — both trigger a download even when the element is `display:none`, and each format would pay for the other's video. `section-loops` starts playback on intersection (a `display:none` element never intersects, so the hidden loop is never even fetched) and each poster is a CSS background declared next to its loop.
+- `hero-runners.jpg` (1366×768) and `hero-runners-mobile.jpg` (384×768) are an older desktop visual and its mobile crop — kept, referenced by nothing.
+- **The mobile loop has no `autoplay` or `poster`** — both trigger a download even when the element is `display:none`. `section-loops` starts playback on intersection and its poster is a CSS background declared next to it. The desktop side no longer has a loop to guard this way — see the loading-screen section below for how it avoids the same class of bug on mobile.
 - Above 760px the two CTAs are **centred** (`.hero-full-inner{align-items:center}`) and stay anchored to the bottom of the hero; `.hero-mark` sits in the middle, above them.
+
+### The two home bands are photos too (2026-09-03)
+`#wearables` and `#suplementos` in `index.html` — **not** the aisle-page headers or the closing cross-link band, which stay video (see §Page inventory). Each is now `.band.band-shot` with a plain `<img fetchpriority="low" loading="lazy">` instead of `<video autoplay>`: `bandas/banda-wearables.jpg` (person on a yoga mat, `object-position:center 34%` — a band is far wider than tall, a centred crop cut her head off) and `bandas/banda-suplementos.jpg` (face centred, default crop). `.band>img` reuses the `object-fit:cover` rule already written for `.band>video`; the gradient veil (`.band::after`) and the overlaid copy are unchanged. `loop-wearables.mp4` / `loop-capsulas.mp4` are **not** orphaned — the aisle pages' closing cross-link bands still use them (see `README.md` for the "do not merge" note).
+
+### Loading screen — `#boot`, module `boot` in `app.js`
+**New 2026-09-03.** Exists to fix one specific bug: every loop on the site is `preload="none"`, so the hero's loop only started fetching once it was actually looked at — on a phone, a second or two of frozen poster then a hard start. The screen buys that fetch (and a `loop.play()`) time in the background, so the loop is already running the instant the screen lifts.
+
+- **Trigger**: an inline, synchronous `<script>` in `<head>` — not in `app.js`, which is `defer` and would let the page paint once before being covered — sets `html.className += " booting"` unless `sessionStorage["lowlabs-booted"]` is already set. Duplicated across all five page templates (`index.html`, `tienda.html`, `wearables.html`, `suplementos.html`, `gen-products.js`) since it must run before any external script. A `setTimeout` failsafe strips the class after 8 s regardless, in case `app.js` never boots.
+- **Progress is three weighted jobs**, not a timer: `document.fonts.ready`, the `load` event, and the **actually-visible** loop reaching `canplay`/`loadeddata` (`firstLoop()` filters on `offsetParent !== null` — the hero declares two loops, one per format, the other is `display:none`). A time-based floor keeps the bar moving even if a job stalls, capped at 88% so the last stretch still means something finished. A hard 5 s ceiling reveals regardless of state — a slow network degrades the animation, never blocks access.
+- **Reduced motion skips the theatre entirely**: the whole apparatus exists to hide a video start that will not happen for these visitors (`section-loops` freezes them on the poster). The module reveals as soon as fonts + `load` are ready, no bar, no floor delay — see the early `if (reduceMotion){...return;}` branch, before the animated-bar code even runs.
+- Sets `LOWSCROLL.stop()`/`.start()` around the wait, same guard as the cart drawer and the search panel, so Lenis's position does not drift behind a blocked body.
+- Verified live: forcing `html.booting` / `.boot.done` classes confirms the white screen + wordmark + bar render correctly on both breakpoints; sampling `video.currentTime` across 391 animation frames after a real (uncleared) boot showed the loop already playing at reveal, zero `paused` frames over 6.5 s.
 
 ### Responsive breakpoints
 | Width | What changes |
@@ -448,7 +460,7 @@ That is exactly three cards plus two gutters, so the closed track and the open p
 
 **Motion tokens** live on `.goals-stage`: `--goals-gap: clamp(10px,1.6vw,18px)` and `--goals-ease: cubic-bezier(.22,1,.36,1)`. The return is deliberately shorter than the outbound trip — 160 + 260 ms against 280 + 400 ms.
 
-## 9. `app.js` — 17 modules
+## 9. `app.js` — 20 modules
 
 Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not decorative: `.rv` elements start at `opacity: 0`, so before the wrapper existed one uncaught error could leave **the entire page invisible**. The reveal module also has a 4-second failsafe.
 
@@ -458,6 +470,7 @@ Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not de
 | `catalog` | Renders the framed grids from `productCard()` (`[data-exclude]`, `[data-handles]`, `[data-category]`) **and** the floating tracks from `flyCard()` (`.fcards[data-handles]`) |
 | `cat-sort` | The aisle pages' sort chips. **Moves** the existing card nodes rather than re-rendering — a re-render would drop the observer that pauses product loops off-screen and restart every video |
 | `shop` | Builds `/tienda` aisles — one carousel per category, then **re-lands the URL fragment**: the aisles are born in JS, so the browser's own jump to `#wearables` fired on an anchor that did not exist yet. It re-lands on every layout shake (fonts, images, arrows folding) until a real gesture — wheel, touch, key, pointer — says the reader has taken over |
+| `boot` | **New 2026-09-03.** The `#boot` loading screen — see the dedicated section above for the full mechanics (weighted jobs, time floor, reduced-motion bypass). Runs before `reveal`, since revealing the page and lifting the boot screen are two different things: the page's own `.rv` elements still fade in normally underneath, the boot screen is a layer above all of it. |
 | `card-add` | **New 2026-09-03.** The round add-to-cart button on every product card. One delegated listener on `document` — cards are injected by several modules and re-rendered on aisle sort, so a per-button listener would be lost each render. From a card nobody has chosen a colour or size, so it takes the catalogue's first of each (the bundle's convention) and lets the drawer show the combination for correction. A product whose variant will not resolve is never added silently — it goes to its page. |
 | `search` | **New 2026-09-03.** The nav's magnifier opens a glass panel with live suggestions. Everything comes from `catalog.js` — no external service, no index to maintain. The module only opens the panel, asks the catalogue and renders the list. The input is a combobox over a `listbox`, so arrows walk the suggestions without leaving the field; the walk has one position more than the list, so leaving it by either end returns to "nothing highlighted", which is the state where Enter opens the first result. Escape closes and returns focus. `body.search-open` freezes the page, so the module stops Lenis exactly like the cart drawer — without it, Lenis keeps advancing on a frozen page and renders the jump on close. |
 | `goals` | The assistant. Disclosure buttons (`aria-expanded`), open/close choreography, recommendation rendering, `#objetivo=<id>` in the URL. All the animation is **declared in CSS** (`.is-leaving`, `.is-open`, `.is-in`, `.is-coming`, `.is-folding`) and only **triggered** here; the sole thing JS computes is the FLIP, which needs real measurements — `travel()` above 720px (position changes, size does not), `fold()` below (size changes, position does not). Landing is `settle()`: it aligns the **section** so the question stays readable above its answer, falls back to the stage alone when the section will not fit, and **does nothing when the stage is already fully in view** — since the stage keeps the same box open and closed, there is usually nothing to catch up. 1.1 s, quintic ease-out, `focus({preventScroll:true})` first to kill the browser's instant jump. |
@@ -518,12 +531,17 @@ deploy/media/
 │   ├── promix-relax/       promix-relax.png
 │   └── absorption-sleep/   absorption-sleep.png
 ├── landing/
-│   ├── hero/               hero-desktop.mp4 + poster-hero-desktop.jpg,
+│   ├── hero/               hero-desktop.jpg (photo, active since 09/03),
 │   │                       hero-mobile.mp4 + poster-hero-mobile.jpg,
-│   │                       hero-runners.jpg + hero-runners-mobile.jpg (retirés)
+│   │                       hero-runners.jpg + hero-runners-mobile.jpg (retirés) —
+│   │                       hero-desktop.mp4 + poster-hero-desktop.jpg deleted 09/03,
+│   │                       superseded by the photo, nothing referenced them
 │   ├── objetivos/          goal-dormir / -rendimiento / -salud .mp4 (+ posters)
 │   ├── bandas/             loop-wearables, loop-capsulas, loop-brand,
-│   │                       loop-wearables-hero, loop-suplementos-hero (+ posters)
+│   │                       loop-wearables-hero, loop-suplementos-hero (+ posters),
+│   │                       banda-wearables.jpg + banda-suplementos.jpg (09/03,
+│   │                       the two HOME bands only — the aisle-page and
+│   │                       cross-link videos above are unaffected)
 │   └── capitulos/          loop-vertical, cymbiotika-shot (+ posters)
 └── archivo/                30 files kept but referenced by nothing
     ├── cirqa/              app screens, rock/tan/sensor shots, wrist-negra
@@ -608,7 +626,7 @@ vercel --prod
 3. **`deploy/catalog.js`** — everything about products and goals. Most content changes start and end here.
 4. **`deploy/index.html`** — homepage structure and section order.
 5. **`deploy/wearables.html`** / **`deploy/suplementos.html`** — the aisle-page template; the two files are the same skeleton with different copy, media and category.
-6. **`deploy/app.js`** — the 17 modules.
+6. **`deploy/app.js`** — the 20 modules.
 7. **`deploy/styles.css`** — the design system; the liquid-glass and backdrop-filter comments are load-bearing.
 8. **`build/gen-products.js`** — the page templates for `/productos/*`, including the nav and the category breadcrumb.
 
@@ -628,7 +646,7 @@ vercel --prod
 - **Do not reintroduce green.** The `--teal-*` names are historical; their values are grey.
 - **Do not unscope the `#lg-refract` backdrop filter** from the Firefox guard.
 - **Do not lower the `--lg-fill` floor opacity** below `.64`.
-- **Do not upscale `hero-desktop.mp4`** — the source is 736×414 and already stretched 2×–3.4× by `cover`. Re-encoding it larger adds bytes, not detail; only a higher-resolution master helps.
+- **`hero-desktop.mp4` is gone (deleted 2026-09-03)** — the desktop hero is `hero-desktop.jpg` now. If it ever changes back to video, remember the `<link rel="preload">` in `<head>` has to be re-pointed too — it silently kept targeting the wrong file through the previous switch, see §Hero.
 - **Do not remove `outputDirectory: "deploy"`** from `vercel.json`.
 - **Do not open a second Lenis instance, a second `requestAnimationFrame` loop, or add another scroll/animation library.** One instance, `autoRaf`, and the reveals stay on `IntersectionObserver`.
 - **Do not call `window.scrollTo` directly** in `app.js` — use `scrollToY()`, or `LOWSCROLL` from another file.

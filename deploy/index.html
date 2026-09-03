@@ -19,7 +19,12 @@
 <link rel="preconnect" href="https://cdn.shopify.com">
 <!-- Typographie verrouillée : Outfit (titres) + DM Sans (texte courant). Aucune autre famille sur le site. -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="/media/landing/hero/poster-hero-desktop.jpg" media="(min-width: 760px)" fetchpriority="high">
+<!-- Le hero desktop est une photo depuis le 03/09/2026 : c'est `hero-desktop.jpg`
+     qu'il faut précharger, pas `poster-hero-desktop.jpg` — l'affiche de
+     l'ancienne boucle vidéo, orpheline, que ce lien ciblait encore. Sans ce
+     correctif le vrai visuel n'était découvert qu'à la lecture de la CSS,
+     et 43 ko partaient sur un fichier que plus personne n'affiche. -->
+<link rel="preload" as="image" href="/media/landing/hero/hero-desktop.jpg" media="(min-width: 760px)" fetchpriority="high">
 <link rel="preload" as="image" href="/media/landing/hero/poster-hero-mobile.jpg" media="(max-width: 759px)" fetchpriority="high">
 <script>
 document.documentElement.className += " js";
@@ -36,9 +41,40 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   "currenciesAccepted": "MXN"
 }
 </script>
-<link rel="stylesheet" href="/styles.css?v=33034ac7">
+<link rel="stylesheet" href="/styles.css?v=d75b932f">
+<!-- ===== Écran d'ouverture — décidé AVANT la première peinture.
+     Le script est en ligne et synchrone à dessein : posé dans app.js, qui
+     est en `defer`, la page aurait le temps de se peindre une fois avant
+     d'être recouverte, et c'est précisément ce clignotement qu'on veut
+     éviter. Il ne fait que deux choses : marquer la racine, et poser un
+     filet de sécurité — si app.js ne démarrait pas, l'écran ne doit en
+     aucun cas retenir le site. ===== -->
+<script>
+(function(d){
+  var h = d.documentElement;
+  try { if (sessionStorage.getItem("lowlabs-booted")) return; } catch(e){}
+  h.className += " booting";
+  setTimeout(function(){
+    h.className = h.className.replace(/\s*booting/g, "");
+  }, 8000);
+})(document);
+</script>
 </head>
 <body class="has-hero">
+
+<!-- ===== Écran d'ouverture. Il ne sert pas à faire patienter pour rien :
+     pendant qu'il est là, la boucle du hero est réellement chargée puis
+     LANCÉE en coulisses, de sorte qu'au moment où l'écran s'efface la
+     vidéo tourne déjà. C'est tout l'objet du dispositif — sur téléphone la
+     boucle est en `preload="none"` et démarrait donc au moment où on la
+     regardait, avec le temps de latence que ça suppose. ===== -->
+<div class="boot" id="boot" role="status" aria-label="Cargando lowlabs">
+  <div class="boot-inner">
+    <p class="boot-mark">lowlabs</p>
+    <div class="boot-bar"><i class="boot-fill" id="boot-fill"></i></div>
+  </div>
+</div>
+
 
 <!-- Filtre de réfraction des boutons en verre liquide. Un bruit fractal
      déplace le fond puis est refloué : c'est ce qui donne l'ondulation.
@@ -226,13 +262,14 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           </div>
         </div>
       </div>
-      <div class="band rv">
-        <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
-               disablepictureinpicture disableremoteplayback
-               poster="/media/landing/bandas/poster-loop-wearables.jpg"
-               width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
-          <source src="/media/landing/bandas/loop-wearables.mp4" type="video/mp4">
-        </video>
+      <div class="band band-shot rv">
+        <!-- Photo depuis le 03/09/2026, en remplacement de la boucle vidéo.
+             Le cadrage est remonté à 34% : le bandeau est bien plus large
+             que haut, `cover` y rogne donc le haut et le bas d'un 16/9, et
+             le sujet — la personne sur son tapis — occupe la moitié
+             supérieure du cadre. Centré, on lui coupait la tête. -->
+        <img src="/media/landing/bandas/banda-wearables.jpg" alt=""
+             width="1366" height="769" fetchpriority="low" loading="lazy">
         <div class="band-inner">
           <!-- La bannière ouvre le rayon Wearables entier : son texte parle
                donc de toute la gamme Garmin, pas de la seule CIRQA. -->
@@ -308,13 +345,12 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           </div>
         </div>
       </div>
-      <div class="band rv">
-        <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
-               disablepictureinpicture disableremoteplayback
-               poster="/media/landing/bandas/poster-loop-capsulas.jpg"
-               width="1280" height="720" aria-hidden="true" tabindex="-1" data-autoloop>
-          <source src="/media/landing/bandas/loop-capsulas.mp4" type="video/mp4">
-        </video>
+      <div class="band band-shot rv">
+        <!-- Photo depuis le 03/09/2026, en remplacement de la boucle vidéo.
+             Le visage est au centre du cadre : on garde donc un cadrage
+             centré, contrairement au bandeau wearables juste au-dessus. -->
+        <img src="/media/landing/bandas/banda-suplementos.jpg" alt=""
+             width="1366" height="769" fetchpriority="low" loading="lazy">
         <div class="band-inner">
           <span class="eyebrow">Cymbiotika</span>
           <h2>Formulados por dietistas y científicos</h2>
@@ -442,6 +478,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <script src="/lenis.min.js?v=daec1872" defer></script>
 <script src="/catalog.js?v=78301d8e" defer></script>
 <script src="/cart.js?v=f3d8c0c3" defer></script>
-<script src="/app.js?v=88843426" defer></script>
+<script src="/app.js?v=bcd053a5" defer></script>
 </body>
 </html>
