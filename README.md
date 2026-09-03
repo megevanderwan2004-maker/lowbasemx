@@ -375,6 +375,19 @@ dans les cartes encadrées de la boutique. Il n'y en a plus qu'un.
 
 - **Un jeton, `--tile` (`#f1f2f3`)**, porte le fond de TOUS les visuels
   produit — carte flottante, carte encadrée, vignette de recherche.
+- **Le gris porte la carte ENTIÈRE, du visuel au prix** (03/09/2026, second
+  passage). Le visuel n'a plus de fond propre : en poser un second
+  dessinerait un rectangle dans le rectangle. La surface blanche et l'ombre
+  de `.prod` partent avec — deux familles de cartes sur la même page ne
+  peuvent pas avoir deux fonds.
+- **Le texte est calé à gauche.** Centré, le prix et le bouton d'ajout se
+  disputaient l'axe médian.
+- **Un bouton rond d'ajout au panier** ferme la ligne de prix, dans les deux
+  gabarits. C'est la seule surface colorée de la carte : c'est ce qui en
+  fait une commande et non une décoration. La carte n'est donc plus un
+  `<a>` unique — un `<button>` imbriqué dans un `<a>` serait invalide : le
+  lien couvre la carte par un pseudo-élément étiré et le bouton repasse
+  au-dessus par son `z-index`.
 - **Le fond alterné des rayons de `/tienda` a été retiré.** Il valait
   `--surface-teal` (`#f3f4f5`), soit deux points d'écart avec la tuile : les
   tuiles y disparaissaient purement et simplement, et le même carrousel
@@ -408,7 +421,16 @@ venaient de six studios et occupaient de 55 % à 94 % de leur fichier, ce qui
 se lisait comme un défaut d'échelle d'une tuile à l'autre. **Les sources ne
 sont jamais touchées**, le script écrit un `card.png` à côté.
 
-Trois visuels ont aussi été corrigés à la source :
+Cinq visuels ont aussi été corrigés à la source :
+
+- **Venu 4** : la carte montrait `venu-4.png`, le rendu au bracelet **cuir
+  beige**, alors que la fiche ouvre sur le coloris **Crema**, blanc. Le
+  client ne retrouvait pas ce qu'il avait vu. La carte lit maintenant
+  `venu-4-crema.jpg`.
+- **Promix Debloat** : la carte montrait `debloat-trio.jpg`, trois sticks
+  **tous orange**. C'est l'image 3 de la galerie (`debloat-sobres.jpg`) qui
+  est la bonne — elle montre les trois parfums, mangue, pêche blanche et
+  orange.
 
 - **CIRQA** montrait la Malva en carrousel alors que sa fiche ouvre sur la
   Negra. Le client voyait un bracelet mauve, cliquait, tombait sur un noir.
@@ -540,6 +562,29 @@ en ouvrir une ne sont pas le même acte : elles portent maintenant
 Conséquence directe : **les flèches ne font plus que déplacer le focus.** Elles
 sélectionnaient, ce qui déclencherait aujourd'hui trois ouvertures pour
 traverser la piste. Entrée ou Espace ouvre.
+
+### Ajouter au panier depuis une carte
+
+Un seul écouteur, posé sur le document : les cartes sont injectées par
+plusieurs modules et re-rendues au tri des rayons, un écouteur par bouton
+serait perdu à chaque nouveau rendu.
+
+Depuis une carte, **personne n'a choisi de coloris ni de taille**. On prend
+donc les premiers du catalogue — la convention du bundle — et c'est le
+tiroir qui s'ouvre derrière en affichant la combinaison retenue, de sorte
+que le client la VOIT et peut la corriger sur place. Un produit dont la
+variante ne se résout pas n'est jamais ajouté en silence : on l'envoie sur
+sa fiche.
+
+Le disque vire au vert une seconde et demie après l'ajout : le tiroir
+s'ouvre par-dessus, mais s'il est refermé aussitôt il doit rester une trace
+de ce qui vient de se passer.
+
+**Le visuel du panier suit désormais le coloris de la ligne.** Sans ça, une
+CIRQA Negra s'affichait avec le packshot Malva — le sélecteur disait
+« Negra » juste à côté d'un bracelet mauve.
+
+---
 
 ### Quatre façons de revenir
 

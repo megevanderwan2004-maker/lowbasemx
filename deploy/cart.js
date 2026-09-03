@@ -49,7 +49,20 @@
      catalogue se répercute donc tout seul. */
   function product(l){ return CATALOG ? CATALOG.byHandle(l.handle) : null; }
 
-  function lineImage(p){ return p ? (p.packshot || p.image) : ""; }
+  /* Le visuel d'une ligne suit le COLORIS de cette ligne. Sans ça, une
+     CIRQA Negra s'affichait avec le packshot Malva : le sélecteur disait
+     « Negra » juste à côté d'un bracelet mauve. À défaut de coloris, on
+     retombe sur `card` — le même visuel que les carrousels et la recherche,
+     pour que le produit se reconnaisse d'un bout à l'autre du parcours. */
+  function lineImage(p, line){
+    if (!p) return "";
+    if (line && line.color && p.colors){
+      for (var i = 0; i < p.colors.length; i++){
+        if (p.colors[i].name === line.color) return p.colors[i].image;
+      }
+    }
+    return p.card || p.packshot || p.image;
+  }
 
   /* L'intitulé de la seconde option se déclare dans la fiche : « Talla »
      pour un bracelet, « Formato » pour une boîte de sticks. */
@@ -226,7 +239,7 @@
         html +=
           '<article class="cart-line">' +
             '<a class="cart-thumb" href="' + esc(CATALOG.url(p.handle)) + '">' +
-              '<img loading="lazy" src="' + esc(lineImage(p)) + '" alt="" width="90" height="90">' +
+              '<img loading="lazy" src="' + esc(lineImage(p, l)) + '" alt="" width="90" height="90">' +
             '</a>' +
             '<div class="cart-body">' +
               '<a class="cart-name" href="' + esc(CATALOG.url(p.handle)) + '">' + esc(p.short) + '</a>' +

@@ -780,15 +780,34 @@ section{padding:clamp(22px,3.2vw,40px) 0}
    inchangée depuis le 21/08/2026 : la tuile habille le visuel, elle
    n'élargit pas la carte, et les marges des sections voisines ne bougent
    donc pas. */
+/* Le gris ne s'arrête plus au visuel : il porte toute la carte, du haut de
+   l'image au bas du prix. C'est la demande du 03/09/2026, et c'est aussi ce
+   qui donne à la rangée sa silhouette régulière — des blocs pleins, et non
+   des visuels posés au-dessus d'un texte flottant sur du blanc.
+   Le texte passe à gauche : centré, il laissait le prix et le bouton
+   d'ajout se disputer l'axe médian. */
 .fcard{
+  position:relative;
   flex:0 0 min(44vw,210px);scroll-snap-align:start;
-  display:flex;flex-direction:column;align-items:center;gap:0;
-  text-decoration:none;color:var(--ink);text-align:center;
-  padding:0 0 4px;
+  display:flex;flex-direction:column;gap:0;
+  color:var(--ink);text-align:left;
+  background:var(--tile);border-radius:var(--radius-md);
+  padding:0 0 clamp(10px,1.4vw,13px);
+  transition:background .2s ease-out;
 }
+.fcard:hover{background:#ebedee}
+/* Le lien couvre la carte entière par un pseudo-élément étiré : c'est ce
+   qui permet au bouton d'ajout d'exister sans être imbriqué dans un `<a>`,
+   ce qui serait invalide. Le bouton repasse au-dessus par son z-index. */
+.fcard-link{
+  display:flex;flex-direction:column;text-decoration:none;color:inherit;
+}
+.fcard-link::after{content:"";position:absolute;inset:0;z-index:1}
+.fcard-link:focus-visible{outline:none}
+.fcard-link:focus-visible::after{outline:3px solid var(--teal-600);outline-offset:-3px;border-radius:var(--radius-md)}
 .fcard-media{
   display:block;width:100%;aspect-ratio:1;position:relative;overflow:hidden;
-  background:var(--tile);border-radius:var(--radius-md);
+  border-radius:var(--radius-md) var(--radius-md) 0 0;
 }
 /* La réserve intérieure est ce qui fait « présentation » plutôt que
    « vignette » : le produit ne touche jamais le bord de sa tuile. */
@@ -812,12 +831,24 @@ section{padding:clamp(22px,3.2vw,40px) 0}
 .fcard-brand{
   font-family:var(--font-display);font-size:.6rem;font-weight:500;
   text-transform:uppercase;letter-spacing:.13em;line-height:1.4;
-  color:var(--teal-brand);margin-top:10px;
+  color:var(--teal-700);margin:clamp(9px,1.2vw,12px) clamp(11px,1.5vw,14px) 0;
 }
 .fcard-name{
   font-family:var(--font-display);font-weight:600;font-size:.86rem;
-  letter-spacing:-.015em;line-height:1.25;margin-top:3px;
+  letter-spacing:-.015em;line-height:1.3;
+  margin:2px clamp(11px,1.5vw,14px) 0;
 }
+/* Prix à gauche, ajout à droite, sur la même ligne de base. `margin-top:auto`
+   colle le pied au bas de la carte quel que soit le nombre de lignes du nom :
+   c'est ce qui aligne les prix d'une rangée entière. */
+.fcard-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin:auto clamp(11px,1.5vw,14px) 0;padding-top:clamp(8px,1.1vw,11px);
+}
+.fcard-price{display:flex;align-items:baseline;gap:5px;min-width:0;flex-wrap:wrap}
+.fcard-price b{font-family:var(--font-display);font-size:.98rem;font-weight:600;letter-spacing:-.025em}
+.fcard-price s{color:var(--teal-600);font-size:.72rem}
+.fcard-price small{font-size:.6rem;color:var(--teal-700);letter-spacing:.04em;font-weight:500}
 .fcard-price{font-family:var(--font-display);font-size:1.02rem;font-weight:600;letter-spacing:-.02em}
 .fcard-price small{font-size:.68rem;color:var(--teal-700);letter-spacing:.04em;font-weight:500}
 /* Le prix porte l'affordance : même verre que « Comprar », posé sous le
@@ -833,6 +864,34 @@ section{padding:clamp(22px,3.2vw,40px) 0}
 }
 .fcard-buy small{font-size:.62rem;color:var(--teal-700);letter-spacing:.04em;font-weight:500}
 .fcard-name{margin-bottom:6px}
+/* ---- Ajouter au panier depuis une carte --------------------------------
+   Un disque d'encre, la seule surface colorée de la carte : c'est ce qui en
+   fait une commande et non une décoration. Il vit au-dessus du lien étiré,
+   sinon le clic ouvrirait la fiche au lieu d'ajouter. */
+.card-add{
+  position:relative;z-index:2;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border:none;border-radius:50%;cursor:pointer;
+  background:var(--cta);color:#fff;
+  transition:transform .18s ease-out,background .2s ease-out;
+}
+.card-add svg{width:16px;height:16px}
+.card-add:hover{transform:scale(1.08)}
+.card-add:active{transform:scale(.94)}
+.card-add:focus-visible{outline:3px solid var(--teal-600);outline-offset:2px}
+/* Confirmation brève : le disque vire au vert le temps d'une seconde et
+   demie. Le tiroir s'ouvre par-dessus, mais s'il est refermé aussitôt il
+   doit rester une trace de ce qui vient de se passer. */
+.card-add.done{background:#2f7a4f}
+.card-add.done svg{animation:card-add-pop .32s ease-out}
+@keyframes card-add-pop{
+  0%{transform:scale(1)} 45%{transform:scale(1.28)} 100%{transform:scale(1)}
+}
+@media(prefers-reduced-motion:reduce){
+  .card-add:hover,.card-add:active{transform:none}
+  .card-add.done svg{animation:none}
+}
+
 /* Repère de défilement : discret, jamais une commande. Vide tant que la
    piste tient à l'écran — le conteneur n'occupe alors aucune place. */
 .card-dots{display:flex;justify-content:center;gap:7px}
@@ -2025,7 +2084,20 @@ body.search-open{overflow:hidden}
 }
 /* Deux produits par rangée au minimum, jusqu'aux plus petits écrans :
    une carte pleine largeur oblige à scroller pour comparer. */
+/* Sur téléphone, le pied de la carte qui flotte doit tenir sur UNE ligne
+   avec son bouton. Le cas limite est la Venu 4 : c'est le seul prix à cinq
+   chiffres doublé d'un prix barré, et à 44vw il débordait, ce qui faisait
+   descendre son prix d'une ligne pendant que ceux de ses voisines restaient
+   en haut. Deux dixièmes de rem et quatre pixels de bouton suffisent. */
 @media(max-width:719px){
+  .fcard{padding-bottom:11px}
+  .fcard-brand,.fcard-name{margin-left:11px;margin-right:11px}
+  .fcard-foot{margin-left:11px;margin-right:11px;gap:6px}
+  .fcard-price b{font-size:.9rem}
+  .fcard-price s{font-size:.64rem}
+  .fcard-foot .card-add{width:30px;height:30px}
+  .fcard-foot .card-add svg{width:14px;height:14px}
+
   .cat-grid{grid-template-columns:1fr 1fr}
   .prod-body{padding:12px 13px 14px;gap:5px}
   .prod-name{font-size:.9rem}
@@ -2047,8 +2119,10 @@ body.search-open{overflow:hidden}
     flex:none;line-height:1.5;max-height:3em;overflow:hidden;
   }
   .cat-grid .prod-price{margin-top:auto}
-  /* Le prix barré et la devise passent à la ligne au lieu d'être rognés. */
-  .prod-price{flex-wrap:wrap;gap:4px 7px}
+  /* Le prix barré et la devise passent à la ligne au lieu d'être rognés —
+     mais dans leur propre boîte : la rangée, elle, garde le bouton d'ajout
+     collé à droite. */
+  .prod-price-v{gap:3px 7px}
   .prod-price b{font-size:1.02rem}
   .prod-price s{font-size:.72rem}
   .prod-price small{font-size:.66rem}
@@ -2058,18 +2132,19 @@ body.search-open{overflow:hidden}
 /* Les quatre produits restants tiennent sur une rangée sous la fiche
    produit : auto-fill s'arrêterait avant et laisserait un orphelin. */
 @media(min-width:1120px){.cat-grid[data-exclude]{grid-template-columns:repeat(4,1fr)}}
+/* Même parti que la carte qui flotte : le gris porte la carte entière, du
+   visuel au prix. La surface blanche et son ombre partent avec — deux
+   familles de cartes sur la même page ne peuvent pas avoir deux fonds. */
 .prod{
   display:flex;flex-direction:column;
-  background:var(--surface);border-radius:var(--radius-lg);overflow:hidden;
-  box-shadow:var(--glass-hairline),var(--shadow-soft);
-  transition:transform .22s ease-out,box-shadow .24s ease-out;
+  background:var(--tile);border-radius:var(--radius-lg);overflow:hidden;
+  transition:transform .22s ease-out,background .24s ease-out;
 }
-.prod:hover{transform:translateY(-4px);box-shadow:var(--glass-hairline),var(--shadow-lift)}
-/* Le dégradé a laissé la place au jeton partagé : c'est ce qui met les
-   deux familles de cartes sur le même fond, à la teinte près. */
+.prod:hover{transform:translateY(-4px);background:#ebedee}
+/* Plus de fond propre : la carte entière est déjà à `--tile`, en poser un
+   second ici dessinerait un rectangle dans le rectangle. */
 .prod-media{
   position:relative;aspect-ratio:1;overflow:hidden;
-  background:var(--tile);
 }
 .prod-media img{
   position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
@@ -2090,7 +2165,13 @@ body.search-open{overflow:hidden}
 }
 .prod-name{font-size:1.02rem;line-height:1.26;color:var(--ink)}
 .prod-tag{font-size:.83rem;color:var(--teal-700);line-height:1.5;flex:1}
-.prod-price{display:flex;align-items:baseline;gap:8px;margin-top:4px}
+/* Le bouton d'ajout se colle à droite de la ligne de prix, comme sur la
+   carte qui flotte : même geste au même endroit dans les deux gabarits.
+   La rangée elle-même NE se replie pas — c'est `.prod-price-v` qui plie,
+   sinon le bouton descendait avec la devise sur les cartes étroites. */
+.prod-price{display:flex;align-items:center;gap:8px;margin-top:4px}
+.prod-price-v{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;min-width:0}
+.prod-price .card-add{margin-left:auto}
 .prod-price b{font-family:var(--font-display);font-size:1.22rem;font-weight:600;letter-spacing:-.026em}
 .prod-price s{color:var(--teal-600);font-size:.82rem}
 .prod-price small{font-size:.72rem;color:var(--teal-700);letter-spacing:.04em}

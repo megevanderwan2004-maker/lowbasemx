@@ -23,14 +23,20 @@ SIDE = 900           # côté du fichier produit
 
 SOURCES = {
     "cirqa":            "cirqa/cirqa-packshot.png",
-    "venu-4":           "venu-4/venu-4.png",
+    # Le rendu « venu-4.png » est le bracelet CUIR BEIGE ; la fiche, elle,
+    # ouvre sur le coloris Crema, blanc. La carte montrait donc un
+    # beige que le client ne retrouvait pas en cliquant.
+    "venu-4":           "venu-4/venu-4-crema.jpg",
     "venu-3s":          "venu-3s/venu-3s.png",
     "vivoactive-6":     "vivoactive-6/vivoactive-6.png",
     "creatina":         "creatina/creatina.png",
     "promix-relax":     "promix-relax/promix-relax.png",
     "absorption-sleep": "absorption-sleep/sleep-packshot.png",
     "promix-creatina":  "promix-creatina/promix-creatine-trio.png",
-    "promix-debloat":   "promix-debloat/debloat-trio.jpg",
+    # Image 3 de la galerie : le trio des trois parfums — mangue, pêche
+    # blanche, orange. Le trio « debloat-trio.jpg » ne montrait que
+    # l'orange, trois fois.
+    "promix-debloat":   "promix-debloat/debloat-sobres.jpg",
     "banda-cirqa":      "banda-cirqa/banda-azul-frances.jpg",
 }
 

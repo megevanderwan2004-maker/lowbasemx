@@ -29,6 +29,30 @@
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
 
+  /* L'ancêtre le plus proche qui porte une classe — `Element.closest` avec
+     un repli, et surtout borné à `document` pour ne jamais remonter plus
+     haut qu'il ne faut. */
+  function upTo(node, cls){
+    while (node && node !== document){
+      if (node.nodeType === 1 && (" " + node.className + " ").indexOf(" " + cls + " ") > -1) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  /* Le bouton rond « ajouter au panier ». Il est posé sur la ligne de prix
+     des deux gabarits de carte : c'est un raccourci, pas le parcours
+     principal — celui-ci reste la fiche produit, que la carte ouvre. */
+  function addBtn(p){
+    return '<button class="card-add" type="button" data-add="' + esc(p.handle) + '" ' +
+        'aria-label="Añadir ' + esc(p.short) + ' al carrito">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+          'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M6 7h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7Z"/>' +
+          '<path d="M9 7V5.5a3 3 0 0 1 6 0V7"/>' +
+        '</svg></button>';
+  }
+
   /* Bascule une classe sans toucher aux autres : réécrire className en
      entier effacerait celles que le générateur a posées — `.contain` sur
      les vues produit, par exemple, qui commande leur cadrage. */
@@ -186,10 +210,17 @@
           '<span class="prod-cat">' + esc(p.category) + '</span>' +
           '<h3 class="prod-name">' + esc(p.name) + '</h3>' +
           '<p class="prod-tag">' + esc(p.tagline) + '</p>' +
+          /* Le prix est enveloppé : sans ce span, le bouton d'ajout était un
+             frère des trois valeurs et repartait à la ligne avec elles dès
+             que la carte devenait étroite. Isolé, il reste collé à droite
+             et c'est le prix seul qui se replie. */
           '<div class="prod-price price-num">' +
-            '<b>' + CATALOG.money(p.price) + '</b>' +
-            (p.compareAt ? '<s>' + CATALOG.money(p.compareAt) + '</s>' : "") +
-            '<small>MXN</small>' +
+            '<span class="prod-price-v">' +
+              '<b>' + CATALOG.money(p.price) + '</b>' +
+              (p.compareAt ? '<s>' + CATALOG.money(p.compareAt) + '</s>' : "") +
+              '<small>MXN</small>' +
+            '</span>' +
+            addBtn(p) +
           '</div>' +
           '<a class="btn btn-ink btn-block btn-sm" href="' + url + '">Ver producto</a>' +
         '</div>' +
@@ -212,19 +243,32 @@
     return '<img loading="lazy" src="' + esc(cardShot(p)) + '" alt="" width="600" height="600">';
   }
 
+  /* La carte n'est plus un `<a>` unique : elle porte maintenant un bouton
+     d'ajout, et un `<button>` imbriqué dans un `<a>` serait invalide. Le
+     lien couvre donc la carte par un pseudo-élément étiré (`.fcard-link`
+     dans la CSS) et le bouton repasse au-dessus par son `z-index`. La
+     surface cliquable reste la carte entière. */
   function flyCard(p){
-    return '<a class="fcard" href="' + CATALOG.url(p.handle) + '">' +
-        '<span class="fcard-media">' +
-          flyMedia(p) +
-          (p.badge ? '<span class="fcard-badge glass-dark">' + esc(p.badge) + '</span>' : "") +
-        '</span>' +
-        '<span class="fcard-brand">' + esc(p.brand || p.category) + '</span>' +
-        '<b class="fcard-name">' + esc(p.short) + '</b>' +
-        /* Le prix devient l'affordance : un bouton au même langage que
-           « Comprar ». C'est un span — la carte entière est déjà un lien,
-           et un <button> imbriqué dans un <a> serait invalide. */
-        '<span class="btn btn-ink btn-sm fcard-buy price-num">' + CATALOG.money(p.price) + ' <small>MXN</small></span>' +
-      '</a>';
+    return '<article class="fcard">' +
+        '<a class="fcard-link" href="' + CATALOG.url(p.handle) + '">' +
+          '<span class="fcard-media">' +
+            flyMedia(p) +
+            (p.badge ? '<span class="fcard-badge glass-dark">' + esc(p.badge) + '</span>' : "") +
+          '</span>' +
+          '<span class="fcard-brand">' + esc(p.brand || p.category) + '</span>' +
+          '<span class="fcard-name">' + esc(p.short) + '</span>' +
+        '</a>' +
+        '<div class="fcard-foot">' +
+          /* Pas de « MXN » ici : à cette largeur il passait à la ligne et
+             cassait l'alignement des pieds de carte, alors que le bandeau
+             de la section et la fiche produit le disent déjà. */
+          '<span class="fcard-price price-num">' +
+            '<b>' + CATALOG.money(p.price) + '</b>' +
+            (p.compareAt ? '<s>' + CATALOG.money(p.compareAt) + '</s>' : "") +
+          '</span>' +
+          addBtn(p) +
+        '</div>' +
+      '</article>';
   }
 
   /* =====================================================================
@@ -900,6 +944,47 @@
     }
   });
 
+
+  /* =====================================================================
+     Ajouter au panier depuis une carte
+
+     Un seul écouteur, posé sur le document : les cartes sont injectées par
+     plusieurs modules et re-rendues au tri des rayons, un écouteur par
+     bouton serait perdu à chaque nouveau rendu.
+
+     Le choix des options est celui du bundle, pour la même raison : depuis
+     une carte, personne n'a choisi de coloris ni de taille. On prend donc
+     les premiers du catalogue — et c'est le tiroir qui s'ouvre derrière,
+     en affichant la combinaison retenue, de sorte que le client la VOIT et
+     peut la corriger. Un produit dont la variante ne se résout pas n'est
+     jamais ajouté en silence : on l'envoie sur sa fiche.
+     ===================================================================== */
+  module("card-add", function(){
+    document.addEventListener("click", function(e){
+      var btn = upTo(e.target, "card-add");
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      var p = CATALOG.byHandle(btn.getAttribute("data-add"));
+      if (!p) return;
+
+      var color = p.colors ? p.colors[0].name : null;
+      var size  = p.sizes  ? p.sizes[0].name  : null;
+      var variant = CATALOG.variantOf ? CATALOG.variantOf(p, color, size) : null;
+
+      if (!variant || !window.LOWCART){ location.href = CATALOG.url(p.handle); return; }
+
+      LOWCART.add([{ variant: variant, handle: p.handle,
+                     color: color, size: size, qty: 1 }]);
+
+      /* Une confirmation brève sur le bouton lui-même : le tiroir s'ouvre,
+         mais si le client le referme aussitôt il doit rester une trace de
+         ce qui vient de se passer. */
+      flag(btn, "done", true);
+      setTimeout(function(){ flag(btn, "done", false); }, 1400);
+    }, false);
+  });
 
   /* =====================================================================
      Recherche — suggestions pendant la frappe
