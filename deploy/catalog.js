@@ -12,7 +12,11 @@
   var PRODUCTS = [
     {
       handle: "cirqa",
-      pairs: ["absorption-sleep", "promix-relax", "creatina"],
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["cirqa","banda","band","pulsera","smart band","brazalete","sin pantalla","sueno","sleep","salud","health","estres","body battery","garmin"],
+      pairs: ["banda-cirqa", "absorption-sleep", "promix-creatina"],
       gallery: [
         "/media/archivo/cirqa/cirqa-rock.jpg",
         "/media/archivo/cirqa/wrist-negra.jpg",
@@ -38,6 +42,20 @@
          `cirqa-malva.jpg` : le rendu brut a un fond blanc, et sur une carte
          sans cadre `drop-shadow` en ferait l'ombre d'un rectangle. */
       packshot: "/media/productos/cirqa/cirqa-malva-packshot.png",
+      /* `card` est LE visuel des carrousels et des grilles — le seul endroit
+         à changer pour corriger ce qu'on y voit.
+
+         Tous les `card.png` sont produits par `build/card-shots.py`, qui
+         recadre chaque source sur son contenu réel et la repose au centre
+         d'un carré avec la MÊME réserve pour tous : les packshots venaient
+         de six studios différents et occupaient de 55 % à 94 % de leur
+         fichier, ce qui se lisait comme un défaut d'échelle d'une tuile à
+         l'autre. Les sources ne sont pas touchées — le script écrit à côté.
+
+         Ici, `card` répare en plus une incohérence : la carte montrait la
+         Malva alors que la fiche ouvre sur la Negra, premier coloris. Le
+         client voyait un bracelet mauve, cliquait, tombait sur un noir. */
+      card: "/media/productos/cirqa/card.png",
       video: "/media/productos/cirqa/hero-cirqa.mp4",
       poster: "/media/productos/cirqa/poster-hero-cirqa.jpg",
       shopify: { handle: "garmin-cirqa-smart-band", variants: {
@@ -95,7 +113,12 @@
     },
     {
       handle: "venu-4",
-      pairs: ["promix-creatina", "creatina", "absorption-sleep"],
+      card: "/media/productos/venu-4/card.png",
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["venu","reloj","watch","smartwatch","amoled","pantalla","entrenamiento","vo2","garmin"],
+      pairs: ["promix-creatina", "absorption-sleep", "cirqa"],
       /* Une seule option, la couleur : `variants` est donc une table plate,
          couleur → référence, sans niveau de taille. */
       shopify: { handle: "garmin-venu-4", variants: {
@@ -150,7 +173,12 @@
     },
     {
       handle: "venu-3s",
-      pairs: ["promix-relax", "absorption-sleep", "creatina"],
+      card: "/media/productos/venu-3s/card.png",
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["venu","reloj","watch","smartwatch","amoled","compacto","41 mm","muneca delgada","garmin"],
+      pairs: ["promix-relax", "promix-creatina", "cirqa"],
       shopify: { handle: "garmin-venu-3s", variant: "64212129743225" },
       name: "Garmin Venu® 3S",
       short: "Venu® 3S",
@@ -178,7 +206,12 @@
     },
     {
       handle: "vivoactive-6",
-      pairs: ["promix-creatina", "promix-debloat", "absorption-sleep"],
+      card: "/media/productos/vivoactive-6/card.png",
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["vivoactive","reloj","watch","smartwatch","entrenamiento","training","gps","garmin"],
+      pairs: ["promix-creatina", "promix-debloat", "cirqa"],
       shopify: { handle: "garmin-vivoactive-6", variant: "64212131119481" },
       name: "Garmin Vívoactive® 6",
       short: "Vívoactive® 6",
@@ -206,7 +239,12 @@
     },
     {
       handle: "creatina",
-      pairs: ["cirqa", "promix-relax", "venu-4"],
+      card: "/media/productos/creatina/card.png",
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["creatina","creatine","liposomal","cymbiotika","fuerza","strength","musculo","muscle","rendimiento"],
+      pairs: ["cirqa", "promix-debloat", "venu-4"],
       shopify: { handle: "cymbiotika-liposomal-advanced-creatine", variant: "64212132823417" },
       name: "Cymbiotika Liposomal Advanced Creatine",
       short: "Advanced Creatine",
@@ -214,7 +252,12 @@
       tagline: "5 g de creatina liposomal. Tono muscular y recuperación.",
       price: 1349,
       compareAt: 1499,
-      badge: "Suplementos",
+      /* Le badge disait « Suplementos » — la catégorie, que la carte
+         affiche déjà par ailleurs, et qui ne dit rien d'un produit en
+         particulier. Retiré le 03/09/2026 : un repère commercial se
+         mérite (« Más vendido », « Nuevo »), il ne se remplit pas avec
+         le rayon. */
+      badge: "",
       category: "Suplementos",
       image: "/media/productos/creatina/creatina.png",
       hero: "/media/productos/creatina/creatina.png",
@@ -253,7 +296,12 @@
        --------------------------------------------------------------------- */
     {
       handle: "promix-relax",
-      pairs: ["cirqa", "absorption-sleep", "venu-3s"],
+      card: "/media/productos/promix-relax/card.png",
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["relax","magnesio","magnesium","calma","descanso","recuperacion","recovery","melisa","lemon balm","sueno","noche","promix"],
+      pairs: ["cirqa", "promix-debloat", "venu-3s"],
       shopify: { handle: "promix-relax-magnesium-complex", variant: "64212134855033" },
       name: "Promix Relax: Magnesium Complex",
       short: "Relax",
@@ -304,7 +352,12 @@
     },
     {
       handle: "absorption-sleep",
-      pairs: ["cirqa", "promix-relax", "venu-3s"],
+      card: "/media/productos/absorption-sleep/card.png",
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["sleep","sueno","dormir","noche","descanso","absorption","the absorption company","insomnio","rutina nocturna"],
+      pairs: ["cirqa", "promix-debloat", "venu-3s"],
       /* Option unique : le format. La table est donc plate, format →
          référence, et chaque format porte SON prix. */
       shopify: { handle: "the-absorption-company-sleep", variants: {
@@ -371,7 +424,11 @@
        --------------------------------------------------------------------- */
     {
       handle: "promix-creatina",
-      pairs: ["cirqa", "creatina", "venu-4"],
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["creatina","creatine","monohidrato","monohydrate","non gmo","promix","fuerza","strength","musculo","muscle"],
+      pairs: ["cirqa", "promix-debloat", "venu-4"],
       shopify: { handle: "promix-non-gmo-creatine", variant: "64212133347705" },
       name: "Promix Non-GMO Creatine",
       short: "Non-GMO Creatine",
@@ -388,6 +445,13 @@
       image: "/media/productos/promix-creatina/promix-creatine-packshot.png",
       hero: "/media/productos/promix-creatina/promix-creatine-packshot.png",
       packshot: "/media/productos/promix-creatina/promix-creatine-packshot.png",
+      /* Le packshot d'origine gardait, en bas à gauche, l'ombre portée du
+         studio : un voile crème que `mix-blend-mode:multiply` transformait
+         en salissure sur la tuile grise. Redétouré le 03/09/2026 depuis
+         `1-promix-creatine-stick-packs.png` avec build/cutout.swift
+         (mode `dist`, 14/26), puis recadré sur sa boîte englobante pour
+         occuper sa tuile comme les autres produits. */
+      card: "/media/productos/promix-creatina/card.png",
       /* Sans ce drapeau, aucun cadre ne porte `.contain`, la règle
          `.gal-stage:has(.gal-frame.contain)` ne prend pas, et le cadre de la
          galerie garde `--surface-teal` : le détourage se poserait alors sur
@@ -424,7 +488,11 @@
     },
     {
       handle: "promix-debloat",
-      pairs: ["cirqa", "promix-relax", "vivoactive-6"],
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["debloat","digestion","probiotico","probiotic","prebiotico","prebiotic","hinchazon","bloating","intestino","gut","promix"],
+      pairs: ["creatina", "cirqa", "vivoactive-6"],
       shopify: { handle: "promix-debloat-prebiotic-probiotic", variant: "64212135903609" },
       name: "Promix Debloat Prebiotic + Probiotic",
       short: "Debloat",
@@ -437,6 +505,10 @@
       video: "/media/productos/promix-debloat/debloat-loop.mp4",
       poster: "/media/productos/promix-debloat/poster-debloat-loop.jpg",
       packshot: "/media/productos/promix-debloat/promix-debloat.png",
+      /* Le trio de sticks remplace la boucle vidéo dans les carrousels :
+         plus lisible en petit, et cohérent avec les autres cartes, qui sont
+         toutes des visuels fixes depuis le 03/09/2026. */
+      card: "/media/productos/promix-debloat/card.png",
       /* Le packshot est déjà détouré ; ce qui se voyait comme un fond, c'est
          la plaque de la galerie. Sans `shotFit`, aucun cadre ne porte
          `.contain`, la règle `.gal-stage:has(.gal-frame.contain)` ne prend
@@ -479,7 +551,11 @@
          Les quatre autres teintes (Negra, Gris Francés, Malva, Azul Capitán)
          existent aussi chez Garmin : elles attendent leurs visuels. */
       handle: "banda-cirqa",
-      pairs: ["cirqa", "absorption-sleep", "promix-relax"],
+      /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
+         le catalogue est en es-MX mais les noms de molécules et les
+         termes produit circulent en anglais. */
+      keywords: ["banda","band","correa","strap","repuesto","recambio","cirqa","brazalete","garmin"],
+      pairs: ["cirqa", "absorption-sleep", "promix-creatina"],
       shopify: { handle: "banda-cirqa-repuesto", variants: {
         "Gris Lima":    { "S–M": "64326134333817", "L–XL": "64326134366585" },
         "Oliva Oscuro": { "S–M": "64326134399353", "L–XL": "64326134432121" },
@@ -498,6 +574,10 @@
          l'ombre du rectangle entier. La galerie, elle, garde le JPEG : son
          cadre est blanc et `mix-blend-mode:multiply` y efface le fond. */
       packshot: "/media/productos/banda-cirqa/banda-packshot.png",
+      /* Un seul coloris en carrousel — le bleu — pour que la bande de
+         rechange ne se lise pas comme trois produits différents selon la
+         page. Les sept coloris restent sur la fiche, où ils se choisissent. */
+      card: "/media/productos/banda-cirqa/card.png",
       shotFit: "contain",
       colors: [
         { name: "Gris Lima",    dot: "#a8a98d", image: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
@@ -548,7 +628,7 @@
       poster: "/media/landing/objetivos/poster-goal-dormir.jpg",
       lede: "Sueño profundo, despertares medidos, rutina que se sostiene.",
       pick: "cirqa",
-      also: ["absorption-sleep", "promix-relax"],
+      also: ["absorption-sleep", "banda-cirqa"],
       why: "La CIRQA mide el sueño sin una pantalla que te despierte: puntuación, fases, VFC y temperatura de la piel, toda la noche."
     },
     {
@@ -559,7 +639,7 @@
       poster: "/media/landing/objetivos/poster-goal-rendimiento.jpg",
       lede: "Entrenar con datos, no con sensaciones.",
       pick: "venu-4",
-      also: ["promix-creatina", "creatina"],
+      also: ["promix-creatina", "absorption-sleep"],
       why: "Predisposición para entrenar, VO2 max y estado del entreno en una pantalla AMOLED que lees de un vistazo."
     },
     {
@@ -577,6 +657,215 @@
 
   var BY_HANDLE = {};
   for (var i = 0; i < PRODUCTS.length; i++) BY_HANDLE[PRODUCTS[i].handle] = PRODUCTS[i];
+
+  /* -----------------------------------------------------------------------
+     Recommandations — la logique vit ICI, et nulle part ailleurs
+
+     `pairs` (par produit) et `also` (par objectif) restent la préférence
+     éditoriale : ce qu'on AIMERAIT proposer. Mais depuis le 03/09/2026 rien
+     ne sort sans passer par `recommend()`, qui applique trois règles.
+
+     1. GROUPES EXCLUSIFS. Deux produits d'un même groupe répondent au même
+        besoin : les montrer ensemble ne complète rien, ça demande au client
+        d'arbitrer à notre place. Ils ne peuvent donc ni se recommander l'un
+        l'autre, ni cohabiter dans une même liste.
+        · Sleep et Relax — les deux formules du soir. C'est la règle dure :
+          consulter l'un ne doit JAMAIS proposer l'autre.
+        · Les deux créatines — Cymbiotika et Promix. Même molécule, deux
+          marques : c'est un choix, pas un complément.
+        · Les trois montres — proposer une seconde montre à qui en regarde
+          une déjà, c'est la lui faire remettre en question.
+     2. COMPLÉMENTARITÉ. À qualité égale, on préfère ce qui vient d'une
+        autre catégorie que le produit consulté — un wearable appelle des
+        suppléments, un supplément appelle un wearable ou un supplément
+        d'une autre fonction. Aucune catégorie ne peut occuper toute la
+        liste : au plus `n - 1` places.
+     3. JAMAIS LE PRODUIT CONSULTÉ. Ni ses doublons.
+
+     Le repli est le catalogue lui-même : si les paires éditoriales ne
+     suffisent plus une fois filtrées, on complète avec ce qui reste de
+     compatible plutôt que de rendre une liste courte.
+     ----------------------------------------------------------------------- */
+  var EXCLUSIVE = [
+    ["absorption-sleep", "promix-relax"],
+    ["creatina", "promix-creatina"],
+    ["venu-4", "venu-3s", "vivoactive-6"]
+  ];
+
+  function conflict(a, b){
+    if (a === b) return true;
+    for (var i = 0; i < EXCLUSIVE.length; i++){
+      var g = EXCLUSIVE[i];
+      if (g.indexOf(a) > -1 && g.indexOf(b) > -1) return true;
+    }
+    return false;
+  }
+
+  /* `seed` permet de faire passer une liste ÉCRITE À LA MAIN par le même
+     filtre — c'est ce qui garantit qu'un `also` d'objectif obéit aux mêmes
+     règles qu'un `pairs` de fiche produit, sans dupliquer le tri. */
+  function recommend(handle, n, seed){
+    var self = BY_HANDLE[handle];
+    n = n || 3;
+
+    var wanted = seed || (self && self.pairs) || [];
+    /* Le catalogue en repli, les compléments d'abord : une catégorie autre
+       que celle du produit consulté passe devant. */
+    var rest = PRODUCTS.map(function(p){ return p.handle; })
+      .filter(function(h){ return wanted.indexOf(h) === -1; });
+    if (self){
+      rest.sort(function(a, b){
+        var da = BY_HANDLE[a].category === self.category ? 1 : 0;
+        var db = BY_HANDLE[b].category === self.category ? 1 : 0;
+        return da - db;
+      });
+    }
+
+    var out = [], perCat = {};
+    var queue = wanted.concat(rest);
+    for (var i = 0; i < queue.length && out.length < n; i++){
+      var c = BY_HANDLE[queue[i]];
+      if (!c) continue;
+      if (handle && conflict(c.handle, handle)) continue;
+
+      var clash = false;
+      for (var k = 0; k < out.length; k++){
+        if (conflict(c.handle, out[k].handle)){ clash = true; break; }
+      }
+      if (clash) continue;
+
+      /* Aucune catégorie ne prend toute une liste de trois : il y reste
+         toujours une place pour autre chose. En dessous, le plafond ne
+         s'applique pas — sur deux compléments, exiger deux catégories
+         différentes écarterait un second supplément pertinent pour aller
+         chercher un accessoire qui l'est moins. */
+      var cap = n <= 2 ? n : n - 1;
+      var used = perCat[c.category] || 0;
+      if (used >= cap) continue;
+
+      perCat[c.category] = used + 1;
+      out.push(c);
+    }
+    return out;
+  }
+
+  /* -----------------------------------------------------------------------
+     Recherche — aucun service externe, uniquement ce catalogue
+
+     Trois exigences derrière ce moteur : répondre pendant la frappe, tolérer
+     l'à-peu-près (accents, casse, mot partiel, une faute de frappe), et ne
+     jamais rendre un résultat que le client ne comprendrait pas.
+
+     · `norm` retire les accents et la casse : « sueño », « SUENO » et
+       « sueno » sont la même requête. C'est indispensable en espagnol.
+     · Chaque produit est aplati une seule fois en une liste de mots — nom,
+       nom court, marque, catégorie, accroche et `keywords`. Le coût est
+       payé au chargement, pas à chaque touche.
+     · TOUS les mots de la requête doivent trouver preneur : « creatina
+       promix » ne doit pas remonter la créatine Cymbiotika juste parce que
+       « creatina » correspond.
+     · La tolérance aux fautes est volontairement étroite — une seule
+       substitution, et seulement sur les mots d'au moins quatre lettres.
+       Au-delà, « venu » remonterait « menu » et la recherche perdrait sa
+       crédibilité.
+     ----------------------------------------------------------------------- */
+  function norm(v){
+    v = String(v == null ? "" : v).toLowerCase();
+    return v.normalize ? v.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : v;
+  }
+
+  function words(v){
+    return norm(v).split(/[^a-z0-9]+/).filter(Boolean);
+  }
+
+  /* Vrai si `a` et `b` sont à une substitution près. On ne traite ni
+     l'insertion ni la suppression : à cette échelle de catalogue elles
+     ouvrent plus de faux positifs qu'elles ne rattrapent de fautes. */
+  function near(a, b){
+    if (a.length !== b.length || a.length < 4) return false;
+    var d = 0;
+    for (var i = 0; i < a.length; i++){
+      if (a.charAt(i) !== b.charAt(i) && ++d > 1) return false;
+    }
+    return d === 1;
+  }
+
+  var HAY = {};
+  function haystack(p){
+    if (HAY[p.handle]) return HAY[p.handle];
+    var bag = []
+      .concat(words(p.name), words(p.short), words(p.brand),
+              words(p.category), words(p.tagline));
+    (p.keywords || []).forEach(function(k){ bag = bag.concat(words(k)); });
+    var seen = {}, out = [];
+    bag.forEach(function(w){ if (!seen[w]){ seen[w] = 1; out.push(w); } });
+    return (HAY[p.handle] = out);
+  }
+
+  /* Le poids dit la QUALITÉ de la correspondance, pas sa quantité : un mot
+     entier vaut mieux qu'un début de mot, qui vaut mieux qu'un fragment au
+     milieu, qui vaut mieux qu'une faute rattrapée. */
+  function hit(bag, q){
+    var best = 0;
+    for (var i = 0; i < bag.length; i++){
+      var w = bag[i];
+      if (w === q) return 10;
+      if (w.indexOf(q) === 0) best = Math.max(best, 7);
+      else if (w.indexOf(q) > 0) best = Math.max(best, 4);
+      else if (near(w, q)) best = Math.max(best, 3);
+    }
+    return best;
+  }
+
+  function searchProducts(query){
+    var qs = words(query);
+    if (!qs.length) return [];
+    var out = [];
+    PRODUCTS.forEach(function(p){
+      var bag = haystack(p), total = 0;
+      for (var i = 0; i < qs.length; i++){
+        var h = hit(bag, qs[i]);
+        if (!h) return;              /* un mot sans preneur écarte le produit */
+        total += h;
+      }
+      /* Coup de pouce au produit dont le nom COMMENCE par la requête : qui
+         tape « venu » cherche la Venu avant un supplément qui la cite. */
+      if (norm(p.short).indexOf(norm(query)) === 0 ||
+          norm(p.name).indexOf(norm(query)) === 0) total += 6;
+      out.push({ product: p, score: total });
+    });
+    out.sort(function(a, b){ return b.score - a.score || a.product.price - b.product.price; });
+    return out.map(function(r){ return r.product; });
+  }
+
+  /* Les rayons sont des réponses à part entière : « watch » doit pouvoir
+     ouvrir Wearables, pas seulement lister quatre montres. */
+  var AISLES = [
+    { label: "Wearables",   url: "/wearables",
+      keywords: ["wearable","wearables","reloj","relojes","watch","watches","smartwatch","garmin","banda","pulsera"] },
+    { label: "Suplementos", url: "/suplementos",
+      keywords: ["suplemento","suplementos","supplement","supplements","vitaminas","polvo","capsulas","sobres"] },
+    { label: "Accesorios",  url: "/tienda",
+      keywords: ["accesorio","accesorios","accessory","correa","strap","banda","repuesto","recambio","cable"] }
+  ];
+
+  function searchAisles(query){
+    var qs = words(query);
+    if (!qs.length) return [];
+    var out = [];
+    AISLES.forEach(function(a){
+      var bag = words(a.label).concat(a.keywords.reduce(function(acc, k){ return acc.concat(words(k)); }, []));
+      var total = 0;
+      for (var i = 0; i < qs.length; i++){
+        var h = hit(bag, qs[i]);
+        if (!h) return;
+        total += h;
+      }
+      out.push({ aisle: a, score: total });
+    });
+    out.sort(function(a, b){ return b.score - a.score; });
+    return out.map(function(r){ return r.aisle; });
+  }
 
   var BY_GOAL = {};
   for (var g = 0; g < GOALS.length; g++) BY_GOAL[GOALS[g].id] = GOALS[g];
@@ -640,6 +929,14 @@
     categories: CATEGORIES,
     byHandle: function(h){ return BY_HANDLE[h]; },
     byGoal: function(id){ return BY_GOAL[id]; },
+    /* Le seul point d'entrée des recommandations. Tout ce qui propose un
+       produit à côté d'un autre passe par là : le bundle des fiches, les
+       compléments de l'assistant par objectif, et ce qui viendra ensuite. */
+    recommend: recommend,
+    /* La recherche : produits d'abord, rayons ensuite. Aucun index externe,
+       aucun appel réseau — le catalogue se suffit. */
+    search: searchProducts,
+    searchAisles: searchAisles,
     inCategory: function(cat){
       return PRODUCTS.filter(function(p){ return p.category === cat; });
     },

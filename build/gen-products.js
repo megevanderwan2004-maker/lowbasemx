@@ -54,10 +54,33 @@ const nav = () => `
     </div>
     <a class="logo" href="/">lowlabs</a>
     <div class="nav-end">
+      <button class="search-icon" type="button" data-search-open aria-label="Buscar productos" aria-expanded="false" aria-controls="search-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></button>
       <button class="cart-icon" type="button" data-cart-open data-cart-count aria-label="Abrir el carrito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7Z"/><path d="M9 7V5.5a3 3 0 0 1 6 0V7"/></svg></button>
     </div>
   </div>
-</nav>`;
+</nav>
+
+<!-- ===== Recherche — panneau unique, présent sur toutes les pages.
+     Il vit HORS de .shell et à côté de la nav, comme le tiroir du panier :
+     pose dedans, il heriterait de l'overflow de la coquille et serait rogne.
+     Le contenu est injecte par le module search d'app.js ; sans JS le
+     bouton reste inerte et la nav garde ses trois liens. ===== -->
+<div class="search-panel" id="search-panel" hidden>
+  <div class="search-shell glass-light blurred">
+    <form class="search-form" role="search" autocomplete="off">
+      <svg class="search-form-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input class="search-input" id="search-input" type="search" name="q"
+             placeholder="Busca un producto, una marca, un objetivo…"
+             aria-label="Buscar productos" aria-autocomplete="list"
+             aria-controls="search-results" aria-expanded="false">
+      <button class="search-close" type="button" data-search-close aria-label="Cerrar la búsqueda">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </form>
+    <div class="search-results" id="search-results" role="listbox" aria-label="Sugerencias"></div>
+  </div>
+</div>
+`;
 
 const footer = () => `
 <footer>
@@ -439,9 +462,11 @@ ${p.highlights.slice(0, 3).map((h) => `            <li>${CHECK}${esc(h)}</li>`).
     </section>
 
     <!-- ===== Bundle : le produit vu + deux compléments, remise de 10%.
-         Les articles viennent du champ pairs du catalogue ; app.js
-         calcule les totaux et pousse la sélection dans le panier. ===== -->
-    <section class="bundle" aria-labelledby="bundle-t" id="bundle" data-handles="${p.pairs ? p.pairs.slice(0, 2).join(",") : ""}">
+         Les compléments ne sont plus écrits ici : app.js les demande à
+         LOWLABS.recommend(), qui applique les règles d'exclusion du
+         catalogue. Une page générée avant une règle la respecte donc
+         quand même — c'est tout l'intérêt de ne plus les figer. ===== -->
+    <section class="bundle" aria-labelledby="bundle-t" id="bundle">
       <div class="container">
         <div class="bundle-card rv">
           <div class="bundle-head">

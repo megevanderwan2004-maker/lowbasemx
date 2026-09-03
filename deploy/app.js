@@ -143,22 +143,38 @@
     to:    scrollToY
   };
 
-  /* La carte produit est le seul gabarit : home, boutique et recommandation
-     la réutilisent, aucune variante n'est dupliquée ailleurs. */
-  /* Un produit qui déclare une vidéo l'utilise comme visuel de carte : la
-     boucle remplace la photo dans la même boîte, l'affiche restant posée
-     tant que la lecture n'a pas démarré (ou si elle est refusée). */
+  /* -------------------------------------------------------------------
+     Le visuel d'une carte — un seul point de décision
+
+     Refondu le 03/09/2026. Deux règles, et elles valent pour TOUTES les
+     cartes du site : celles qui flottent sur la home comme celles,
+     encadrées, de la boutique et des rayons.
+
+     1. Un seul champ commande ce qu'on voit : `card`, puis `packshot`,
+        puis `image`. Corriger ce qu'un carrousel affiche — le mauvais
+        coloris, un packshot trop serré — se fait donc dans `catalog.js`
+        et nulle part ailleurs.
+     2. Plus aucune vidéo. Les boucles produit tournaient dans certaines
+        cartes et pas dans d'autres, ce qui suffisait à casser l'unité
+        d'une rangée : deux cartes immobiles, une qui bouge. Les boucles
+        restent sur les fiches produit, où elles ont la place de se voir.
+     ------------------------------------------------------------------- */
+  function cardShot(p){ return p.card || p.packshot || p.image; }
+
   function cardMedia(p){
-    if (!p.video){
-      return '<img loading="lazy" src="' + esc(p.image) + '" alt="" width="600" height="600">';
-    }
-    return '<video autoplay muted loop playsinline webkit-playsinline preload="metadata" ' +
-      'disablepictureinpicture disableremoteplayback poster="' + esc(p.poster || p.image) + '" ' +
-      'width="600" height="600" aria-hidden="true" tabindex="-1" data-autoloop>' +
-        '<source src="' + esc(p.video) + '" type="video/mp4">' +
-      '</video>';
+    return '<img loading="lazy" src="' + esc(cardShot(p)) + '" alt="" width="600" height="600">';
   }
 
+  /* Le surtitre porte ce que le NOM ne dit pas — c'est la règle, et c'est
+     pour ça que les deux gabarits n'y mettent pas le même champ :
+     · la carte encadrée affiche le nom complet, marque comprise
+       (« Cymbiotika Liposomal Advanced Creatine ») : son surtitre garde
+       donc la catégorie, sans quoi la marque serait écrite deux fois de
+       suite, en capitales puis en toutes lettres ;
+     · la carte qui flotte affiche le nom court (« Advanced Creatine ») :
+       son surtitre porte la marque, qui n'apparaît nulle part ailleurs.
+     Même emplacement, même typographie, même graisse dans les deux cas :
+     c'est la cohérence visuelle qui compte, pas l'uniformité du contenu. */
   function productCard(p){
     var url = CATALOG.url(p.handle);
     return '<article class="prod">' +
@@ -190,24 +206,19 @@
       '</div>';
   }
 
-  /* Les suppléments qui ont une boucle la jouent dans le carrousel ; les
-     wearables gardent leur packshot détouré. Le fond de studio de la
-     boucle est dissous par le masque radial du CSS, sans quoi elle
-     redeviendrait un rectangle au milieu des fiches qui flottent. */
+  /* Même visuel que la carte encadrée, même règle : `cardShot`, et rien
+     d'autre. Les deux gabarits ne peuvent donc plus diverger. */
   function flyMedia(p){
-    if (p.category === "Suplementos" && p.video){
-      return '<video autoplay muted loop playsinline webkit-playsinline preload="metadata" ' +
-        'disablepictureinpicture disableremoteplayback poster="' + esc(p.poster || p.packshot || p.image) + '" ' +
-        'width="600" height="600" aria-hidden="true" tabindex="-1" data-autoloop>' +
-          '<source src="' + esc(p.video) + '" type="video/mp4">' +
-        '</video>';
-    }
-    return '<img loading="lazy" src="' + esc(p.packshot || p.image) + '" alt="" width="600" height="600">';
+    return '<img loading="lazy" src="' + esc(cardShot(p)) + '" alt="" width="600" height="600">';
   }
 
   function flyCard(p){
     return '<a class="fcard" href="' + CATALOG.url(p.handle) + '">' +
-        '<span class="fcard-media">' + flyMedia(p) + '</span>' +
+        '<span class="fcard-media">' +
+          flyMedia(p) +
+          (p.badge ? '<span class="fcard-badge glass-dark">' + esc(p.badge) + '</span>' : "") +
+        '</span>' +
+        '<span class="fcard-brand">' + esc(p.brand || p.category) + '</span>' +
         '<b class="fcard-name">' + esc(p.short) + '</b>' +
         /* Le prix devient l'affordance : un bouton au même langage que
            « Comprar ». C'est un span — la carte entière est déjà un lien,
@@ -476,7 +487,13 @@
     function render(g){
       var p = CATALOG.byHandle(g.pick);
       if (!p) return;
-      var also = (g.also || []).map(CATALOG.byHandle).filter(Boolean);
+      /* Les compléments de l'objectif passent par le même filtre que ceux
+         d'une fiche produit : `also` dit la préférence, `recommend` fait
+         respecter les exclusions. Le produit recommandé en tête est passé
+         comme référence, pour qu'on ne propose pas son propre doublon. */
+      var also = CATALOG.recommend
+        ? CATALOG.recommend(g.pick, 2, (g.also || []))
+        : (g.also || []).map(CATALOG.byHandle).filter(Boolean);
 
       /* Trois retraits par rapport à la version longue, tous pour la même
          raison — la carte disait deux fois la même chose :
@@ -881,6 +898,184 @@
         }, false);
       }
     }
+  });
+
+
+  /* =====================================================================
+     Recherche — suggestions pendant la frappe
+
+     Tout vient de `catalog.js` : aucun service externe, aucun appel réseau,
+     aucun index à maintenir. Le module ne fait que trois choses — ouvrir le
+     panneau, demander au catalogue, rendre la liste.
+
+     Trois partis pris d'interface :
+     · Le panneau est un `listbox` et l'input un `combobox` : la flèche
+       parcourt les suggestions sans sortir du champ, ce qui est le seul
+       moyen de garder la frappe et la navigation dans la même main.
+     · Aucun bouton « Buscar ». La liste EST le résultat ; un bouton
+       promettrait une page de résultats qui n'existe pas.
+     · Le premier résultat n'est jamais présélectionné. Entrée sans choix
+       explicite ouvre le premier produit — mais rien n'est surligné tant
+       que le client n'a pas pris la main, sinon la flèche du bas semble
+       « sauter » le premier.
+     ===================================================================== */
+  module("search", function(){
+    var panel = $("search-panel"),
+        input = $("search-input"),
+        list  = $("search-results");
+    if (!panel || !input || !list || !CATALOG.search) return;
+
+    var openers = document.querySelectorAll("[data-search-open]");
+    if (!openers.length) return;
+
+    var items = [];      /* les suggestions rendues, dans l'ordre */
+    var cursor = -1;     /* -1 = personne n'a encore pris la main */
+    var lastFocus = null;
+
+    function money(p){ return CATALOG.money(p.price); }
+
+    /* Le visuel de la suggestion est le MÊME que celui des cartes : c'est
+       `card` qui commande, comme partout ailleurs depuis le 03/09/2026. */
+    function shot(p){ return p.card || p.packshot || p.image; }
+
+    function render(q){
+      var prods  = CATALOG.search(q).slice(0, 6);
+      var aisles = CATALOG.searchAisles ? CATALOG.searchAisles(q).slice(0, 2) : [];
+      items = [];
+
+      if (!q){
+        list.innerHTML = "";
+        list.hidden = true;
+        input.setAttribute("aria-expanded", "false");
+        return;
+      }
+
+      if (!prods.length && !aisles.length){
+        list.innerHTML = '<p class="search-empty">Nada para « ' + esc(q) + ' ».' +
+          ' <a href="/tienda">Ver toda la tienda</a></p>';
+        list.hidden = false;
+        input.setAttribute("aria-expanded", "true");
+        return;
+      }
+
+      var html = "";
+      if (prods.length){
+        html += '<p class="search-group">Productos</p>';
+        prods.forEach(function(p){
+          items.push(CATALOG.url(p.handle));
+          html +=
+            '<a class="search-hit" role="option" aria-selected="false" href="' + CATALOG.url(p.handle) + '">' +
+              '<span class="search-hit-media"><img loading="lazy" src="' + esc(shot(p)) + '" alt="" width="88" height="88"></span>' +
+              '<span class="search-hit-text">' +
+                '<span class="search-hit-brand">' + esc(p.brand || p.category) + '</span>' +
+                '<b class="search-hit-name">' + esc(p.short) + '</b>' +
+              '</span>' +
+              '<span class="search-hit-price price-num">' + money(p) + ' <small>MXN</small></span>' +
+            '</a>';
+        });
+      }
+      if (aisles.length){
+        html += '<p class="search-group">Secciones</p>';
+        aisles.forEach(function(a){
+          items.push(a.url);
+          html +=
+            '<a class="search-hit search-hit-aisle" role="option" aria-selected="false" href="' + esc(a.url) + '">' +
+              '<span class="search-hit-text"><b class="search-hit-name">' + esc(a.label) + '</b></span>' +
+              '<span class="search-hit-go" aria-hidden="true">→</span>' +
+            '</a>';
+        });
+      }
+
+      list.innerHTML = html;
+      list.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+      cursor = -1;
+      mark();
+    }
+
+    function nodes(){ return list.querySelectorAll(".search-hit"); }
+
+    function mark(){
+      each(nodes(), function(el, i){
+        var on = i === cursor;
+        flag(el, "on", on);
+        el.setAttribute("aria-selected", on ? "true" : "false");
+        if (on && el.scrollIntoView) el.scrollIntoView({ block: "nearest" });
+      });
+    }
+
+    function open(){
+      if (!panel.hidden) return;
+      lastFocus = document.activeElement;
+      panel.hidden = false;
+      /* Un cadre passe entre l'affichage et la classe, sinon la transition
+         d'ouverture n'a pas d'état de départ à quitter. */
+      requestAnimationFrame(function(){ flag(panel, "on", true); });
+      each(openers, function(b){ b.setAttribute("aria-expanded", "true"); });
+      document.body.className += " search-open";
+      /* Le corps passe en `overflow:hidden` sous cette classe. Lenis pilote
+         la position réelle du document : sans l'arrêter, il continuerait
+         d'avancer sa propre position sur une page immobile et la rendrait
+         d'un bloc à la fermeture. Le tiroir du panier fait exactement
+         pareil — c'est la même contrainte, pas une précaution. */
+      if (window.LOWSCROLL) window.LOWSCROLL.stop();
+      try { input.focus({ preventScroll: true }); } catch(e){ input.focus(); }
+    }
+
+    function close(){
+      if (panel.hidden) return;
+      flag(panel, "on", false);
+      each(openers, function(b){ b.setAttribute("aria-expanded", "false"); });
+      document.body.className = document.body.className.replace(/\s*search-open/g, "");
+      if (window.LOWSCROLL) window.LOWSCROLL.start();
+      setTimeout(function(){
+        panel.hidden = true;
+        input.value = "";
+        render("");
+      }, reduceMotion ? 0 : 200);
+      if (lastFocus && lastFocus.focus){
+        try { lastFocus.focus({ preventScroll: true }); } catch(e){ lastFocus.focus(); }
+      }
+    }
+
+    each(openers, function(b){
+      b.addEventListener("click", function(){
+        if (panel.hidden) open(); else close();
+      }, false);
+    });
+    each(document.querySelectorAll("[data-search-close]"), function(b){
+      b.addEventListener("click", close, false);
+    });
+
+    /* Le champ répond à la frappe, pas à la soumission : il n'y a pas de
+       page de résultats à atteindre. */
+    input.addEventListener("input", function(){ render(input.value); }, false);
+    var form = panel.querySelector(".search-form");
+    if (form) form.addEventListener("submit", function(e){
+      e.preventDefault();
+      var target = items[cursor > -1 ? cursor : 0];
+      if (target) location.href = target;
+    }, false);
+
+    panel.addEventListener("keydown", function(e){
+      if (e.key === "Escape" || e.key === "Esc"){ e.preventDefault(); close(); return; }
+      var d = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0;
+      if (!d || !items.length) return;
+      e.preventDefault();
+      /* Le parcours compte une position de plus que la liste : la sortie
+         par le haut ET par le bas repasse par « aucune suggestion
+         surlignée », qui est l'état où Entrée ouvre le premier résultat.
+         Sans elle, on ne pourrait plus revenir au champ sans la souris. */
+      cursor += d;
+      if (cursor >= items.length) cursor = -1;
+      else if (cursor < -1) cursor = items.length - 1;
+      mark();
+    }, false);
+
+    /* Cliquer hors de la nacelle referme, comme le tiroir du panier. */
+    panel.addEventListener("click", function(e){
+      if (e.target === panel) close();
+    }, false);
   });
 
   /* =====================================================================
@@ -1443,9 +1638,15 @@
     var sec = $("bundle"), row = $("bundle-row");
     if (!sec || !row || !PRODUCT) return;
 
-    var extras = (sec.getAttribute("data-handles") || "").split(",")
-      .map(function(h){ return CATALOG.byHandle(h.replace(/^\s+|\s+$/g, "")); })
-      .filter(Boolean);
+    /* Les compléments ne sont plus lus dans l'attribut de la page générée :
+       ils sont demandés au catalogue, qui applique les règles d'exclusion
+       (voir `recommend` dans catalog.js). C'est ce qui garantit qu'une fiche
+       Sleep ne proposera jamais Relax, et réciproquement — la page pouvait
+       être générée avant que la règle existe. */
+    var extras = CATALOG.recommend ? CATALOG.recommend(PRODUCT.handle, 2)
+      : (sec.getAttribute("data-handles") || "").split(",")
+          .map(function(h){ return CATALOG.byHandle(h.replace(/^\s+|\s+$/g, "")); })
+          .filter(Boolean);
     if (!extras.length){ sec.parentNode.removeChild(sec); return; }
 
     var items = [PRODUCT].concat(extras);

@@ -247,6 +247,10 @@ idempotent : relancé, il remplace l'empreinte au lieu de l'empiler.
   sous 720px. La boîte média est en `aspect-ratio:1`, donc c'est cette base de
   flex — et elle seule — qui commande la hauteur de la carte : la changer
   déplace aussi les marges des sections voisines.
+- **Ne pas remettre un fond de section derrière un carrousel.** Les tuiles
+  produit sont à `--tile` (`#f1f2f3`) ; toute section teintée en dessous de
+  `#f6f7f8` les fait disparaître. C'est ce qui est arrivé aux rayons de
+  `/tienda`, dont le fond alterné a été retiré le 03/09/2026.
 - Ne pas dissocier les cartes d'objectif de la boucle Garmin Connect : les deux
   lisent le **même jeton**, `--media-box` (`clamp(260px,25vw,380px)`, 9/16).
   C'est une demande explicite du propriétaire — retoucher l'une sans l'autre
@@ -362,6 +366,119 @@ Deux conséquences à ne pas défaire :
   suivante. `.cat-head .band.deep::after` ne garde que le plancher du bas.
 - **La réserve basse de `.band-inner`** compte le dock : à `100dvh` avec un
   contenu calé en bas, le bouton passait sous lui.
+
+## Les cartes produit — une seule tuile pour tout le site
+
+Refonte du 03/09/2026. Il y avait deux langages : les produits **flottaient**
+sur le blanc dans les carrousels de la home, et posaient sur un dégradé gris
+dans les cartes encadrées de la boutique. Il n'y en a plus qu'un.
+
+- **Un jeton, `--tile` (`#f1f2f3`)**, porte le fond de TOUS les visuels
+  produit — carte flottante, carte encadrée, vignette de recherche.
+- **Le fond alterné des rayons de `/tienda` a été retiré.** Il valait
+  `--surface-teal` (`#f3f4f5`), soit deux points d'écart avec la tuile : les
+  tuiles y disparaissaient purement et simplement, et le même carrousel
+  n'avait pas le même aspect selon sa place dans la page.
+- **Plus aucune vidéo dans une carte.** Certaines boucles tournaient, les
+  autres non : deux cartes immobiles et une qui bouge suffisent à casser une
+  rangée. Les boucles restent sur les fiches produit, où elles ont la place.
+- **L'ombre portée a disparu** avec le fond blanc : elle servait à décoller
+  un packshot, sur une tuile elle ne fait plus qu'un halo sale au bord.
+- **Le surtitre porte ce que le nom ne dit pas** : la catégorie sur la carte
+  encadrée (qui affiche le nom complet, marque comprise), la marque sur la
+  carte qui flotte (qui n'affiche que le nom court). Même emplacement, même
+  typographie — c'est la cohérence visuelle qui compte, pas l'uniformité du
+  contenu.
+
+### `card` — le seul champ qui commande un visuel de carrousel
+
+`cardShot()` lit `card`, puis `packshot`, puis `image`. Corriger ce qu'un
+carrousel montre se fait donc dans `catalog.js`, et nulle part ailleurs.
+
+Les dix `card.png` sont fabriqués par **`build/card-shots.py`**, lancé à la
+main (il demande Pillow, que le build Node n'utilise pas) :
+
+```bash
+python3 build/card-shots.py
+```
+
+Il recadre chaque source sur son contenu réel et la repose au centre d'un
+carré, avec la même réserve pour toutes — 88 % du cadre. Les packshots
+venaient de six studios et occupaient de 55 % à 94 % de leur fichier, ce qui
+se lisait comme un défaut d'échelle d'une tuile à l'autre. **Les sources ne
+sont jamais touchées**, le script écrit un `card.png` à côté.
+
+Trois visuels ont aussi été corrigés à la source :
+
+- **CIRQA** montrait la Malva en carrousel alors que sa fiche ouvre sur la
+  Negra. Le client voyait un bracelet mauve, cliquait, tombait sur un noir.
+- **Non-GMO Creatine** gardait l'ombre de studio en bas à gauche, que
+  `mix-blend-mode:multiply` transformait en salissure sur le gris. Redétourée
+  avec `build/cutout.swift` (`dist`, 14/26).
+- **La bande de rechange** ne montre plus que le bleu. Ses sept coloris
+  restent sur sa fiche, où ils se choisissent.
+
+---
+
+## La recherche — `#search-panel`
+
+Ajoutée le 03/09/2026 ; il n'y en avait aucune. Le loupe de la nav ouvre une
+nacelle de verre qui suggère pendant la frappe.
+
+**Aucun service externe, aucun index.** Tout vient de `catalog.js`, qui
+expose `LOWLABS.search()` et `LOWLABS.searchAisles()`. Chaque produit est
+aplati une fois au chargement en une liste de mots — nom, nom court, marque,
+catégorie, accroche et un champ `keywords` (espagnol **et** anglais : le
+catalogue est en es-MX mais les noms de molécules circulent en anglais).
+
+Quatre comportements à connaître avant d'y toucher :
+
+- **Les accents et la casse sont neutralisés.** « sueño », « SUENO » et
+  « sueno » sont la même requête — indispensable en espagnol.
+- **Tous les mots de la requête doivent trouver preneur.** « creatina
+  promix » ne remonte pas la créatine Cymbiotika juste parce que
+  « creatina » correspond.
+- **La tolérance aux fautes est étroite** : une seule substitution, et
+  seulement sur les mots d'au moins quatre lettres. Au-delà, « venu »
+  remonterait « menu ».
+- **Le poids dit la qualité de la correspondance**, pas sa quantité : mot
+  entier (10) > début de mot (7) > fragment (4) > faute rattrapée (3), plus
+  un bonus au produit dont le nom commence par la requête.
+
+Le panneau fige le corps, donc **il arrête Lenis** comme le tiroir du panier.
+Sans ça, Lenis avance sa position sur une page immobile et la rend d'un bloc
+à la fermeture.
+
+---
+
+## Les recommandations — `LOWLABS.recommend()`
+
+Centralisées dans `catalog.js` le 03/09/2026. `pairs` (par produit) et `also`
+(par objectif) restent la préférence éditoriale : ce qu'on **aimerait**
+proposer. Mais plus rien ne sort sans passer par le filtre.
+
+**Groupes exclusifs** — deux produits d'un même groupe répondent au même
+besoin ; les montrer ensemble ne complète rien, ça demande au client
+d'arbitrer à notre place. Ils ne peuvent ni se recommander l'un l'autre, ni
+cohabiter dans une liste :
+
+| Groupe | Pourquoi |
+|---|---|
+| Sleep ↔ Relax | Les deux formules du soir. **Règle dure demandée par le propriétaire** : consulter l'une ne doit jamais proposer l'autre. |
+| Les deux créatines | Même molécule, deux marques : c'est un choix, pas un complément. |
+| Venu 4 / Venu 3S / Vívoactive 6 | Proposer une seconde montre à qui en regarde une déjà, c'est la lui faire remettre en question. |
+
+**Complémentarité** — aucune catégorie ne prend toute une liste de trois. En
+dessous, le plafond ne s'applique pas : sur deux compléments, exiger deux
+catégories différentes écarterait un second supplément pertinent pour aller
+chercher un accessoire qui l'est moins.
+
+Le bundle des fiches produit ne lit plus `data-handles` : il appelle
+`recommend()`. Une page **générée avant** qu'une règle existe la respecte donc
+quand même — c'est tout l'intérêt de ne plus figer les compléments dans le
+HTML.
+
+---
 
 ## L'assistant par objectif — `#objetivo`
 

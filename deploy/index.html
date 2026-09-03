@@ -36,7 +36,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   "currenciesAccepted": "MXN"
 }
 </script>
-<link rel="stylesheet" href="/styles.css?v=478e1672">
+<link rel="stylesheet" href="/styles.css?v=02e2bb2e">
 </head>
 <body class="has-hero">
 
@@ -69,27 +69,47 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
     </div>
     <a class="logo" href="/">lowlabs</a>
     <div class="nav-end">
+      <button class="search-icon" type="button" data-search-open aria-label="Buscar productos" aria-expanded="false" aria-controls="search-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></button>
       <button class="cart-icon" type="button" data-cart-open data-cart-count aria-label="Abrir el carrito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7Z"/><path d="M9 7V5.5a3 3 0 0 1 6 0V7"/></svg></button>
     </div>
   </div>
 </nav>
 
+<!-- ===== Recherche — panneau unique, présent sur toutes les pages.
+     Il vit HORS de `.shell` et à côté de la nav, comme le tiroir du panier :
+     posé dedans, il hériterait du `overflow` de la coquille et serait rogné.
+     Le contenu est injecté par le module `search` d'app.js ; sans JS le
+     bouton reste inerte et la nav garde ses trois liens. ===== -->
+<div class="search-panel" id="search-panel" hidden>
+  <div class="search-shell glass-light blurred">
+    <form class="search-form" role="search" autocomplete="off">
+      <svg class="search-form-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input class="search-input" id="search-input" type="search" name="q"
+             placeholder="Busca un producto, una marca, un objetivo…"
+             aria-label="Buscar productos" aria-autocomplete="list"
+             aria-controls="search-results" aria-expanded="false">
+      <button class="search-close" type="button" data-search-close aria-label="Cerrar la búsqueda">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </form>
+    <div class="search-results" id="search-results" role="listbox" aria-label="Sugerencias"></div>
+  </div>
+</div>
+
+
 <div class="shell">
 
   <!-- ===== Hero pleine largeur ===== -->
   <header class="hero-full" id="hero">
-    <!-- Desktop : boucle vidéo, depuis le 22/08/2026. Mêmes précautions que
-         la boucle mobile juste dessous — ni `autoplay` ni `poster`, qui
-         déclenchent le téléchargement même quand l'élément est en
-         display:none, et le téléphone paierait 416 ko pour un visuel qu'il
-         n'affiche jamais. C'est `section-loops` qui lance la lecture quand
-         la boucle entre dans le cadre, donc jamais sous 760px, et l'affiche
-         est posée en fond CSS au-dessus. -->
-    <video class="hero-loop-desktop" muted loop playsinline webkit-playsinline preload="none"
-           disablepictureinpicture disableremoteplayback
-           width="736" height="414" aria-hidden="true" tabindex="-1" data-autoloop>
-      <source src="/media/landing/hero/hero-desktop.mp4" type="video/mp4">
-    </video>
+    <!-- Desktop : photo depuis le 03/09/2026, en remplacement de la boucle
+         vidéo du 22/08. Le visuel est posé en FOND CSS et non dans une
+         balise `img` : un `<img>` en `display:none` est tout de même
+         téléchargé par le navigateur, et le téléphone paierait 285 ko pour
+         un visuel qu'il n'affiche jamais. Un fond CSS sur un élément
+         `display:none`, lui, n'est jamais demandé. C'est exactement le
+         mécanisme que les affiches des deux boucles utilisaient déjà.
+         Décoratif : le `h1` hors écran plus bas porte le sens. -->
+    <div class="hero-shot-desktop" aria-hidden="true"></div>
     <!-- Mobile : boucle vidéo à la place de l'image. Ni `autoplay` ni
          `poster` ici — les deux déclenchent le téléchargement même quand
          l'élément est en display:none. C'est `section-loops` qui lance la
@@ -420,8 +440,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
 <!-- Défilement fluide : une seule instance, démarrée par app.js. -->
 <script src="/lenis.min.js?v=daec1872" defer></script>
-<script src="/catalog.js?v=3db17903" defer></script>
+<script src="/catalog.js?v=78301d8e" defer></script>
 <script src="/cart.js?v=5487c53c" defer></script>
-<script src="/app.js?v=9397997b" defer></script>
+<script src="/app.js?v=5313e3fc" defer></script>
 </body>
 </html>
