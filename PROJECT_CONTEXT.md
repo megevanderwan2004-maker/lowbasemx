@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-09-03 (desktop hero + aisle headers are photos, one home band is, full-grey product cards with quick add-to-cart, smart search, recommendation rules, first-visit loading screen, hero preload fix)
+> Last updated: 2026-09-04 (desktop hero + aisle headers are photos, one home band is, full-grey product cards with quick add-to-cart, smart search, recommendation rules, loading screen on every load with a verified loop start, hero preload fix)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -98,21 +98,26 @@ lowlabs-cirqa-context/
 │
 ├── build/
 │   ├── gen-products.js        ★ Generates deploy/productos/*.html from catalog.js
+│   ├── stamp-assets.js        Fingerprints ?v=<sha1[0:8]> on every served file
+│   ├── card-shots.py          Normalises card visuals to card.png (88% of frame)
+│   ├── cutout.swift           Cuts a packshot out onto transparency
 │   └── serve.js               Static preview server that emulates Vercel cleanUrls
 │
 ├── deploy/                    ★ CANONICAL — the deployed site
-│   ├── index.html             Homepage (430 lines)
+│   ├── index.html             Homepage (492 lines)
 │   ├── tienda.html            Shop page; aisles rendered client-side
 │   ├── wearables.html         Wearables aisle page (/wearables)
 │   ├── suplementos.html       Supplements aisle page (/suplementos)
 │   ├── productos/             GENERATED — do not hand-edit
 │   │   ├── cirqa.html  venu-4.html  venu-3s.html  vivoactive-6.html
 │   │   ├── creatina.html  promix-creatina.html  promix-debloat.html
-│   │   └── promix-relax.html  absorption-sleep.html
-│   ├── catalog.js             ★ Single source of truth: products + goals (651 lines)
-│   ├── app.js                 All behaviour, 20 isolated modules (2326 lines)
-│   ├── styles.css             Full design system (2701 lines)
-│   └── media/                 92 MB, 125 files — see section 10
+│   │   └── promix-relax.html  absorption-sleep.html  banda-cirqa.html
+│   ├── catalog.js             ★ Single source of truth: products + goals (963 lines)
+│   ├── app.js                 All behaviour, 20 isolated modules (2417 lines)
+│   ├── cart.js                Cart + drawer, hand-off to Shopify checkout (327 lines)
+│   ├── lenis.min.js           Smooth scroll — vendored copy of node_modules/lenis
+│   ├── styles.css             Full design system (3039 lines)
+│   └── media/                 96 MB, 139 files — see section 10
 │
 ├── site/                      ⚠️ ABANDONED — single-file version, many revisions behind
 ├── shopify-theme/             ⚠️ ABANDONED — Liquid theme, matches the old single-product page
@@ -125,14 +130,14 @@ lowlabs-cirqa-context/
 
 ## 4. Technology stack and the generation step
 
-- **No framework, no npm, no `package.json`.** Vanilla HTML/CSS/ES5-compatible JS.
-- **One build step, run manually**: `node build/gen-products.js` reads `deploy/catalog.js` in a `vm` sandbox (exposing a fake `window`) and writes the ten product pages. This exists because `vercel.json` declares `buildCommand: null` — the generated files must be committed.
+- **No framework, no bundler.** Vanilla HTML/CSS/ES5-compatible JS. There is a `package.json`, but it holds **one** dependency — `lenis`, the smooth scroll — and it is not built: `npm run vendor:lenis` copies its distributed file to `deploy/lenis.min.js`, which is committed. Run that after any `npm install`.
+- **One build step, run manually**: `npm run build` chains two scripts. `gen-products.js` reads `deploy/catalog.js` in a `vm` sandbox (exposing a fake `window`) and writes the ten product pages; `stamp-assets.js` then re-fingerprints the served files (section 15). This exists because `vercel.json` declares `buildCommand: null` — the generated files must be committed.
 
 ```bash
-node build/gen-products.js
+npm run build
 ```
 
-**Run it after any change to `catalog.js`, or to the nav/footer/band templates inside `gen-products.js`.** Forgetting leaves the ten product pages stale, and nothing warns you.
+**Run it after any change to `catalog.js`, or to the nav/footer/band/boot templates inside `gen-products.js`.** Forgetting leaves the ten product pages stale, and nothing warns you.
 
 - **Google Fonts**: Outfit (display) + DM Sans (body) — web-safe stand-ins for the brand fonts Codec Pro and Canva Sans.
 - **Images**: mostly local under `deploy/media/`; CIRQA photography still comes from the Shopify CDN.
@@ -143,7 +148,7 @@ node build/gen-products.js
 |-------|------|-------|
 | `/` | `deploy/index.html` | Homepage. Carries `class="has-hero"` on `<body>` — this drives the top spacing (section 6). |
 | `/tienda` | `deploy/tienda.html` | Shop. `<div id="shop-sections">` is filled by the `shop` module, one carousel aisle per category. |
-| `/wearables`, `/suplementos` | `deploy/wearables.html`, `deploy/suplementos.html` | Aisle pages, reached from the top nav. Same chrome as `/tienda`; the grid is a `.cat-grid[data-category]` filled by the `catalog` module from `catalog.js`, so **no product is written in their HTML** — adding or removing one from the catalogue updates both pages, count included (`data-count-for`). Each page opens on **its own** `.band` loop (`bandas/loop-wearables-hero.mp4`, `bandas/loop-suplementos-hero.mp4`) and closes on a cross-link band re-using the home loops. Sort chips are the `cat-sort` module. |
+| `/wearables`, `/suplementos` | `deploy/wearables.html`, `deploy/suplementos.html` | Aisle pages, reached from the top nav. Same chrome as `/tienda`; the grid is a `.cat-grid[data-category]` filled by the `catalog` module from `catalog.js`, so **no product is written in their HTML** — adding or removing one from the catalogue updates both pages, count included (`data-count-for`). Each page opens on **its own** header band, which is split by breakpoint since 2026-09-03: a **photo on desktop** (`banda-wearables.jpg`, `banda-suplementos.jpg`), laid down as a **CSS background** rather than an `<img>` so the phone never pays for it, and **the loop on mobile** (`bandas/loop-wearables-hero.mp4`, `bandas/loop-suplementos-hero.mp4`), stripped of `autoplay` and `poster` so the desktop does not fetch a video it hides. Each closes on a cross-link band re-using the home loops. Sort chips are the `cat-sort` module. |
 | `/productos/{handle}` | generated | 10 pages — the nine products plus `banda-cirqa`, the replacement band. `<body data-product="{handle}">` is how `app.js` knows which catalogue entry to bind. |
 
 `cleanUrls: true` in `vercel.json` is what makes `/tienda` and `/productos/cirqa` resolve without `.html`. `build/serve.js` reproduces that locally.
@@ -429,7 +434,7 @@ The buy button adds the selected variant to the cart (`deploy/cart.js`) and open
 ### To wire the remaining eight products
 1. Create the product in Shopify admin, note the variant IDs.
 2. Add `shopify: { handle: "...", variants: { … } }` to the entry in `deploy/catalog.js`.
-3. Run `node build/gen-products.js`.
+3. Run `npm run build`.
 
 No other file needs touching — the button label, the note under it, and the JSON-LD all derive from the catalogue.
 
@@ -502,7 +507,7 @@ Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not de
 
 ### Smooth scrolling — Lenis 1.3.26
 
-`deploy/lenis.min.js` (19 kB) is a straight copy of `node_modules/lenis/dist/lenis.min.js`; `npm run vendor:lenis` refreshes it. There is **no bundler** — the file is loaded with a plain `<script defer>` before `catalog.js` on all 13 pages, and `styles.css` carries the library's few CSS rules so no extra request is made.
+`deploy/lenis.min.js` (19 kB) is a straight copy of `node_modules/lenis/dist/lenis.min.js`; `npm run vendor:lenis` refreshes it. There is **no bundler** — the file is loaded with a plain `<script defer>` before `catalog.js` on all 14 pages, and `styles.css` carries the library's few CSS rules so no extra request is made.
 
 One instance, created in `smooth-scroll` with `autoRaf: true` — **Lenis's own loop is the only `requestAnimationFrame` loop on the page.** Lenis drives the document's real scroll position, so `position:sticky`, the `IntersectionObserver`s (`.rv` reveals, `section-loops` video play/pause) and the fixed nav/dock need no adaptation.
 
@@ -600,10 +605,10 @@ Rushes were renamed after the loop they produce (`landing/loop-wearables.mp4` �
 ## 11. How to run locally
 
 ```bash
-node build/serve.js 4175
+npm run serve
 ```
 
-Serves `deploy/` at `http://localhost:4175` and emulates Vercel's `cleanUrls`. `.claude/launch.json` points at this script.
+Serves `deploy/` at `http://localhost:4175` (`build/serve.js`) and emulates Vercel's `cleanUrls`. `.claude/launch.json` points at this script. Run `npm run build` first if `catalog.js` changed.
 
 `.claude/serve.py` is the older Python equivalent and **does not work here**: macOS blocks the CommandLineTools `python3` from reading this Documents folder. Use the Node server.
 
@@ -634,6 +639,8 @@ vercel --prod
 8. **`site/` and `shopify-theme/`** — abandoned. Delete, or regenerate from `deploy/`?
 9. **No analytics, no cookie banner, no dedicated shipping/returns page.** The footer's "Garantía y devoluciones" points at `mailto:`.
 10. **`assets-hd/resource_urls.json`** holds expired Shopify staged-upload URLs; historical record only.
+11. **The Cymbiotika sachet with the honey drip** never reached the repository as a file — it was pasted into the conversation but never landed on disk, and searching Downloads, Desktop, Pictures, the session scratchpads and Cymbiotika's own Shopify catalogue did not turn it up. `creatina` currently shows the official `CreatinePacket.png` cut-out: same sachet, same angle, transparent background, **no drip**. Ask for the file if the drip matters.
+12. **The `/wearables` desktop header is a still frame** (1366×768) extracted from a screenshot, not a source render. If the source video exists it could return as a desktop loop.
 
 ## 14. Files to understand before making changes
 
@@ -651,10 +658,10 @@ vercel --prod
 ### Before changing anything
 1. Read `README.md` and `CLAUDE.md`, then this file.
 2. Assume `deploy/` unless told otherwise. `site/` and `shopify-theme/` are stale.
-3. Preview with `node build/serve.js 4175`.
+3. Preview with `npm run serve` (port 4175).
 
 ### Rules that will bite you if ignored
-- **Run `node build/gen-products.js`** after editing `catalog.js` or the generator templates. Nothing warns you if you forget.
+- **Run `npm run build`** after editing `catalog.js` or the generator templates — it regenerates the product pages *and* re-stamps the asset fingerprints. Nothing warns you if you forget.
 - **Never hand-edit `deploy/productos/*.html`** — regenerated, your changes vanish.
 - **Keep media paths in sync with their folder** — `productos/<handle>/`, `landing/<partie>/`, and a poster next to its loop. `gen-products.js` depends on the poster rule.
 - **Do not change Shopify variant IDs** without confirming against the live store.
@@ -671,9 +678,9 @@ vercel --prod
 - **Preserve accessibility**: skip link, ARIA radiogroups with roving tabindex (product colour/size — the goal cards are disclosure buttons, see §8), `sr-only` price context, ≥44px tap targets, `prefers-reduced-motion` fallbacks.
 
 ### Adding a product
-1. Append an entry to `PRODUCTS` in `deploy/catalog.js` (`handle`, `name`, `short`, `brand`, `tagline`, `price`, `category`, `image`, `highlights`, `specs`; optional `badge`, `compareAt`, `colors`, `sizes`, `shopify`, `packshot`, `video`, `poster`, `videoRatio`, `story`).
+1. Append an entry to `PRODUCTS` in `deploy/catalog.js` (`handle`, `name`, `short`, `brand`, `tagline`, `price`, `category`, `image`, `highlights`, `specs`, `keywords`; optional `badge`, `compareAt`, `colors`, `sizes`, `shopify`, `packshot`, `card`, `shotFit`, `video`, `poster`, `videoRatio`, `story`). **`keywords`** is what the search matches on — Spanish, English and the plausible misspellings; **`card`** is what every carousel and grid shows.
 2. Put its optimised visuals in `deploy/media/productos/<handle>/` and its sources in `assets/<handle>/`. For a carousel it needs a **cut-out** (`packshot`).
-3. Run `node build/gen-products.js`.
+3. Run `npm run build`.
 4. Add it to a carousel by hand: `data-handles` on `#cards`, `#wear-grid` and `#sup-grid` in `index.html`. The Tienda aisles **and both aisle pages** pick it up automatically from its `category` — nothing to touch there.
 5. Editorial chapters are hand-written — only cards and aisles are generated.
 6. Update the dock in `index.html` and `tienda.html`: "N productos" and the "Desde $X MXN" floor. (The aisle pages' dock shows shipping and warranty, not a count, so it needs nothing.)

@@ -34,6 +34,9 @@ distribué est copié dans `deploy/`.
 │
 ├── build/
 │   ├── gen-products.js     génère deploy/productos/*.html depuis catalog.js
+│   ├── stamp-assets.js     empreinte ?v=<sha1> sur les fichiers servis
+│   ├── card-shots.py       normalise les visuels de carte (card.png)
+│   ├── cutout.swift        détoure un packshot sur fond transparent
 │   └── serve.js            serveur d'aperçu, reproduit les cleanUrls de Vercel
 │
 ├── assets/                 sources brutes non servies (voir plus bas)
@@ -225,10 +228,14 @@ idempotent : relancé, il remplace l'empreinte au lieu de l'empiler.
 
 1. Ajouter l'entrée dans `PRODUCTS` (`deploy/catalog.js`) : `handle`, `name`,
    `short`, `brand`, `tagline`, `price`, `category`, `image`, `highlights`,
-   `specs` ; en option `badge`, `compareAt`, `colors`, `sizes`, `shopify`,
-   `packshot`, `video`, `poster`, `videoRatio`, `story`.
-2. Déposer ses visuels dans `deploy/media/productos/<handle>/`.
-3. `node build/gen-products.js`.
+   `specs`, `keywords` ; en option `badge`, `compareAt`, `colors`, `sizes`,
+   `shopify`, `packshot`, `card`, `shotFit`, `video`, `poster`, `videoRatio`,
+   `story`. `keywords` est ce sur quoi la recherche s'appuie — espagnol,
+   anglais et les fautes de frappe probables ; `card` est ce que montrent
+   tous les carrousels et toutes les grilles.
+2. Déposer ses visuels dans `deploy/media/productos/<handle>/`, puis
+   `python3 build/card-shots.py` pour son `card.png`.
+3. `npm run build`.
 4. L'ajouter à la main aux carrousels de la home (`data-handles` sur `#cards`,
    `#wear-grid` et `#sup-grid` dans `index.html`). Les rayons de `/tienda` et
    les pages `/wearables` et `/suplementos` le prennent tout seuls depuis sa
