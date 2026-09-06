@@ -1,0 +1,24 @@
+Origine des visuels de /nosotros
+================================
+
+Trois des cinq fonds et les cinq vignettes sont recadrés depuis des visuels
+DÉJÀ dans le dépôt (deploy/media/) — mêmes droits que les pages où ils
+servent déjà :
+
+  pieza-1.jpg  <- landing/capitulos/poster-loop-vertical.jpg
+  pieza-2.jpg  <- landing/wearables/linterna-noche.jpg
+  pieza-3.jpg  <- landing/bandas/poster-loop-brand.jpg
+  pieza-4.jpg  <- landing/bandas/cat-suplementos.jpg
+  pieza-5.jpg  <- landing/objetivos/poster-goal-dormir.jpg
+  fondo-1.jpg  <- landing/hero/hero-desktop.jpg
+  fondo-3.jpg  <- landing/bandas/banda-wearables.jpg
+  fondo-5.jpg  <- landing/bandas/cat-wearables.jpg
+
+Deux fonds viennent d'Unsplash, téléchargés le 05/09/2026 et servis en local
+(aucun appel à un CDN externe depuis le site) :
+
+  fondo-2.jpg  <- https://images.unsplash.com/photo-1540206395-68808572332f
+  fondo-4.jpg  <- https://images.unsplash.com/photo-1517836357463-d25dfeac3438
+
+Licence Unsplash : usage commercial autorisé, sans attribution obligatoire.
+C'est la seule source externe de la page ; tout le reste est du dépôt.

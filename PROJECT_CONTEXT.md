@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-09-04 (desktop hero + aisle headers are photos, one home band is, full-grey product cards with quick add-to-cart, smart search, recommendation rules, loading screen on every load with a verified loop start, hero preload fix)
+> Last updated: 2026-09-05 (new `/nosotros` page — a pinned scroll hero ported from a 21st.dev React/GSAP/Swiper component to vanilla JS; nav and footer gain a fourth link)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -18,7 +18,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 `deploy/` is **canonical and the only actively maintained variant.** It is a static site of 14 HTML pages plus a shared CSS/JS/catalogue triplet. No build step at request time; product pages are generated ahead of time by a Node script (section 4).
 
 **What works today**
-- 14 pages: home, `/tienda`, the two aisle pages `/wearables` and `/suplementos`, and 10 product pages, all internally linked and verified.
+- 15 pages: home, `/tienda`, the two aisle pages `/wearables` and `/suplementos`, **`/nosotros`** (added 2026-09-05), and 10 product pages, all internally linked and verified.
 - Home opens on the "Los más buscados" carousel, then alternates video band → compact carousel → editorial chapter, with the goal assistant hinging between the wearables and supplements runs.
 - Three home carousels, all on the same compact card (`#mas-buscados`, `#wear-grid`, `#sup-grid`).
 - **Goal assistant**: three cards carrying a muted 9/16 loop (`deploy/media/landing/objetivos/goal-*.mp4`, declared as `video`/`poster` on `GOALS` in `catalog.js`). The cards are deliberately the **same box as the Garmin Connect chapter loop** — both read the `--media-box` token, `clamp(260px,25vw,380px)` in 9/16 — and the track scrolls at every width, so on a phone one card reads whole and the next peeks. Section background is plain white, not the old sand gradient. **Since 2026-08-24, opening a goal removes the other two and takes their place** rather than laying a recommendation underneath: the chosen card travels to card 1's slot and the panel fills the exact rectangle the other two vacated. Full mechanics in section 8.
@@ -28,7 +28,7 @@ The main competitor is **DelMaz** (delmaz.mx), the official Garmin distributor i
 - **Full-bleed media (08-21)**: `--gutter` falls to zero below 700px — the card *is* the phone screen, square corners included — `.container` runs to 1500px, the closing banner and the cinematic bands touch both edges, and the aisle-page header takes hero height (`clamp(440px,74vh,820px)`).
 - **Smooth scrolling**: one Lenis instance (`deploy/lenis.min.js`, the only npm dependency), started by the `smooth-scroll` module. Touch stays native, horizontal tracks keep their own gesture, `prefers-reduced-motion` skips it entirely. See section 9.
 - **Cart on every page**: drawer with image, name, chosen options, quantity, remove, subtotal; a cart icon in the nav carries the count. Lines are Shopify variant references; checkout is a Shopify cart permalink.
-- **Nav**: links, centred wordmark, cart icon. Nothing else — "Comprar" was removed on 2026-08-12. The three links are real pages: `/tienda`, `/wearables`, `/suplementos`; the current one carries `aria-current="page"`.
+- **Nav**: links, centred wordmark, search and cart icons. Nothing else — "Comprar" was removed on 2026-08-12. The **four** links are real pages: `/tienda`, `/wearables`, `/suplementos`, `/nosotros`; the current one carries `aria-current="page"`. They still fit on one row at 438 px.
 - **Bundle on every PDP**: viewed product + its two first `pairs`, −10% shown, colour swatches on the watch, added as individual variants with the `BUNDLE10` code attached.
 - All ten products check out on Shopify. **Three shapes of variant table** now coexist — single variant, one option (Venu 4 by colour, Sleep by format), two options (CIRQA and the band, colour × size) — and `LOWLABS.variantOf()` in `catalog.js` is the only resolver. `LOWLABS.priceOf()` does the same for prices, since a Sleep format costs more than the product's base price.
 - Liquid-glass design system: white translucent surfaces, ink text, a masked gradient rim shared by buttons, both bars, and the footer.
@@ -106,6 +106,7 @@ lowlabs-cirqa-context/
 ├── deploy/                    ★ CANONICAL — the deployed site
 │   ├── index.html             Homepage (492 lines)
 │   ├── tienda.html            Shop page; aisles rendered client-side
+│   ├── nosotros.html          About page; opens on the pinned scroll hero (§6)
 │   ├── wearables.html         Wearables aisle page (/wearables)
 │   ├── suplementos.html       Supplements aisle page (/suplementos)
 │   ├── productos/             GENERATED — do not hand-edit
@@ -149,12 +150,13 @@ npm run build
 | `/` | `deploy/index.html` | Homepage. Carries `class="has-hero"` on `<body>` — this drives the top spacing (section 6). |
 | `/tienda` | `deploy/tienda.html` | Shop. `<div id="shop-sections">` is filled by the `shop` module, one carousel aisle per category. |
 | `/wearables`, `/suplementos` | `deploy/wearables.html`, `deploy/suplementos.html` | Aisle pages, reached from the top nav. Same chrome as `/tienda`; the grid is a `.cat-grid[data-category]` filled by the `catalog` module from `catalog.js`, so **no product is written in their HTML** — adding or removing one from the catalogue updates both pages, count included (`data-count-for`). Each page opens on **its own** header band, which is split by breakpoint since 2026-09-03: a **photo on desktop** (`banda-wearables.jpg`, `banda-suplementos.jpg`), laid down as a **CSS background** rather than an `<img>` so the phone never pays for it, and **the loop on mobile** (`bandas/loop-wearables-hero.mp4`, `bandas/loop-suplementos-hero.mp4`), stripped of `autoplay` and `poster` so the desktop does not fetch a video it hides. Each closes on a cross-link band re-using the home loops. Sort chips are the `cat-sort` module. |
+| `/nosotros` | `deploy/nosotros.html` | About page, added 2026-09-05. Opens on **the pinned scroll hero** — five thumbnails rise from the bottom of the screen, gather, shrink and settle into the holes of a sentence that then appears word by word. Ported from a 21st.dev React component that drove GSAP ScrollTrigger and Swiper; neither library entered the repo (§6). Carries `class="pg-nosotros"` on `<body>`: it is the only page whose opening visual is **light**, so it takes neither `has-hero` nor `has-dark-top`. Below the hero: an editorial chapter, three promises, four selection criteria, a cross-link band. |
 | `/productos/{handle}` | generated | 10 pages — the nine products plus `banda-cirqa`, the replacement band. `<body data-product="{handle}">` is how `app.js` knows which catalogue entry to bind. |
 
 `cleanUrls: true` in `vercel.json` is what makes `/tienda` and `/productos/cirqa` resolve without `.html`. `build/serve.js` reproduces that locally.
 
 ### Homepage section order
-top bar (scrolling) → floating nav (Tienda / Wearables / Suplementos) → full-bleed hero, two centred CTAs **Suplementos** and **Wearables** linking to the aisle *pages* → **Los más buscados** carousel (`#mas-buscados`, everything but the two extra watches) → **goal assistant** (`#objetivo`, moved up here on 2026-08-23) → Wearables video band (`#wearables`) → **wearables carousel** (`#wear-grid`, the four Garmin) → **Garmin Connect chapter** (editorial) → Suplementos video band (`#suplementos`) → **supplements carousel** (`#sup-grid`) → "Wellness, in one shot." (Cymbiotika, editorial flip) → closing banner → footer → buy dock.
+top bar (scrolling) → floating nav (Tienda / Wearables / Suplementos / Nosotros) → full-bleed hero, two centred CTAs **Suplementos** and **Wearables** linking to the aisle *pages* → **Los más buscados** carousel (`#mas-buscados`, everything but the two extra watches) → **goal assistant** (`#objetivo`, moved up here on 2026-08-23) → Wearables video band (`#wearables`) → **wearables carousel** (`#wear-grid`, the four Garmin) → **Garmin Connect chapter** (editorial) → Suplementos video band (`#suplementos`) → **supplements carousel** (`#sup-grid`) → "Wellness, in one shot." (Cymbiotika, editorial flip) → closing banner → footer → buy dock.
 
 The goal assistant is the **hinge between the two aisles** — it closes the wearables run and opens the supplements one. It used to close the page; moved 08-12.
 
@@ -273,10 +275,31 @@ Settled in two passes the same day. Final state:
 - **The two aisle headers are photo on desktop, video on phone** — the hero's mechanism, for the hero's reason. The photo is a **CSS background** on `.cat-head .band-photo`, never an `<img>`, because an `<img>` in `display:none` is still downloaded. Symmetrically the loop lost its `autoplay` and `poster`, which were fetching it on desktop where it is hidden; `section-loops` starts it on intersection and its poster is a CSS background declared only inside the `max-width:759px` query. Measured: a desktop load of `/suplementos` fetches the 190 kB photo and nothing else — the 5 MB loop stays at `readyState 0`, `buffered 0`.
 - **`band-photo`, not `band-shot`.** The latter already exists on the home as a **modifier** of the band itself (`.band.band-shot`), not as a child. Two roles under one name always end up colliding in a stylesheet this size.
 
+### The pinned scroll hero — `/nosotros`, module `saga` in `app.js`
+
+The opening of `/nosotros` is ported from a component published on 21st.dev: a pinned hero where a row of thumbnails rises, gathers, shrinks, and lodges itself into the holes of a sentence that then appears word by word. The original is a React component driving **GSAP ScrollTrigger** and **Swiper**. Neither library entered the repo, and that was not a shortcut — there is no React and no bundler here, and the standing rule is one animation loop per page (Lenis). The whole thing is rebuilt from what the page already has.
+
+| In the original | Here |
+|---|---|
+| `ScrollTrigger` + `pin` | `position:sticky` on `.saga-stage`, inside a seven-screen `.saga` track. Progress **is** real scroll, so Lenis, anchors and the keyboard keep working untouched. The track is sized in `svh` (stable under a collapsing address bar) while the stage may use `dvh`; the run is measured, so the mismatch self-corrects. |
+| Swiper (`effect:fade`, autoplay) | A CSS crossfade on `.saga-bg img.on`, driven by a `setInterval` the module kills as soon as the section leaves the viewport **or** the background has finished fading out (`p ≥ .22`). |
+| Absolute clones appended to `document.body` | Nothing. The same five `.saga-piece` elements make the whole journey — no node to create, none to clean up. The original had to remove its clones by hand at every stage change. |
+| Hard-coded positions | Measured. `.saga-slot` gives the start, `.saga-chip` the arrival, both read off the real layout: the sentence does not wrap the same way at every width, in every font, in every language. |
+
+Four beats, taken as-is from the original: `0 → .30` the background fades (over the first sixth only) while the thumbnails rise, staggered a tenth of a beat apart; `.30 → .60` they converge on the centre of the screen, shrinking to final size; `.60 → .75` they reach their hole in the sentence **vertically first, then horizontally** — that dogleg is what reads as travel rather than a diagonal; `.75 → 1` the sentence appears segment by segment, in an order **shuffled on every load**.
+
+Three things to know before touching it:
+
+- **The two series of invisible markers are load-bearing.** `.saga-slot` and `.saga-chip` are never painted, but every position is measured on them. Removing one, or breaking the one-for-one correspondence between pieces, slots and holes, drops the section to its flat variant — deliberate, but silent. `--saga-chip` must stay both the size of the hole and the arrival size of the thumbnail; two different values put the image next to its gap.
+- **The fallback is complete.** Under reduced motion, without JS, or on a marker mismatch, `saga-flat` (or `html:not(.js)`) folds the track to one screen: the sentence reads in full, the thumbnails line up underneath, nothing is computed. Opacity removes nothing from the accessibility tree — a screen reader gets the whole sentence at once whatever the progress.
+- **The four secondary backgrounds are `data-src`.** As `src` the boot screen would have waited for all of them: it forces `eager` on whatever sits in the first viewport, and these images *are* the first viewport. The module wires them after `load`, well before the crossfade needs them.
+
+`.saga-foot` (the hint plus the five start slots) sits above the dock via `--dock-h`, which `dock-height` re-measures on every width change — without it the thumbnail row runs under the price pill, and it did.
+
 ### Loading screen — `#boot`, module `boot` in `app.js`
 **New 2026-09-03.** Exists to fix one specific bug: every loop on the site is `preload="none"`, so the hero's loop only started fetching once it was actually looked at — on a phone, a second or two of frozen poster then a hard start. The screen buys that fetch (and a `loop.play()`) time in the background, so the loop is already running the instant the screen lifts.
 
-- **Trigger**: an inline, synchronous `<script>` in `<head>` — not in `app.js`, which is `defer` and would let the page paint once before being covered — sets `html.className += " booting"`. **Every load, no session memory** — the `sessionStorage` gate was removed 2026-09-03 on request, so the screen also plays on reload and on every page-to-page move; each page has its own visuals and its own loop to prepare, so there is nothing a previous page would have loaded on its behalf. Duplicated across all five page templates (`index.html`, `tienda.html`, `wearables.html`, `suplementos.html`, `gen-products.js`) since it must run before any external script. A `setTimeout` failsafe strips the class after 8 s regardless, in case `app.js` never boots.
+- **Trigger**: an inline, synchronous `<script>` in `<head>` — not in `app.js`, which is `defer` and would let the page paint once before being covered — sets `html.className += " booting"`. **Every load, no session memory** — the `sessionStorage` gate was removed 2026-09-03 on request, so the screen also plays on reload and on every page-to-page move; each page has its own visuals and its own loop to prepare, so there is nothing a previous page would have loaded on its behalf. Duplicated across all six page templates (`index.html`, `tienda.html`, `wearables.html`, `suplementos.html`, `nosotros.html`, `gen-products.js`) since it must run before any external script. A `setTimeout` failsafe strips the class after 8 s regardless, in case `app.js` never boots.
 - **Progress is three weighted jobs**, not a timer: `document.fonts.ready`, the `load` event, and the **actually-visible** loop reaching `canplay`/`loadeddata` (`firstLoop()` filters on `offsetParent !== null` — the hero declares two loops, one per format, the other is `display:none`). A time-based floor keeps the bar moving even if a job stalls, capped at 88% so the last stretch still means something finished. A hard 5 s ceiling reveals regardless of state — a slow network degrades the animation, never blocks access.
 - **Reduced motion skips the theatre entirely**: the whole apparatus exists to hide a video start that will not happen for these visitors (`section-loops` freezes them on the poster). The module reveals as soon as fonts + `load` are ready, no bar, no floor delay — see the early `if (reduceMotion){...return;}` branch, before the animated-bar code even runs.
 - Sets `LOWSCROLL.stop()`/`.start()` around the wait, same guard as the cart drawer and the search panel, so Lenis's position does not drift behind a blocked body.
@@ -391,7 +414,7 @@ Two consequences, do not undo them:
 ### Asset fingerprints — why a correct deploy can stay invisible
 Pages used to reference `/styles.css` and `/app.js` bare. The headers say `max-age=0, must-revalidate`, but iOS Safari happily reserves its own copy without hitting the network, especially in a tab left open. On 2026-08-22 three correct deployments in a row stayed invisible on an iPhone for that reason alone — the site was right, the phone was looking at something else.
 
-`build/stamp-assets.js` (chained after `gen-products.js` in `npm run build`) stamps `?v=<sha1[0:8]>` on `styles.css`, `app.js`, `catalog.js`, `cart.js` and `lenis.min.js` across all 14 pages. A different URL is a different cache entry, so the address changes whenever the content does. The script is idempotent — re-running replaces the fingerprint rather than stacking it. Product pages are regenerated unstamped by `gen-products.js` and re-stamped every build; that is why the second half always reports the 10 product pages as touched.
+`build/stamp-assets.js` (chained after `gen-products.js` in `npm run build`) stamps `?v=<sha1[0:8]>` on `styles.css`, `app.js`, `catalog.js`, `cart.js` and `lenis.min.js` across all 15 pages. A different URL is a different cache entry, so the address changes whenever the content does. The script is idempotent — re-running replaces the fingerprint rather than stacking it. Product pages are regenerated unstamped by `gen-products.js` and re-stamped every build; that is why the second half always reports the 10 product pages as touched.
 
 **Run `npm run build` after touching `styles.css` or `app.js`, not only `catalog.js`** — otherwise the stamp goes stale and the old cache problem returns.
 
@@ -480,7 +503,7 @@ That is exactly three cards plus two gutters, so the closed track and the open p
 
 **Motion tokens** live on `.goals-stage`: `--goals-gap: clamp(10px,1.6vw,18px)` and `--goals-ease: cubic-bezier(.22,1,.36,1)`. The return is deliberately shorter than the outbound trip — 160 + 260 ms against 280 + 400 ms.
 
-## 9. `app.js` — 20 modules
+## 9. `app.js` — 21 modules
 
 Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not decorative: `.rv` elements start at `opacity: 0`, so before the wrapper existed one uncaught error could leave **the entire page invisible**. The reveal module also has a 4-second failsafe.
 
@@ -503,11 +526,12 @@ Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not de
 | `checkout` | Shopify redirect or mailto fallback |
 | `read-more` | Below 720px, clamps long paragraphs to 3 lines with a `Ver más` toggle |
 | `carousel` | Arrows of every floating track; the step is measured from the real gap between the first two items. Also **hides the arrows** — and the `.head-aside` that only held them — when the track already fits |
+| `saga` | **New 2026-09-05.** The `/nosotros` pinned scroll hero (§6). Draws on scroll events only — one frame per event, never a loop of its own — and prefers `lenis.on("scroll")` when the instance exists, the same arbitration as `past-hero`. Falls back to the flat layout (`saga-flat`) under reduced motion, or whenever the three series of markers stop matching one-for-one. |
 | `carousel-dots` | Fills every `.card-dots` with one dot per page. The page count comes from the **real step between two cards** and the track's **content box** (padding excluded) — not from `scrollWidth/clientWidth`, which counts gutters and invents a page. Rebuilds on resize and on `load`; also drives the goals track |
 
 ### Smooth scrolling — Lenis 1.3.26
 
-`deploy/lenis.min.js` (19 kB) is a straight copy of `node_modules/lenis/dist/lenis.min.js`; `npm run vendor:lenis` refreshes it. There is **no bundler** — the file is loaded with a plain `<script defer>` before `catalog.js` on all 14 pages, and `styles.css` carries the library's few CSS rules so no extra request is made.
+`deploy/lenis.min.js` (19 kB) is a straight copy of `node_modules/lenis/dist/lenis.min.js`; `npm run vendor:lenis` refreshes it. There is **no bundler** — the file is loaded with a plain `<script defer>` before `catalog.js` on all 15 pages, and `styles.css` carries the library's few CSS rules so no extra request is made.
 
 One instance, created in `smooth-scroll` with `autoRaf: true` — **Lenis's own loop is the only `requestAnimationFrame` loop on the page.** Lenis drives the document's real scroll position, so `position:sticky`, the `IntersectionObserver`s (`.rv` reveals, `section-loops` video play/pause) and the fixed nav/dock need no adaptation.
 
@@ -563,7 +587,12 @@ deploy/media/
 │   │                       banda-wearables.jpg (home #wearables band),
 │   │                       cat-suplementos.jpg + cat-wearables.jpg (the two
 │   │                       aisle headers, DESKTOP only) — see the table in §6
-│   └── capitulos/          loop-vertical, cymbiotika-shot (+ posters)
+│   ├── capitulos/          loop-vertical, cymbiotika-shot (+ posters)
+│   └── nosotros/           pieza-1..5.jpg (the five square thumbnails that
+│                           travel into the sentence) + fondo-1..5.jpg (the
+│                           relaying background) + FUENTES.txt. Eight are crops
+│                           of visuals already in the repo, two come from
+│                           Unsplash — see open question 13
 └── archivo/                30 files kept but referenced by nothing
     ├── cirqa/              app screens, rock/tan/sensor shots, wrist-negra
     ├── objetivos/          goal-energia, -longevidad, -recuperacion,
@@ -641,6 +670,7 @@ vercel --prod
 10. **`assets-hd/resource_urls.json`** holds expired Shopify staged-upload URLs; historical record only.
 11. **The Cymbiotika sachet with the honey drip** never reached the repository as a file — it was pasted into the conversation but never landed on disk, and searching Downloads, Desktop, Pictures, the session scratchpads and Cymbiotika's own Shopify catalogue did not turn it up. `creatina` currently shows the official `CreatinePacket.png` cut-out: same sachet, same angle, transparent background, **no drip**. Ask for the file if the drip matters.
 12. **The `/wearables` desktop header is a still frame** (1366×768) extracted from a screenshot, not a source render. If the source video exists it could return as a desktop loop.
+13. **Two of the five `/nosotros` backgrounds come from Unsplash** (`fondo-2`, `fondo-4`, downloaded 2026-09-05 and served locally — no external CDN call). The Unsplash License covers commercial use without attribution, so these are the only images on the site whose rights are actually *clear*; every provenance is recorded in `deploy/media/landing/nosotros/FUENTES.txt`. The other eight are crops of visuals already in the repo, so they inherit open question 4.
 
 ## 14. Files to understand before making changes
 
@@ -649,7 +679,7 @@ vercel --prod
 3. **`deploy/catalog.js`** — everything about products and goals. Most content changes start and end here.
 4. **`deploy/index.html`** — homepage structure and section order.
 5. **`deploy/wearables.html`** / **`deploy/suplementos.html`** — the aisle-page template; the two files are the same skeleton with different copy, media and category.
-6. **`deploy/app.js`** — the 20 modules.
+6. **`deploy/app.js`** — the 21 modules.
 7. **`deploy/styles.css`** — the design system; the liquid-glass and backdrop-filter comments are load-bearing.
 8. **`build/gen-products.js`** — the page templates for `/productos/*`, including the nav and the category breadcrumb.
 

@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Suplementos — lowlabs</title>
-<meta name="description" content="Cymbiotika, Promix y The Absorption Company. Sobres líquidos y cápsulas de absorción mejorada, sin suscripción y con envío gratis a todo México.">
-<meta property="og:title" content="Suplementos | lowlabs">
-<meta property="og:description" content="Cinco fórmulas cortas, formuladas por dietistas y científicos. Sin suscripción, sin letra chica.">
+<title>Nosotros — lowlabs</title>
+<meta name="description" content="Somos una tienda mexicana corta y directa: distribuidor Garmin y suplementos de absorción mejorada, sin catálogo infinito ni suscripciones. Así elegimos lo que vendemos.">
+<meta property="og:title" content="Nosotros | lowlabs">
+<meta property="og:description" content="Elegimos pocas cosas, las usamos todos los días, y solo entonces las traemos a México.">
 <meta property="og:image" content="https://cdn.shopify.com/s/files/1/1026/1721/9449/files/cirqa-lineup.jpg?v=1785272697">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_MX">
@@ -43,7 +43,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 })(document);
 </script>
 </head>
-<body class="has-dark-top">
+<body class="pg-nosotros">
 
 <!-- ===== Écran d'ouverture. Il ne sert pas à faire patienter pour rien :
      pendant qu'il est là, la boucle du hero est réellement chargée puis
@@ -78,8 +78,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       <div class="nav-links">
         <a href="/tienda">Tienda</a>
         <a href="/wearables">Wearables</a>
-        <a href="/suplementos" aria-current="page">Suplementos</a>
-        <a href="/nosotros">Nosotros</a>
+        <a href="/suplementos">Suplementos</a>
+        <a href="/nosotros" aria-current="page">Nosotros</a>
       </div>
     </div>
     <a class="logo" href="/">lowlabs</a>
@@ -112,108 +112,155 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 </div>
 
 
+
 <div class="shell">
 
-  <!-- ===== En-tête de rayon : la bannière tient lieu de hero, et se monte
-       comme lui — HORS de <main>, pour que le contenu lui passe par-dessus au
-       défilement au lieu de la pousser. La nav flotte dessus. ===== -->
-  <header class="cat-head" aria-labelledby="cat-t">
-    <div class="band deep band-cat band-cat-sup">
-      <!-- Ordinateur : photo, depuis le 03/09/2026. Elle est posée en FOND CSS
-           (voir styles.css) et non dans une balise `img` : un `<img>` en
-           `display:none` est tout de même téléchargé, un fond CSS ne l'est
-           jamais — le téléphone, qui garde la boucle, ne paie donc rien pour
-           elle. Symétriquement la boucle perd `autoplay` et `poster`, qui
-           déclenchaient son chargement sur ordinateur alors qu'elle y est
-           masquée ; c'est `section-loops` qui la lance à l'entrée dans le
-           cadre, et son affiche est un fond CSS déclaré sous 760px. -->
-      <div class="band-photo" aria-hidden="true"></div>
-      <video muted loop playsinline webkit-playsinline preload="none"
-             disablepictureinpicture disableremoteplayback
-             width="720" height="1280" aria-hidden="true" tabindex="-1" data-autoloop>
-        <source src="/media/landing/bandas/loop-suplementos-hero.mp4" type="video/mp4">
-      </video>
-      <div class="band-inner">
-        <span class="eyebrow">Suplementos</span>
-        <h1 id="cat-t">Un gesto al día. Nada que aprender.</h1>
-        <p>Sobres líquidos y cápsulas de absorción mejorada, formulados por dietistas y científicos. Sin suscripción, sin letra chica.</p>
-        <a class="btn btn-smoke btn-lg" href="#lista">Ver la selección</a>
+  <!-- =====================================================================
+       « La frase » — l'ouverture de la page Nosotros.
+
+       Reprise du montage repéré sur 21st.dev (hero à défilement épinglé).
+       L'original est un composant React qui pilote GSAP ScrollTrigger et
+       Swiper ; ici il n'y a ni React, ni bundler, ni seconde bibliothèque
+       d'animation — la règle du projet est explicite. Le montage est donc
+       refait avec ce que la page a déjà :
+
+       · l'épinglage de GSAP → `position:sticky` sur `.saga-stage`, dans une
+         piste `.saga` haute de plusieurs écrans. C'est le défilement réel
+         qui fait la progression, Lenis compris ;
+       · le carrousel Swiper du fond → un fondu enchaîné en CSS, cadencé par
+         un `setInterval` qui ne tourne que pendant que la section est vue ;
+       · les clones absolus posés dans `document.body` → rien du tout : ce
+         sont LES MÊMES cinq vignettes qui voyagent du bas de l'écran
+         jusque dans la phrase. Une seule série d'éléments, donc rien à
+         nettoyer et rien qui puisse rester sur la page.
+
+       Sans JS (ou en mouvement réduit) la section se replie sur un écran :
+       la phrase est lisible en entier, les cinq vignettes sont alignées
+       dessous, et la piste ne réserve plus sa hauteur.
+       ===================================================================== -->
+  <section class="saga" id="saga" aria-labelledby="saga-t">
+    <div class="saga-stage">
+
+      <!-- Le fond qui se relaie. Les images sont posées en `img` et non en
+           fond CSS : elles doivent être décodées avant la levée de l'écran
+           d'ouverture, et un fond CSS n'est pas visible de `document.images`. -->
+      <!-- Seul le premier fond est demandé au chargement. Les quatre autres
+           portent `data-src` : posés en `src`, l'écran d'ouverture les aurait
+           tous attendus — il force en `eager` et attend ce qui se trouve dans
+           le premier écran, et ces images occupent l'écran entier. Le module
+           `saga` les branche après `load`, bien avant que le relais n'en ait
+           besoin. -->
+      <div class="saga-bg" aria-hidden="true">
+        <img class="on" src="/media/landing/nosotros/fondo-1.jpg" width="1600" height="900" alt="" fetchpriority="high">
+        <img data-src="/media/landing/nosotros/fondo-2.jpg" width="1600" height="900" alt="" loading="lazy">
+        <img data-src="/media/landing/nosotros/fondo-3.jpg" width="1600" height="900" alt="" loading="lazy">
+        <img data-src="/media/landing/nosotros/fondo-4.jpg" width="1600" height="900" alt="" loading="lazy">
+        <img data-src="/media/landing/nosotros/fondo-5.jpg" width="1600" height="900" alt="" loading="lazy">
       </div>
+
+      <!-- La phrase. Chaque `.saga-chip` est un ancrage VIDE : il ne porte
+           aucune image, il réserve la place où la vignette correspondante
+           viendra se poser. C'est lui qui donne au JS la position d'arrivée,
+           mesurée sur la mise en page réelle plutôt que devinée. -->
+      <h1 class="saga-line" id="saga-t">
+        <span class="saga-seg">Elegimos pocas cosas,</span><i class="saga-chip" aria-hidden="true"></i>
+        <span class="saga-seg">las usamos todos los días,</span><i class="saga-chip" aria-hidden="true"></i>
+        <span class="saga-seg">y solo entonces las traemos a México</span><i class="saga-chip" aria-hidden="true"></i>
+        <span class="saga-seg">al precio que deberían costar:</span><i class="saga-chip" aria-hidden="true"></i>
+        <span class="saga-seg">sin catálogo infinito,<i class="saga-chip" aria-hidden="true"></i> sin suscripción.</span>
+      </h1>
+
+      <!-- Les cinq emplacements de départ, en bas de l'écran. Invisibles eux
+           aussi : ils ne servent qu'à mesurer. Les vignettes qu'on voit sont
+           les `.saga-piece`, posées par-dessus en absolu. -->
+      <div class="saga-foot" aria-hidden="true">
+        <p class="saga-hint"><span>Desliza</span></p>
+        <div class="saga-slots">
+          <i class="saga-slot"></i><i class="saga-slot"></i><i class="saga-slot"></i><i class="saga-slot"></i><i class="saga-slot"></i>
+        </div>
+      </div>
+
+      <div class="saga-pieces">
+        <figure class="saga-piece"><img src="/media/landing/nosotros/pieza-1.jpg" width="760" height="760" alt="Bandas CIRQA en tres colores"></figure>
+        <figure class="saga-piece"><img src="/media/landing/nosotros/pieza-2.jpg" width="760" height="760" alt="La linterna de un reloj Garmin encendida de noche"></figure>
+        <figure class="saga-piece"><img src="/media/landing/nosotros/pieza-3.jpg" width="760" height="760" alt="Cápsulas doradas vistas de cerca"></figure>
+        <figure class="saga-piece"><img src="/media/landing/nosotros/pieza-4.jpg" width="760" height="760" alt="Una mujer sostiene un frasco de suplemento"></figure>
+        <figure class="saga-piece"><img src="/media/landing/nosotros/pieza-5.jpg" width="760" height="760" alt="Una recámara al amanecer"></figure>
+      </div>
+
     </div>
-  </header>
+  </section>
 
   <main id="contenido">
-    <!-- ===== La grille : rien n'est écrit en dur, `data-category` suffit.
-         app.js la remplit depuis catalog.js et tient le compte à jour. ===== -->
-    <section class="cat-list" id="lista" aria-labelledby="lista-t">
+
+    <!-- ===== Qui nous sommes ===== -->
+    <section class="chapter editorial" aria-labelledby="quienes-t">
       <div class="container">
-        <div class="section-head rv">
-          <div>
-            <span class="eyebrow">La selección</span>
-            <h2 id="lista-t">Todos los suplementos</h2>
-            <p>Cinco fórmulas cortas, elegidas con criterio. Vegan, Non-GMO y con trazabilidad de ingredientes.</p>
+        <div class="chapter-grid">
+          <div class="chapter-media wide rv">
+            <img src="/media/landing/nosotros/fondo-3.jpg" width="1600" height="900" loading="lazy"
+                 alt="Una sesión de yoga en casa, vista desde arriba">
           </div>
-          <div class="head-aside">
-            <p class="shop-count" data-count-for="grid-suplementos"></p>
-            <div class="sort-chips" data-sort-for="grid-suplementos" role="group" aria-label="Ordenar">
-              <button class="btn btn-quiet btn-sm" type="button" data-sort="destacados" aria-pressed="true">Destacados</button>
-              <button class="btn btn-quiet btn-sm" type="button" data-sort="precio-asc" aria-pressed="false">Precio ↑</button>
-              <button class="btn btn-quiet btn-sm" type="button" data-sort="precio-desc" aria-pressed="false">Precio ↓</button>
-            </div>
+          <div class="chapter-copy">
+            <span class="eyebrow rv">Quiénes somos</span>
+            <h2 id="quienes-t" class="rv">Una tienda corta, hecha en México.</h2>
+            <p class="rv">lowlabs nació de una idea simple: en México se paga de más por la tecnología de bienestar, y se elige entre demasiadas cosas. Trabajamos directo con Garmin y con las marcas de suplementos que usamos, sin intermediarios de por medio, y trasladamos esa diferencia al precio.</p>
+            <p class="rv">Diez productos. Cuatro marcas. Nada que no usemos nosotros.</p>
+            <a class="btn btn-ink rv" href="/tienda">Ver la selección completa</a>
           </div>
         </div>
-        <div class="cat-grid rv" id="grid-suplementos" data-category="Suplementos"></div>
       </div>
     </section>
 
-    <!-- ===== Trois repères pour choisir, pas une fiche technique ===== -->
-    <section class="cat-facts" aria-labelledby="facts-t">
+    <!-- ===== Trois promesses ===== -->
+    <section class="chapter tinted" aria-labelledby="promesas-t">
       <div class="container">
         <div class="section-head center rv">
           <div>
-            <span class="eyebrow">Cómo elegir</span>
-            <h2 id="facts-t">Empieza por lo que quieres sentir</h2>
+            <span class="eyebrow">Lo que sí prometemos</span>
+            <h2 id="promesas-t">Tres cosas, y las tres se verifican</h2>
           </div>
         </div>
         <ul class="pick-grid rv">
           <li>
-            <b>Rendir mejor</b>
-            <span>Creatina liposomal o monohidratada: fuerza, potencia y recuperación muscular.*</span>
-            <a class="btn btn-quiet btn-sm" href="/productos/creatina">Ver Advanced Creatine</a>
+            <b>Producto original, garantía oficial</b>
+            <span>Somos distribuidor directo: la garantía Garmin es válida en México y la respalda la marca, no nosotros.</span>
+            <a class="btn btn-quiet btn-sm" href="/wearables">Ver los wearables</a>
           </li>
           <li>
-            <b>Dormir profundo</b>
-            <span>Sin melatonina: azafrán liposomal, PharmaGABA® y magnesio bisglicinato.*</span>
-            <a class="btn btn-quiet btn-sm" href="/productos/absorption-sleep">Ver Sleep</a>
+            <b>Precio de distribuidor</b>
+            <span>Sin tienda física ni catálogo de cientos de referencias: lo que ahorramos en estructura está en la etiqueta.</span>
+            <a class="btn btn-quiet btn-sm" href="/tienda">Comparar precios</a>
           </li>
           <li>
-            <b>Sentirte ligero</b>
-            <span>Prebióticos y probióticos en sobres, tres sabores, para el confort digestivo.*</span>
-            <a class="btn btn-quiet btn-sm" href="/productos/promix-debloat">Ver Debloat</a>
+            <b>Cero suscripciones</b>
+            <span>Garmin Connect™ es gratuita y lo seguirá siendo. Nuestros suplementos se compran una vez, no se contratan.</span>
+            <a class="btn btn-quiet btn-sm" href="/suplementos">Ver los suplementos</a>
           </li>
         </ul>
       </div>
     </section>
 
-    <!-- ===== Rappel de garanties — le même bloc que /tienda ===== -->
-    <section class="chapter tinted" aria-labelledby="trust-t">
+    <!-- ===== Comment on choisit ===== -->
+    <section class="chapter" aria-labelledby="criterios-t">
       <div class="container">
         <div class="section-head center rv">
           <div>
-            <span class="eyebrow">Sin letra chica</span>
-            <h2 id="trust-t">Lo mismo en cada pedido</h2>
+            <span class="eyebrow">Cómo elegimos</span>
+            <h2 id="criterios-t">Cuatro filtros antes de entrar al catálogo</h2>
+            <p>Si un producto no pasa los cuatro, no lo vendemos. Por eso la lista es corta.</p>
           </div>
         </div>
-        <ul class="trust-grid rv">
-          <li><b>Envío gratis</b><span>A todo México, en cada pedido.</span></li>
-          <li><b>Garantía oficial</b><span>Producto 100% original, válido en México.</span></li>
-          <li><b class="price-num">$0</b><span>Sin suscripción ni cargos recurrentes.</span></li>
-          <li><b>Pago seguro</b><span>Tarjeta vía Shopify Checkout.</span></li>
-        </ul>
+        <ol class="saga-criterios rv">
+          <li><b>Se mide</b><span>Lo que promete tiene que poder comprobarse: una métrica, un estudio, una etiqueta con dosis reales.</span></li>
+          <li><b>Se usa a diario</b><span>Lo probamos meses antes de listarlo. Si se queda en el cajón, no entra.</span></li>
+          <li><b>No cobra dos veces</b><span>Nada de funciones detrás de una membresía, ni fórmulas atadas a un envío recurrente.</span></li>
+          <li><b>Se puede reponer</b><span>Bandas, cables y recargas disponibles en México, para que el producto dure más que la moda.</span></li>
+        </ol>
       </div>
     </section>
 
-    <!-- ===== Passerelle vers l'autre rayon ===== -->
+    <!-- ===== Passerelle ===== -->
     <section class="cat-cross" aria-labelledby="cross-t">
       <div class="band deep">
         <video autoplay muted loop playsinline webkit-playsinline preload="metadata"
@@ -223,10 +270,10 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           <source src="/media/landing/bandas/loop-wearables.mp4" type="video/mp4">
         </video>
         <div class="band-inner">
-          <span class="eyebrow">Wearables</span>
-          <h2 id="cross-t">Y para saber si funciona, mídelo.</h2>
-          <p>Sueño, estrés, Body Battery™ y más de 80 actividades — en la app Garmin Connect™ gratuita.</p>
-          <a class="btn btn-smoke btn-lg" href="/wearables">Explorar los wearables</a>
+          <span class="eyebrow">La tienda</span>
+          <h2 id="cross-t">Diez productos. Ni uno de relleno.</h2>
+          <p>Wearables Garmin sin suscripción y cinco fórmulas de absorción mejorada, con envío gratis a todo México.</p>
+          <a class="btn btn-smoke btn-lg" href="/tienda">Entrar a la tienda</a>
         </div>
       </div>
     </section>
@@ -276,7 +323,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
       <b class="price-num">Envío gratis</b>
       <span>A todo México · Garantía oficial</span>
     </div>
-    <a class="btn btn-ink" href="#lista">Ver los suplementos</a>
+    <a class="btn btn-ink" href="/tienda">Ver la tienda</a>
   </div>
 </div>
 

@@ -24,6 +24,8 @@ distribué est copié dans `deploy/`.
 │   ├── tienda.html         boutique (/tienda)
 │   ├── wearables.html      rayon Wearables (/wearables)
 │   ├── suplementos.html    rayon Suplementos (/suplementos)
+│   ├── nosotros.html       page « à propos » (/nosotros) — ouvre sur la
+│   │                       phrase qui se construit au défilement
 │   ├── productos/          10 fiches produit — GÉNÉRÉES, ne pas éditer à la main
 │   ├── catalog.js          produits + objectifs : prix, textes, specs, médias
 │   ├── cart.js             panier + tiroir, hand-off vers le checkout Shopify
@@ -88,7 +90,15 @@ deploy/media/
 │   │                           loop-capsulas.mp4 restent utilisées : la première
 │   │                           par les passerelles de clôture, la seconde par le
 │   │                           bandeau #suplementos de la home
-│   └── capitulos/              boucles des chapitres éditoriaux + affiches
+│   ├── capitulos/              boucles des chapitres éditoriaux + affiches
+│   └── nosotros/               les visuels de /nosotros : pieza-1..5, les
+│                               cinq vignettes carrées qui voyagent jusque
+│                               dans la phrase, et fondo-1..5, le fond qui
+│                               se relaie derrière. FUENTES.txt note leur
+│                               origine : huit sont des recadrages de
+│                               visuels déjà présents ailleurs dans
+│                               deploy/media/, deux viennent d'Unsplash et
+│                               sont servis en local
 │
 └── archivo/                    médias conservés mais plus référencés
     ├── cirqa/  objetivos/  suplementos/  ritual/
@@ -209,7 +219,7 @@ Deux étapes enchaînées :
 1. `gen-products.js` régénère les 10 fiches produit ;
 2. `stamp-assets.js` colle `?v=<empreinte>` sur les assets partagés
    (`styles.css`, `app.js`, `catalog.js`, `cart.js`, `lenis.min.js`) dans les
-   14 pages.
+   15 pages.
 
 Le tout est **commité** — `buildCommand` est nul côté Vercel. Oublier cette
 commande laisse les fiches périmées *et* les anciennes empreintes en place,
@@ -289,6 +299,14 @@ idempotent : relancé, il remplace l'empreinte au lieu de l'empiler.
   passent à l'encre, les autres pages le laissent blanc. Poser une couleur
   sur `<html>` rendrait ce choix impossible : une règle sur `<html>` ne peut
   pas lire une classe de `<body>`.
+- **La page `/nosotros` ne peut pas se passer de ses deux séries de repères
+  invisibles.** `.saga-slot` (le départ, en bas de l'écran) et `.saga-chip`
+  (l'arrivée, dans la phrase) ne sont jamais peints, mais c'est sur EUX que le
+  module `saga` mesure les positions. En retirer un, ou casser la
+  correspondance un-pour-un entre vignettes, emplacements et trous, fait
+  basculer la section sur sa version plate — c'est volontaire, mais silencieux.
+  Et `--saga-chip` doit rester la taille du trou ET celle de la vignette à
+  l'arrivée : deux valeurs différentes posent l'image à côté de son blanc.
 - La réserve du dock est portée par le **pied de page**, pas par `<body>` :
   sur `<body>` elle laissait voir le fond du document sur 90px sous le pied.
 - Toute copie client est en espagnol (es-MX).
@@ -394,7 +412,8 @@ synchrone dans le `<head>` (donc AVANT la première peinture — posé dans
 d'être recouverte) pose `html.className += " booting"`, et se munit d'un
 filet de 5 secondes : si `app.js` ne démarrait pas, l'écran ne doit jamais retenir le
 site. Il est dupliqué sur les cinq gabarits de page (`index.html`,
-`tienda.html`, `wearables.html`, `suplementos.html`, `gen-products.js`) — pas
+`tienda.html`, `wearables.html`, `suplementos.html`, `nosotros.html`,
+`gen-products.js`) — pas
 un seul point d'entrée, puisqu'il doit s'exécuter avant tout script externe.
 
 Le module `boot` d'`app.js` fait le reste :
@@ -839,6 +858,55 @@ enjamber par un élan. Aucune boucle n'est ajoutée pour autant — c'est Lenis,
 en tient déjà une, qui publie la position ; sans Lenis (mouvement réduit) on
 écoute le défilement natif en passif. `sync()` ne lit rien de la mise en page :
 le seuil est mesuré à part, au chargement et au redimensionnement.
+
+## `/nosotros` — la phrase qui se construit au défilement
+
+Le montage vient d'un composant publié sur 21st.dev : un hero épinglé où une
+rangée de vignettes monte, se rassemble, rétrécit, puis va se loger dans les
+trous d'une phrase qui apparaît mot à mot. L'original est un composant React
+qui pilote **GSAP ScrollTrigger** et **Swiper**. Aucun des deux n'est entré
+ici, et ce n'est pas un raccourci : le dépôt n'a ni React ni bundler, et la
+règle « une seule boucle d'animation sur la page » interdit une seconde
+bibliothèque à côté de Lenis. Tout est donc refait avec ce que la page a déjà.
+
+| Dans l'original | Ici |
+|---|---|
+| `ScrollTrigger` + `pin` | `position:sticky` sur `.saga-stage`, dans une piste `.saga` de sept écrans. La progression **est** le défilement réel — Lenis, les ancres et le clavier continuent de marcher sans adaptation. |
+| Swiper (`effect:fade`, autoplay) | Un fondu enchaîné CSS sur `.saga-bg img.on`, cadencé par un `setInterval` que le module coupe dès que la section sort du cadre **ou** que le fond a fini de s'effacer (`p ≥ .22`). |
+| Clones absolus posés dans `document.body` | Rien. Ce sont les cinq **mêmes** `.saga-piece` qui font tout le trajet, donc aucun nœud à créer et aucun à nettoyer — l'original devait retirer ses clones à la main à chaque changement d'étape. |
+| Positions écrites en dur | Mesurées. `.saga-slot` donne le départ, `.saga-chip` l'arrivée, et les deux sont relevés sur la mise en page réelle : la phrase ne fait pas le même nombre de lignes selon la largeur et la police. |
+
+Les quatre temps, repris tels quels de l'original :
+
+| Progression | Ce qui bouge |
+|---|---|
+| `0 → .30` | Le fond s'efface (sur le premier sixième seulement) pendant que les vignettes montent du bas, en quinconce — un dixième d'étape d'écart entre deux voisines. |
+| `.30 → .60` | Elles convergent vers le centre de l'écran en rétrécissant jusqu'à la taille finale. |
+| `.60 → .75` | Elles rejoignent leur trou dans la phrase : **d'abord la verticale, puis l'horizontale**. C'est ce décrochage qui fait lire un déplacement plutôt qu'une diagonale — le supprimer casse l'effet. |
+| `.75 → 1` | La phrase apparaît segment par segment, dans un **ordre tiré au sort à chaque chargement**. |
+
+Trois points à connaître avant d'y toucher :
+
+- **Aucune boucle nouvelle.** Le module dessine sur événement de défilement,
+  une image au plus par événement, exactement comme `carousel-dots`. Il écoute
+  `lenis.on("scroll")` quand l'instance existe, le défilement natif sinon —
+  même arbitrage que `past-hero`.
+- **Le repli est complet.** En mouvement réduit, sans JS, ou si les trois
+  séries de repères ne se correspondent plus, la classe `saga-flat` (ou
+  `html:not(.js)`) replie la piste sur un écran : la phrase est lisible en
+  entier, les vignettes s'alignent dessous, plus rien n'est calculé. L'opacité
+  ne retire rien à l'arbre d'accessibilité — un lecteur d'écran lit la phrase
+  entière dès l'ouverture, quelle que soit la progression.
+- **Les quatre fonds secondaires sont en `data-src`.** Posés en `src`, l'écran
+  d'ouverture les aurait tous attendus : il force en `eager` ce qui se trouve
+  dans le premier écran, et ces images occupent l'écran entier. Le module les
+  branche après `load`, bien avant que le relais n'en ait besoin.
+
+Le bas de scène (`.saga-foot`) se cale au-dessus de la nacelle via `--dock-h`,
+que `dock-height` remesure à chaque changement de largeur : sans ça la rangée
+de vignettes passe sous les prix.
+
+---
 
 ## Défilement fluide (Lenis)
 

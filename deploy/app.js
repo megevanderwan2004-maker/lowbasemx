@@ -2414,4 +2414,269 @@
     });
   });
 
+
+  /* =====================================================================
+     Page « Nosotros » — la phrase qui se construit au défilement
+
+     Le montage vient d'un composant 21st.dev qui pilotait GSAP ScrollTrigger
+     et Swiper. Ni l'un ni l'autre n'entre ici : le projet n'a ni React ni
+     bundler, et surtout la règle est explicite — une seule boucle
+     d'animation sur la page, celle de Lenis. Ce module n'en ouvre donc
+     aucune : il ne dessine que sur événement de défilement, une image au
+     plus par événement, exactement comme `carousel-dots`.
+
+     Ce que GSAP faisait, et par quoi c'est remplacé :
+     · le `pin` → `position:sticky` sur la scène, dans une piste de sept
+       écrans (CSS). La progression est le défilement réel ;
+     · les clones absolus posés dans `document.body` → rien. Ce sont les
+       cinq mêmes vignettes qui voyagent du bas de l'écran jusque dans la
+       phrase, donc aucun nœud à créer ni à retirer ;
+     · les positions d'arrivée → mesurées sur la mise en page, jamais
+       écrites en dur : la phrase ne fait pas le même nombre de lignes selon
+       la largeur, la police et la langue.
+
+     Quatre temps, repris de l'original :
+       0    → .30   les vignettes montent du bas, en quinconce ;
+       .30  → .60   elles se rassemblent au centre en rétrécissant ;
+       .60  → .75   elles rejoignent leur trou dans la phrase — d'abord la
+                    verticale, puis l'horizontale, ce décrochage est ce qui
+                    fait lire un déplacement plutôt qu'une diagonale ;
+       .75  → 1     la phrase apparaît, segment par segment, dans un ordre
+                    tiré au sort à chaque chargement.
+     ===================================================================== */
+  module("saga", function(){
+    var saga = $("saga");
+    if (!saga) return;
+
+    var stage  = saga.querySelector(".saga-stage");
+    var bg     = saga.querySelector(".saga-bg");
+    var slides = saga.querySelectorAll(".saga-bg img");
+    var segs   = saga.querySelectorAll(".saga-seg");
+    var chips  = saga.querySelectorAll(".saga-chip");
+    var slots  = saga.querySelectorAll(".saga-slot");
+    var pieces = saga.querySelectorAll(".saga-piece");
+    var hint   = saga.querySelector(".saga-hint");
+
+    /* Le montage n'a de sens que si les trois séries se correspondent une
+       pour une : une vignette, son emplacement de départ, son trou
+       d'arrivée. Au moindre écart on se replie sur la version plate plutôt
+       que de poser des vignettes au hasard. */
+    var N = pieces.length;
+    if (!stage || !bg || !N || slots.length !== N || chips.length !== N){
+      flag(saga, "saga-flat", true);
+      return;
+    }
+
+    /* Mouvement réduit : la piste se replie sur un écran, la phrase est
+       lisible d'emblée. Rien n'est mesuré, rien n'est écouté. */
+    if (reduceMotion){ flag(saga, "saga-flat", true); return; }
+
+    /* ---- L'ordre d'apparition des segments, tiré au sort ---- */
+    var rank = [], ordre = [], i, j, t;
+    for (i = 0; i < segs.length; i++) ordre.push(i);
+    for (i = ordre.length - 1; i > 0; i--){
+      j = Math.floor(Math.random() * (i + 1));
+      t = ordre[i]; ordre[i] = ordre[j]; ordre[j] = t;
+    }
+    for (i = 0; i < ordre.length; i++) rank[ordre[i]] = i;
+
+    /* ---- Les mesures ----
+       Tout est ramené au coin haut-gauche de la scène : elle contient les
+       trois séries, donc ces coordonnées restent justes que la scène soit
+       épinglée ou non. */
+    var M = null;
+
+    function measure(){
+      var sr = stage.getBoundingClientRect();
+      var base = slots[0].getBoundingClientRect().width;
+      if (!base || !sr.width) return false;
+
+      var depart = [], arrivee = [], r;
+      for (var k = 0; k < N; k++){
+        r = slots[k].getBoundingClientRect();
+        depart.push({ cx: r.left - sr.left + r.width / 2,
+                      cy: r.top  - sr.top  + r.height / 2 });
+        r = chips[k].getBoundingClientRect();
+        arrivee.push({ cx: r.left - sr.left + r.width / 2,
+                       cy: r.top  - sr.top  + r.height / 2, w: r.width });
+      }
+
+      /* Le rassemblement du milieu : les cinq vignettes déjà à leur taille
+         finale, en ligne, centrées dans la scène. */
+      var puce = arrivee[0].w || 40;
+      var ecart = Math.max(3, puce * .12);
+      var largeur = N * puce + (N - 1) * ecart;
+      var milieu = [];
+      for (k = 0; k < N; k++){
+        milieu.push({ cx: (sr.width - largeur) / 2 + k * (puce + ecart) + puce / 2,
+                      cy: sr.height / 2 });
+      }
+
+      M = { w: sr.width, h: sr.height, base: base,
+            depart: depart, arrivee: arrivee, milieu: milieu,
+            k: puce / base };
+
+      each(pieces, function(el){
+        el.style.width  = base + "px";
+        el.style.height = base + "px";
+      });
+      return true;
+    }
+
+    /* `cx`/`cy` sont le CENTRE voulu ; l'origine des transformations est le
+       coin, on en déduit donc le décalage à partir de la taille réellement
+       peinte (base × échelle). */
+    function poser(el, cx, cy, s){
+      var demi = M.base * s / 2;
+      el.style.transform = "translate3d(" + (cx - demi).toFixed(2) + "px,"
+                                          + (cy - demi).toFixed(2) + "px,0) scale("
+                                          + s.toFixed(4) + ")";
+    }
+
+    function borne(v){ return v < 0 ? 0 : (v > 1 ? 1 : v); }
+
+    function opacites(v){
+      for (var k = 0; k < segs.length; k++) segs[k].style.opacity = v;
+    }
+
+    var dernierFond = null, pret = false;
+
+    function dessiner(){
+      if (!M && !measure()) return;
+      /* Les vignettes ne se peignent qu'une fois placées : sans ça les cinq
+         se superposeraient dans le coin haut-gauche le temps d'une image.
+         C'est ici et pas à la fin du module, parce que la toute première
+         mesure peut échouer — mise en page pas encore stable — et que c'est
+         alors `load` ou `resize` qui la réussit. */
+      if (!pret){ pret = true; flag(saga, "ready", true); }
+
+      var haut = saga.getBoundingClientRect().top;
+      var course = saga.offsetHeight - M.h;
+      var p = course > 0 ? borne(-haut / course) : 0;
+      var k, mp, sp;
+
+      if (p < .30){
+        mp = p / .30;
+        /* Le fond s'efface sur le premier sixième, pas sur toute l'étape :
+           il doit avoir disparu bien avant que les vignettes n'arrivent au
+           centre, sinon elles passent devant une photo encore lisible. */
+        var f = borne(p / .15);
+        bg.style.opacity = (1 - f).toFixed(3);
+        bg.style.transform = "translate3d(0," + (-50 * f).toFixed(1) + "px,0)";
+
+        var levee = -M.h * .30 * mp;
+        for (k = 0; k < N; k++){
+          /* La quinconce : chaque vignette part un dixième d'étape après la
+             précédente et met une demi-étape à faire son chemin. */
+          poser(pieces[k], M.depart[k].cx,
+                           M.depart[k].cy + levee * borne((mp - k * .1) / .5), 1);
+        }
+        opacites(0);
+
+      } else if (p < .60){
+        sp = (p - .30) / .30;
+        bg.style.opacity = "0";
+        for (k = 0; k < N; k++){
+          var ax = M.depart[k].cx, ay = M.depart[k].cy - M.h * .30;
+          poser(pieces[k],
+                ax + (M.milieu[k].cx - ax) * sp,
+                ay + (M.milieu[k].cy - ay) * sp,
+                1 + (M.k - 1) * sp);
+        }
+        opacites(0);
+
+      } else if (p < .75){
+        mp = (p - .60) / .15;
+        bg.style.opacity = "0";
+        for (k = 0; k < N; k++){
+          var sx = M.milieu[k].cx, sy = M.milieu[k].cy;
+          var dx = M.arrivee[k].cx - sx, dy = M.arrivee[k].cy - sy;
+          poser(pieces[k],
+                mp < .5 ? sx : sx + dx * ((mp - .5) / .5),
+                mp < .5 ? sy + dy * (mp / .5) : sy + dy,
+                M.k);
+        }
+        opacites(0);
+
+      } else {
+        bg.style.opacity = "0";
+        for (k = 0; k < N; k++) poser(pieces[k], M.arrivee[k].cx, M.arrivee[k].cy, M.k);
+        for (k = 0; k < segs.length; k++){
+          segs[k].style.opacity = borne((p - (.75 + rank[k] * .03)) / .015).toFixed(3);
+        }
+      }
+
+      if (hint) hint.style.opacity = (1 - borne(p / .06)).toFixed(2);
+
+      /* Le relais du fond ne tourne que tant qu'on peut le voir. */
+      var fondVisible = vue && p < .22;
+      if (fondVisible !== dernierFond){ dernierFond = fondVisible; relais(fondVisible); }
+    }
+
+    /* ---- Le relais du fond ---- */
+    var vue = true, minuteur = null, courant = 0;
+
+    function relais(on){
+      if (on && !minuteur && slides.length > 1){
+        minuteur = setInterval(function(){
+          flag(slides[courant], "on", false);
+          courant = (courant + 1) % slides.length;
+          flag(slides[courant], "on", true);
+        }, 3600);
+      } else if (!on && minuteur){
+        clearInterval(minuteur); minuteur = null;
+      }
+    }
+
+    /* Les fonds 2 à 5 sont posés en `data-src` : l'écran d'ouverture attend
+       les images du premier écran, et celles-ci l'occupent en entier — en
+       `src` elles auraient retenu la levée pour rien. On les branche après
+       `load`, soit plusieurs secondes avant que le relais n'en ait besoin. */
+    function brancherFonds(){
+      each(slides, function(img){
+        var u = img.getAttribute("data-src");
+        if (!u) return;
+        img.removeAttribute("data-src");
+        img.src = u;
+      });
+    }
+    if (document.readyState === "complete") brancherFonds();
+    else window.addEventListener("load", brancherFonds, false);
+
+    if (hasIO){
+      new IntersectionObserver(function(entrees){
+        vue = entrees[0].isIntersecting;
+        if (!vue){ dernierFond = false; relais(false); }
+        else dessiner();
+      }, { threshold: 0 }).observe(stage);
+    }
+
+    /* ---- Le fil du défilement ----
+       Aucune boucle nouvelle : une image au plus par événement, et Lenis
+       reste la seule à en tenir une. Comme `past-hero`, on préfère son
+       propre événement quand il existe. */
+    var attente = false;
+    function auDefilement(){
+      if (attente) return;
+      attente = true;
+      requestAnimationFrame(function(){ attente = false; dessiner(); });
+    }
+
+    if (lenis && lenis.on) lenis.on("scroll", auDefilement);
+    else window.addEventListener("scroll", auDefilement, { passive: true });
+
+    /* La phrase ne fait pas le même nombre de lignes à toutes les largeurs,
+       et la police de repli n'a pas les mêmes chasses que la définitive :
+       dans les deux cas les trous se déplacent, il faut remesurer. */
+    function remesurer(){ M = null; dessiner(); }
+    window.addEventListener("resize", remesurer, { passive: true });
+    window.addEventListener("orientationchange", remesurer, false);
+    window.addEventListener("load", remesurer, false);
+    if (document.fonts && document.fonts.ready){
+      document.fonts.ready.then(remesurer, function(){});
+    }
+
+    dessiner();
+  });
+
 })();

@@ -3037,3 +3037,173 @@ body.cart-open .dock{display:none}
   padding:5px 8px;border-radius:var(--radius-pill);border:1px solid rgba(23,25,27,.16);
   background:var(--surface);max-width:100%;
 }
+
+/* =========================================================================
+   Page « Nosotros » — la phrase qui se construit au défilement
+
+   Montage repris d'un composant 21st.dev (hero à défilement épinglé). Il y
+   pilotait GSAP ScrollTrigger et Swiper ; ici il n'y a ni React ni bundler,
+   et la règle du projet interdit une seconde bibliothèque d'animation ou une
+   seconde boucle rAF. Tout est donc refait avec ce que la page a déjà :
+
+   · l'épinglage → `position:sticky` sur `.saga-stage`, dans une piste haute
+     de sept écrans. C'est le défilement RÉEL qui fait la progression, donc
+     Lenis, les ancres et le clavier continuent de marcher sans adaptation ;
+   · le carrousel de fond → un fondu enchaîné CSS, cadencé par un intervalle
+     que le JS arrête dès que la section sort du cadre ou que le fond a fini
+     de s'effacer. Rien ne tourne pour rien ;
+   · les vignettes → cinq éléments, et cinq seulement. L'original clonait ses
+     icônes dans `document.body` pour les faire voyager ; ce sont ici les
+     mêmes qui vont du bas de l'écran jusque dans la phrase, donc rien à
+     nettoyer et rien qui puisse rester orphelin sur la page.
+
+   Deux repères invisibles portent toute la géométrie : `.saga-slot` (le
+   départ, en bas) et `.saga-chip` (l'arrivée, dans le texte). Le JS les
+   MESURE au lieu de deviner — la phrase change de nombre de lignes selon la
+   largeur et la police, aucune position d'arrivée ne peut être écrite en dur.
+   ========================================================================= */
+body.pg-nosotros{background:#f4f4f5}
+/* L'ouverture touche le haut de l'écran, la nav flotte dessus — même parti
+   que la home et les deux rayons, sans le fond sombre : ici le voile est
+   clair et le titre est à l'encre. */
+body.pg-nosotros .shell{margin-top:0}
+body.pg-nosotros #contenido{position:relative;z-index:1;background:var(--surface)}
+
+.saga{
+  /* La taille d'arrivée d'une vignette. C'est aussi la taille du blanc que
+     `.saga-chip` réserve dans la phrase : les deux doivent être le MÊME
+     nombre, sinon la vignette se pose à côté de son trou. */
+  --saga-chip:clamp(30px,4.4vw,58px);
+  position:relative;
+  /* La piste déborde la gouttière de la coquille : l'ouverture est plein
+     cadre, comme le hero et les bannières de rayon. */
+  margin-inline:calc(-1 * var(--gutter));
+  /* Sept écrans : un pour la scène, six de course. `svh` et non `dvh` — la
+     hauteur de piste ne doit pas changer quand la barre d'adresse d'un
+     téléphone se replie, sinon la progression saute sous le doigt. Le JS
+     mesure la course réelle, la scène peut donc rester en `dvh`. */
+  height:calc(100svh * 7);
+  background:#f4f4f5;
+}
+.saga-stage{
+  position:sticky;top:0;
+  height:100svh;height:100dvh;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ---- Le fond qui se relaie ---- */
+.saga-bg{position:absolute;inset:0;z-index:0;will-change:opacity,transform}
+.saga-bg img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity 1.2s ease;
+}
+.saga-bg img.on{opacity:1}
+/* Le voile. Il monte en bas pour que le bandeau de vignettes se détache, et
+   reste léger au milieu pour que la photo se lise encore. */
+.saga-bg::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,
+    rgba(244,244,245,.58) 0%, rgba(244,244,245,.30) 44%, rgba(244,244,245,.86) 100%);
+}
+
+/* ---- La phrase ---- */
+.saga-line{
+  position:relative;z-index:2;margin:0;
+  max-width:min(92vw,1120px);text-align:center;
+  font-family:var(--font-display);font-weight:600;
+  font-size:clamp(1.25rem,3.9vw,3.3rem);
+  line-height:1.3;letter-spacing:-.03em;color:var(--ink);
+}
+/* Les segments partent invisibles et le JS les révèle un par un, dans un
+   ordre tiré au sort à chaque chargement. L'opacité ne retire rien à
+   l'arbre d'accessibilité : la phrase est lue en entier d'emblée. */
+.saga-seg{opacity:0}
+/* Le trou réservé à une vignette. `visibility:hidden` et non `opacity:0` :
+   il ne doit jamais capter un clic ni se peindre, mais il doit occuper sa
+   place dans la ligne — c'est cette place que le JS mesure. */
+.saga-chip{
+  display:inline-block;vertical-align:middle;visibility:hidden;
+  width:var(--saga-chip);height:var(--saga-chip);
+  margin:0 .16em;
+}
+
+/* ---- Le bas de scène : l'invite, puis les cinq emplacements de départ ----
+   Les deux sont dans le MÊME bloc, et ce bloc se cale au-dessus du dock via
+   `--dock-h`, que `dock-height` remesure à chaque changement de largeur et
+   au chargement de la police. Autrement le bandeau de vignettes passe sous
+   la nacelle des prix — et il y passait. */
+.saga-foot{
+  position:absolute;left:50%;transform:translateX(-50%);
+  bottom:calc(var(--dock-h) + env(safe-area-inset-bottom,0px) + clamp(14px,3vh,34px));
+  width:min(92%,1120px);
+  z-index:1;pointer-events:none;
+  display:grid;gap:clamp(8px,1.4vh,16px);justify-items:center;
+}
+.saga-slots{display:flex;gap:clamp(4px,.55vw,9px);width:100%;visibility:hidden}
+.saga-slot{flex:1;aspect-ratio:1/1;display:block}
+
+/* ---- Les vignettes, seules choses réellement peintes ---- */
+.saga-pieces{position:absolute;inset:0;z-index:3;pointer-events:none}
+.saga-piece{
+  position:absolute;left:0;top:0;margin:0;
+  overflow:hidden;border-radius:12px;background:var(--tile);
+  /* L'origine en haut à gauche : le JS calcule un centre puis en déduit le
+     coin, et une origine centrée ferait dériver la mise à l'échelle. */
+  transform-origin:0 0;
+  will-change:transform;
+  box-shadow:0 8px 26px rgba(23,25,27,.12);
+  /* Rien n'est peint tant que le JS n'a pas mesuré : sans ça les cinq
+     vignettes se superposeraient en haut à gauche le temps d'une image. */
+  opacity:0;
+}
+.saga.ready .saga-piece{opacity:1}
+.saga-piece img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* ---- L'invite ---- */
+.saga-hint{margin:0;transition:opacity .4s ease}
+.saga-hint span{
+  font-family:var(--font-display);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.16em;color:var(--teal-700);
+}
+
+/* ---- Repli : mouvement réduit, ou pas de JS du tout ----
+   La piste se replie sur un écran, la phrase est lisible en entier, les
+   vignettes s'alignent dessous. Aucune position n'est plus calculée. */
+html:not(.js) .saga,.saga.saga-flat{height:auto}
+html:not(.js) .saga-stage,.saga.saga-flat .saga-stage{
+  position:relative;height:auto;overflow:visible;
+  flex-direction:column;gap:clamp(24px,4vh,48px);
+  padding:calc(var(--topbar-h) + var(--nav-h) + clamp(40px,9vh,110px)) clamp(14px,3vw,44px) clamp(32px,6vh,70px);
+}
+html:not(.js) .saga-seg,.saga.saga-flat .saga-seg{opacity:1}
+html:not(.js) .saga-chip,.saga.saga-flat .saga-chip{display:none}
+html:not(.js) .saga-foot,.saga.saga-flat .saga-foot{display:none}
+html:not(.js) .saga-pieces,.saga.saga-flat .saga-pieces{
+  position:relative;inset:auto;width:min(92%,1120px);
+  display:flex;gap:clamp(4px,.55vw,9px);
+}
+html:not(.js) .saga-piece,.saga.saga-flat .saga-piece{
+  position:relative;flex:1;aspect-ratio:1/1;width:auto;height:auto;
+  transform:none;opacity:1;
+}
+
+/* ---- Les quatre critères ---- */
+.saga-criterios{
+  list-style:none;counter-reset:crit;
+  display:grid;gap:clamp(12px,2vw,20px);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));
+}
+.saga-criterios li{
+  counter-increment:crit;position:relative;
+  display:grid;gap:6px;padding:22px 22px 20px;border-radius:var(--radius-md);
+  background:linear-gradient(180deg,var(--glass-light-a),var(--glass-light-b));
+  box-shadow:var(--glass-edge),var(--glass-hairline);
+}
+.saga-criterios li::before{
+  content:"0" counter(crit);
+  font-family:var(--font-display);font-size:.72rem;font-weight:600;
+  letter-spacing:.12em;color:var(--teal-brand);
+}
+.saga-criterios b{font-family:var(--font-display);font-size:1.12rem;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
+.saga-criterios span{font-size:.86rem;color:var(--teal-700);line-height:1.5}
