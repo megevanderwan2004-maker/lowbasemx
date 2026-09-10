@@ -1058,6 +1058,106 @@ Le bandeau **suit aussi la piste** : `galFollow` centre la vignette active quand
 l'image principale change, sans quoi arriver à la douzième image laissait le
 bandeau sur les six premières.
 
+### Les fiches produit — repères d'achat et information dépliable
+
+Depuis le 06/09/2026, **les dix fiches** portent deux blocs de plus.
+
+1. **`.pdp-facts`** — une rangée de repères, sous l'accroche et avant le prix.
+   Sur téléphone elle se fait glisser plutôt que de se replier sur deux lignes,
+   qui repousseraient le bouton d'achat sous la ligne de flottaison.
+2. **`.pdp-info`** — « Todo lo que necesitas saber » : **une barre de
+   pastilles, et rien d'autre tant qu'on n'a rien choisi.** Une pastille
+   déplie sa section, une autre replie la précédente, la croix referme. Les
+   sections n'ont pas d'en-tête à elles : leur titre vit **dans** le volet,
+   sinon la page redevenait la liste de sept lignes qu'on voulait replier.
+
+Le bloc est posé **après le bundle**, comme sur la maquette de référence : on
+propose l'achat groupé, puis on répond aux questions.
+
+Ces deux blocs remplacent le `.pdp-brief` et la section « Ficha técnica »
+que les fiches portaient avant — tout y est, mais replié.
+
+#### D'où vient le contenu
+
+`build/gen-products.js` compose les sections **depuis `deploy/catalog.js`**, et
+de nulle part ailleurs : `tagline`, `story`, `highlights`, `specs`, `colors`,
+`sizes`. Rien n'y est inventé, on ne fait que réorganiser ce que le catalogue
+déclare déjà.
+
+| Section générique | Condition | Source |
+| --- | --- | --- |
+| Resumen | toujours | `story.text` ou `tagline`, puis `highlights`, puis `gallery[0]` |
+| Colores / Tallas / Formatos | `colors` ou `sizes` | le nom, la pastille `dot` et la `note` de chaque option |
+| Ficha técnica | toujours | `specs` |
+| Preguntas frecuentes | toujours | les garanties de la nacelle, le mode de paiement, les options du catalogue |
+
+Les repères de `.pdp-facts` se prennent dans `specs` : la valeur en gras,
+l'intitulé en dessous. `Marca` et `Envío` sont écartés — la marque est déjà en
+surtitre, l'envoi déjà sur la ligne de prix — et une valeur de plus de 40
+caractères n'est plus un repère mais une phrase : elle reste dans la fiche
+technique. En dessous de deux repères la rangée ne dit plus rien et n'est pas
+écrite.
+
+#### La CIRQA est la seule fiche écrite à la main
+
+`PDP_INFO`, dans `build/gen-products.js`, est une table indexée par `handle`
+qui n'a qu'une entrée. Elle donne à la CIRQA sept sections — Resumen, Salud y
+ejercicio, Sueño, Funciones y sensores, Ficha técnica, Qué incluye, Preguntas
+frecuentes — au lieu des quatre génériques. Elles s'appuient en plus sur
+l'annonce produit officielle Garmin du dépôt
+(`assets/cirqa/documentos/83713503-….pdf`, 21/07/2026), et **rien de ce que ce
+PDF marque « confidentiel »** — SKU, UPC, MSRP, emballage, carton maître — n'en
+ressort. Le tableau comparatif de « Funciones y sensores » reprend les treize
+lignes du cadre *Comparación de producto* ; corriger une ligne se fait dans
+`COMPARE_ROWS`, pas dans le HTML.
+
+Une fiche absente de `PDP_INFO` prend les sections génériques. Ajouter une
+fiche écrite à la main se fait en ajoutant son handle à la table, sans toucher
+au reste.
+
+#### Comment ça tient
+
+**Un seul volet ouvert à la fois.** C'est ce qui garde la page courte — la
+raison d'être du bloc — et ce qui rend la pastille active évidente : elle ne
+fait que désigner le volet ouvert, il n'y a rien à observer au défilement.
+
+**Ni bibliothèque ni hauteur calculée en script** : c'est la grille qui
+s'anime, de `0fr` à `1fr`. Le contenu garde sa hauteur naturelle — rien à
+remesurer quand la fenêtre change de largeur, quand les polices arrivent, ou
+quand une image se charge dans le volet.
+
+**Sans script, tous les volets sont ouverts**, chacun portant son titre, et les
+pastilles redeviennent de simples ancres. C'est la classe `js`, écrite dans le
+`<head>` avant la première peinture, qui les referme ; le module `pdp-info`
+d'app.js n'ajoute que le geste — et c'est lui qui pose `aria-expanded` et
+`aria-controls`, pour qu'une pastille n'annonce jamais un pliage qui n'existe
+pas. Un volet replié passe en `visibility:hidden` après l'animation : sans ça
+ses liens resteraient dans l'ordre de tabulation.
+
+**Le recalage est immédiat.** La barre est *au-dessus* des volets : replier
+l'un et déplier l'autre ne la déplace pas, il n'y a donc rien à attendre. On ne
+déplace la page que si la barre est passée sous la nav flottante ou tombée trop
+bas dans la fenêtre. La pastille choisie, elle, est ramenée dans la barre —
+sur téléphone elle pouvait rester à moitié hors champ, et c'est la seule marque
+de ce qui est ouvert.
+
+Le module écoute les clics sur `a[href^="#info-"]` en phase de **capture**, ce
+qui lui donne la main avant le module d'ancrage — qui, lui, ferait glisser la
+page vers un volet encore replié. Le raccourci « Ver la ficha técnica
+completa » de la nacelle passe par le même chemin.
+
+#### Plus de jaune sur les fiches
+
+Le sable reste la teinte du site — home, rayons, chapitres. Sur les **dix
+fiches produit**, seules pages à porter `data-product`, il cède la place au
+gris neutre déjà employé partout ailleurs : badge, carte de bundle, colonne
+d'en-têtes de la fiche technique, colonne mise en avant du tableau comparatif.
+Les règles sont scopées `body[data-product]`, en fin de bloc « Fiches
+produit » dans `styles.css`. Les seules teintes chaudes qui restent sur ces
+pages sont les **pastilles de coloris produit** (`.rail-dot`,
+`.bundle-swatch`, `.info-opts i`) : ce sont les vraies couleurs des articles,
+les neutraliser mentirait sur le produit.
+
 > **En-tête du checkout** — le nom affiché en haut du checkout est le *nom de la
 > boutique* Shopify, aujourd'hui « My Store ». Il se change dans
 > Réglages → Détails de la boutique ; un logo de checkout le remplace

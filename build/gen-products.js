@@ -316,8 +316,546 @@ ${shots
             </div>`;
 }
 
-function briefTitle(p) {
-  return p.category === "Wearables" ? "¿Qué hace por ti?" : "¿Qué es y para qué sirve?";
+/* =========================================================================
+   Fiches produit — repères d'achat et information dépliable
+
+   Deux blocs, sur les DIX fiches :
+
+   · `.pdp-facts` — la rangée de repères, sous l'accroche et avant le prix.
+   · `.pdp-info`  — une barre de pastilles, et rien d'autre tant qu'on n'a
+     rien choisi. Choisir une pastille déplie sa section ; en choisir une
+     autre replie la précédente ; la croix referme.
+
+   Le contenu vient de `deploy/catalog.js` et de lui seul — `tagline`,
+   `story`, `highlights`, `specs`, `colors`, `sizes`, `pairs`. Rien n'y est
+   inventé. La CIRQA est la seule fiche à avoir des sections écrites à la
+   main (PDP_INFO) : elles s'appuient en plus sur l'annonce produit
+   officielle Garmin du dépôt (assets/cirqa/documentos/83713503-….pdf), et
+   rien de ce que ce PDF marque « confidentiel » — SKU, UPC, MSRP,
+   emballage, carton maître — n'en ressort.
+   ========================================================================= */
+
+/* Une liste à coches : le même gabarit que les points d'achat de la
+   nacelle, donc le même CSS et la même lecture. */
+const infoList = (items) =>
+  `<ul class="pdp-list">
+${items.map((t) => `              <li>${CHECK}${t}</li>`).join("\n")}
+            </ul>`;
+
+/* Une énumération se lit en pastilles, pas en paragraphe : onze fonctions
+   d'entraînement à la file feraient un pavé que personne ne parcourt. */
+const infoTags = (items) =>
+  `<ul class="info-tags">
+${items.map((t) => `              <li>${t}</li>`).join("\n")}
+            </ul>`;
+
+/* `square` : les visuels de galerie sont cadrés carré partout ailleurs sur
+   le site (la piste de la fiche les déclare en 900×900 et les rogne), on
+   garde la même règle ici — la boîte est réservée avant le chargement,
+   donc le volet ne saute pas quand l'image arrive. */
+const infoFig = (src, alt, w, h, cls) =>
+  `<figure class="info-fig${cls ? " " + cls : ""}">
+              <img loading="lazy" src="${esc(src)}" alt="${esc(alt)}"${w ? ` width="${w}" height="${h}"` : ""}>
+            </figure>`;
+
+/* Un accessoire renvoyé vers sa propre fiche. Le prix et le visuel sortent
+   du catalogue : un prix écrit en dur se périmerait en silence à la
+   première retouche. Si la fiche disparaît du catalogue, le bloc disparaît
+   avec elle plutôt que de pointer vers une page absente. */
+function recoChip(handle) {
+  const a = products.find((x) => x.handle === handle);
+  if (!a) return "";
+  return `<a class="reco-chip" href="/productos/${a.handle}">
+                <img loading="lazy" src="${esc(a.card || a.packshot || a.image)}" alt="" width="60" height="60">
+                <span><b>${esc(a.name)}</b><small>${money(a.price)} MXN</small></span>
+              </a>`;
+}
+
+function accessoryChip(handle) {
+  const chip = recoChip(handle);
+  if (!chip) return "";
+  return `<div class="info-block">
+            <h4>Accesorios compatibles</h4>
+            <div class="reco-also-list">
+              ${chip}
+            </div>
+          </div>`;
+}
+
+/* Comparatif officiel Garmin : quelles fonctions d'entraînement et de
+   sommeil chacun des trois porte. La colonne CIRQA est celle qu'on
+   souligne — d'où `.col-hl`, dont le fond est neutre sur les fiches. */
+const COMPARE_ROWS = [
+  ["Detección automática de actividades", 0, 0, 1],
+  ["VO2 max", 1, 1, 1],
+  ["Relación de carga", 1, 0, 1],
+  ["Carga de entreno", 1, 0, 1],
+  ["Foco de carga de entreno", 1, 0, 1],
+  ["Efecto del entreno", 1, 1, 1],
+  ["Beneficio principal", 1, 1, 1],
+  ["Beneficio del entreno", 1, 1, 1],
+  ["Tiempo de recuperación (mejorado)", 1, 1, 1],
+  ["Predisposición para entrenar", 1, 0, 1],
+  ["Estado del entreno", 1, 0, 1],
+  ["Puntuación del sueño", 1, 1, 1],
+  ["Entrenador de sueño", 1, 1, 1],
+];
+
+/* La coche du site pour « oui », un tiret pour « non » : à cette taille un
+   point et un tiret se ressemblaient trop pour qu'une colonne se balaie
+   d'un coup d'œil. Le mot reste dit au lecteur d'écran — le glyphe, lui,
+   est masqué. */
+const cell = (on, hl) =>
+  `<td class="${on ? "yes" : "no"}${hl ? " col-hl" : ""}">` +
+  (on ? CHECK : `<span aria-hidden="true">—</span>`) +
+  `<span class="sr-only">${on ? "Sí" : "No"}</span></td>`;
+
+const compareTable = () => `<div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col"><span class="sr-only">Función</span></th>
+                    <th scope="col">Venu® 4</th>
+                    <th scope="col">Vívoactive® 6</th>
+                    <th scope="col" class="col-hl">CIRQA™</th>
+                  </tr>
+                </thead>
+                <tbody>
+${COMPARE_ROWS.map(
+  (r) => `                  <tr><th scope="row">${esc(r[0])}</th>${cell(r[1])}${cell(r[2])}${cell(r[3], true)}</tr>`
+).join("\n")}
+                </tbody>
+              </table>
+            </div>`;
+
+/* -------------------------------------------------------------------------
+   Sections composées depuis le catalogue
+
+   Neuf fiches sur dix n'ont pas de texte écrit à la main : leurs sections
+   sont montées à partir de ce que `catalog.js` déclare déjà. Aucune
+   donnée nouvelle n'est introduite ici — on ne fait que réorganiser.
+   ------------------------------------------------------------------------- */
+
+/* Les repères se prennent dans la fiche technique : la valeur en gras,
+   l'intitulé en dessous. `Marca` et `Envío` sont écartés — la marque est
+   déjà en surtitre, l'envoi déjà sur la ligne de prix. Au-delà de 40
+   caractères une valeur n'est plus un repère mais une phrase : elle reste
+   dans la fiche technique. */
+const FACT_SKIP = ["Marca", "Envío"];
+function genericFacts(p) {
+  return p.specs
+    .filter(([k, v]) => FACT_SKIP.indexOf(k) === -1 && v.length <= 40)
+    .slice(0, 4)
+    .map(([k, v]) => [v, k]);
+}
+
+/* La valeur choisie est déjà nommée dans la nacelle ; ici on donne la
+   liste complète, avec la note que le catalogue attache à chaque option. */
+function optionList(items, dots) {
+  return `<ul class="info-opts">
+${items
+  .map(
+    (o) => `              <li>${dots && o.dot ? `<i style="background:${esc(o.dot)}" aria-hidden="true"></i>` : ""}<b>${esc(o.name)}</b>${o.note ? `<span>${esc(o.note)}</span>` : ""}</li>`
+  )
+  .join("\n")}
+            </ul>`;
+}
+
+function optionsSection(p) {
+  if (!p.colors && !p.sizes) return null;
+  const sizeLabel = p.sizeLabel === "Formato" ? "Formatos" : "Tallas";
+  const title = p.colors && p.sizes ? `Colores y ${sizeLabel.toLowerCase()}`
+    : p.colors ? "Colores" : sizeLabel;
+  /* Un seul intitulé quand il n'y a qu'une liste : le volet porte déjà
+     « Colores » dans sa barre de titre, le répéter juste en dessous ne
+     dit rien de plus. */
+  const both = !!(p.colors && p.sizes);
+  const blocks = [];
+  if (p.colors) {
+    blocks.push(`<div class="info-block">${both ? `
+            <h4>Colores</h4>` : ""}
+            ${optionList(p.colors, true)}
+          </div>`);
+  }
+  if (p.sizes) {
+    blocks.push(`<div class="info-block">${both ? `
+            <h4>${esc(sizeLabel)}</h4>` : ""}
+            ${optionList(p.sizes, false)}
+          </div>`);
+  }
+  return {
+    id: "opciones",
+    title: title,
+    sub: "Lo que puedes elegir",
+    body: blocks.join("\n          "),
+  };
+}
+
+function specsSection(p) {
+  return {
+    id: "specs",
+    title: "Ficha técnica",
+    sub: "Todos los detalles",
+    body: `<div class="spec-table">
+            <dl>
+${p.specs.map(([k, v]) => `              <dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("\n")}
+            </dl>
+          </div>`,
+  };
+}
+
+const faqItem = (q, a) => `            <details>
+              <summary>${q}</summary>
+              <div class="a">${a}</div>
+            </details>`;
+
+/* Une FAQ qui ne dit que ce que la page dit déjà ailleurs : les garanties
+   de la nacelle, le mode de paiement, les options du catalogue. */
+function faqSection(p) {
+  const items = [];
+  if (p.sizes) {
+    const label = p.sizeLabel === "Formato" ? "formato" : "talla";
+    items.push(
+      faqItem(
+        `¿Qué ${label} elijo?`,
+        p.sizes.map((s) => `<b>${esc(s.name)}</b>${s.note ? " — " + esc(s.note) : ""}`).join(" · ") + "."
+      )
+    );
+  }
+  if (p.colors) {
+    items.push(
+      faqItem(
+        "¿En qué colores viene?",
+        "En " + p.colors.length + ": " + p.colors.map((c) => esc(c.name)).join(", ") +
+          ". El color se elige arriba, antes de añadir al carrito."
+      )
+    );
+  }
+  items.push(
+    faqItem(
+      "¿Cómo son el envío y la garantía?",
+      "Envío gratis a todo México y producto original con garantía oficial. " +
+        (p.shopify && p.shopify.handle
+          ? "El pago es seguro, con tarjeta, vía Shopify Checkout."
+          : "Disponible bajo pedido — te contactamos para confirmar tu compra.")
+    ),
+    faqItem(
+      "¿Hay suscripción o cargos recurrentes?",
+      "No. Se paga una sola vez: sin suscripción y sin cargos recurrentes."
+    ),
+    faqItem(
+      "¿Cómo hago un cambio o una devolución?",
+      'Escríbenos a <a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a> con tu número de pedido y te acompañamos.'
+    )
+  );
+  return {
+    id: "faq",
+    title: "Preguntas frecuentes",
+    sub: "Antes de comprar",
+    body: `<div class="faq-list info-faq">
+${items.join("\n")}
+          </div>`,
+  };
+}
+
+function genericSections(p) {
+  const shot = (p.gallery || [])[0];
+  const resumen = {
+    id: "resumen",
+    title: "Resumen",
+    sub: p.category === "Wearables" ? "Qué hace por ti" : "Qué es y para qué sirve",
+    body: `<div class="info-split">
+            <div class="info-copy">
+              <p class="info-lede">${esc(p.story ? p.story.text : p.tagline)}</p>
+              ${infoList(p.highlights.map(esc))}
+            </div>
+            ${shot ? infoFig(shot, p.name, 900, 900, "square") : ""}
+          </div>`,
+  };
+  return [resumen, optionsSection(p), specsSection(p), faqSection(p)].filter(Boolean);
+}
+
+const PDP_INFO = {
+  cirqa: {
+    /* Les repères qui doivent se lire sans défiler, sous la phrase
+       d'accroche et avant le prix. Une seule rangée : sur téléphone elle
+       se fait glisser plutôt que de repousser le bouton sous la ligne
+       de flottaison. */
+    facts: [
+      ["Hasta 10 días", "de batería"],
+      ["Sin pantalla", ""],
+      ["18–20 g", "según talla"],
+      ["+80", "actividades"],
+    ],
+    sections: [
+      {
+        id: "resumen",
+        title: "Resumen",
+        sub: "Qué es y para qué sirve",
+        body: `<div class="info-split">
+            <div class="info-copy">
+              <p class="info-lede">Sin pantallas. Sin distracciones. Una banda discreta que registra tu salud las 24 horas y tus entrenamientos, y lo manda todo a Garmin Connect™. Sin suscripciones.</p>
+              ${infoList([
+                "Monitoreo de salud las 24 horas¹",
+                "Seguimiento avanzado del sueño, puntuación y coaching personalizado",
+                "Más de 80 actividades deportivas y detección automática",
+                "Banda de tela, cómoda de llevar puesta todo el día",
+              ])}
+              <ul class="trust-grid info-stats">
+                <li><b>Hasta 10 días</b><span>de batería entre cargas</span></li>
+                <li><b>Sin pantalla</b><span>todo se lee en Garmin Connect™</span></li>
+                <li><b>18–20 g</b><span>según la talla</span></li>
+                <li><b>Sin suscripción</b><span>Garmin Connect™ es gratuita</span></li>
+              </ul>
+            </div>
+            ${infoFig("/media/archivo/cirqa/wrist-negra.jpg", "CIRQA™ Smart Band en la muñeca", 1280, 1600)}
+          </div>`,
+      },
+      {
+        id: "salud",
+        title: "Salud y ejercicio",
+        sub: "24/7, entrenamiento y actividades",
+        body: `<div class="info-split">
+            <div class="info-copy">
+              <div class="info-block">
+                <h4>Monitoreo de salud 24/7</h4>
+                <p>Una variedad de funciones para seguir cómo estás a lo largo del día, incluida la salud femenina con estimaciones de ovulaciones pasadas.</p>
+                ${infoTags([
+                  "Seguimiento del estrés",
+                  "Pulsioxímetro¹",
+                  "Body Battery™",
+                  "Salud femenina",
+                ])}
+              </div>
+              <div class="info-block">
+                <h4>Apps de seguimiento deportivo</h4>
+                ${infoList([
+                  "Más de 80 actividades, desde el botón de la banda o desde Garmin Connect™",
+                  "Detección automática de actividades, que puedes confirmar y editar después en la app",
+                  "Ubicación en actividades al aire libre con el GPS conectado de tu smartphone",
+                ])}
+              </div>
+              <div class="info-block">
+                <h4>Funciones de entrenamiento</h4>
+                <p>Para saber cuándo esforzarte al máximo y cuándo tomarte un día de recuperación.</p>
+                ${infoTags([
+                  "Predisposición para entrenar",
+                  "Estado de la VFC",
+                  "VO2 max",
+                  "Estado del entreno",
+                  "Carga de entreno",
+                  "Relación de carga",
+                  "Foco de carga de entreno",
+                  "Efecto del entreno",
+                  "Beneficio principal",
+                  "Beneficio del entreno",
+                  "Tiempo de recuperación",
+                ])}
+              </div>
+            </div>
+            ${infoFig("/media/archivo/cirqa/app-body-battery.jpg", "Body Battery™ en la app Garmin Connect™", 900, 1600, "tall")}
+          </div>`,
+      },
+      {
+        id: "sueno",
+        title: "Sueño",
+        sub: "Puntuación, fases y ritmo circadiano",
+        body: `<p class="info-lede">Una puntuación de sueño y coaching personalizado sobre cuánto sueño necesitas y cómo puedes mejorarlo.</p>
+          ${infoList([
+            "Puntuación del sueño y entrenador de sueño",
+            "Fases del sueño y siestas",
+            "Estado de la VFC y temperatura de la piel¹",
+            "Alineación del sueño: qué tan alineado estás con tu ritmo circadiano",
+            "Consistencia de sueño, noche tras noche",
+          ])}`,
+      },
+      {
+        id: "sensores",
+        title: "Funciones y sensores",
+        sub: "Lo que mide y cómo se conecta",
+        body: `<div class="info-split">
+            <div class="info-copy">
+              <div class="info-block">
+                <h4>Lo que mide</h4>
+                ${infoTags([
+                  "Estrés",
+                  "Pulsioxímetro¹",
+                  "Body Battery™",
+                  "Estado de la VFC",
+                  "Temperatura de la piel¹",
+                  "VO2 max",
+                  "Salud femenina",
+                ])}
+              </div>
+              <div class="info-block">
+                <h4>Cómo se conecta</h4>
+                ${infoTags(["GPS conectado", "Bluetooth®", "ANT+®", "Garmin Connect™"])}
+                <p class="info-fine">El GPS conectado usa el de tu smartphone: registra tu ubicación en actividades al aire libre cuando la banda está enlazada.</p>
+              </div>
+              <div class="info-block">
+                <h4>Cómo se controla</h4>
+                <p>Un botón en la banda inicia una actividad. Todo lo demás se ve, se edita y se comparte desde Garmin Connect™, en el móvil o en la web.</p>
+              </div>
+            </div>
+            ${infoFig("/media/archivo/cirqa/cirqa-sensor-negra.jpg", "Sensor óptico y contactos de carga de la CIRQA™ Smart Band", 1600, 1200)}
+          </div>
+          <div class="info-block">
+            <h4>Frente a los relojes Garmin</h4>
+            <p>CIRQA™ cubre las funciones de entreno y de sueño de un Venu® 4 o un Vívoactive® 6 — sin pantalla.</p>
+            ${compareTable()}
+            <p class="compare-note">Comparativa de las funciones de entreno y de sueño de los tres modelos, según la ficha técnica de Garmin. El Venu® 4 y el Vívoactive® 6 añaden pantalla táctil AMOLED y otras funciones que no aparecen en este cuadro.</p>
+          </div>`,
+      },
+      {
+        id: "specs",
+        title: "Ficha técnica",
+        sub: "Peso, medidas y conectividad",
+        body: `<div class="spec-table">
+            <dl>
+              <dt>Pantalla</dt><dd>Sin pantalla — todo en Garmin Connect™</dd>
+              <dt>Duración de batería</dt><dd>Hasta 10 días</dd>
+              <dt>Peso</dt><dd>18 g (S–M) · 20 g (L–XL)</dd>
+              <dt>Tamaño de la caja</dt><dd>27.5 × 46.9 × 8.7 mm</dd>
+              <dt>Ajuste en muñeca</dt><dd>S–M: 120–200 mm · L–XL: 145–240 mm</dd>
+              <dt>Conectividad</dt><dd>GPS conectado, Bluetooth®, ANT+®</dd>
+              <dt>App</dt><dd>Garmin Connect™ (gratuita, sin suscripción)</dd>
+              <dt>Colores</dt><dd>Negra · Gris Francés · Malva · Azul Capitán</dd>
+            </dl>
+          </div>`,
+      },
+      {
+        id: "caja",
+        title: "Qué incluye",
+        sub: "Lo que hay en la caja",
+        body: `${infoList([
+          "CIRQA™ Smart Band, en el color y la talla que elijas",
+          "Cable de carga y datos",
+          "Documentación",
+        ])}
+          ${accessoryChip("banda-cirqa")}`,
+      },
+      {
+        id: "faq",
+        title: "Preguntas frecuentes",
+        sub: "Antes de comprar",
+        body: `<div class="faq-list info-faq">
+            <details>
+              <summary>¿Necesito una suscripción?</summary>
+              <div class="a">No. Garmin Connect™ es gratuita, en el móvil y en la web, y no hay cargos recurrentes de ningún tipo.</div>
+            </details>
+            <details>
+              <summary>¿De verdad no tiene pantalla?</summary>
+              <div class="a">No la tiene, y ése es el punto: la banda registra, tú consultas cuando quieres. Todos los datos se leen en Garmin Connect™.</div>
+            </details>
+            <details>
+              <summary>¿Cuánto dura la batería?</summary>
+              <div class="a">Hasta 10 días entre cargas. Se carga con el cable de carga y datos que viene en la caja.</div>
+            </details>
+            <details>
+              <summary>¿Qué talla elijo?</summary>
+              <div class="a">S–M se ajusta a muñecas de 120 a 200 mm de circunferencia; L–XL, de 145 a 240 mm. Mide tu muñeca con una cinta métrica antes de elegir.</div>
+            </details>
+            <details>
+              <summary>¿Tiene GPS?</summary>
+              <div class="a">GPS conectado: registra tu ubicación en actividades al aire libre cuando está enlazada al GPS de tu smartphone.</div>
+            </details>
+            <details>
+              <summary>¿Puedo cambiar la banda?</summary>
+              <div class="a">Sí. Las bandas CIRQA™ de repuesto se venden por separado, en varios colores — <a href="/productos/banda-cirqa">verlas aquí</a>.</div>
+            </details>
+            <details>
+              <summary>¿Es un dispositivo médico?</summary>
+              <div class="a">No. No está destinado a diagnosticar ni monitorear ninguna condición médica; consulta Garmin.com/ataccuracy. El pulsioxímetro no está disponible en todos los países.</div>
+            </details>
+            <details>
+              <summary>¿Cómo son el envío y la garantía?</summary>
+              <div class="a">Envío gratis a todo México, producto original con garantía oficial y pago seguro con tarjeta vía Shopify Checkout.</div>
+            </details>
+          </div>`,
+      },
+    ],
+  },
+};
+
+/* Les fiches écrites à la main l'emportent ; les autres composent depuis le
+   catalogue. Les deux passent par le même gabarit et le même script. */
+function infoFacts(p) {
+  return (PDP_INFO[p.handle] && PDP_INFO[p.handle].facts) || genericFacts(p);
+}
+function infoSections(p) {
+  return (PDP_INFO[p.handle] && PDP_INFO[p.handle].sections) || genericSections(p);
+}
+
+/* La rangée de repères, sous la phrase d'accroche : ce qu'on doit savoir
+   avant même de faire défiler. En dessous de deux repères elle ne dit plus
+   rien — la fiche technique les porte déjà — et on ne l'écrit pas. */
+function factsRow(p) {
+  const facts = infoFacts(p);
+  if (facts.length < 2) return "";
+  return `
+            <ul class="pdp-facts">
+${facts.map((f) => `              <li><b>${esc(f[0])}</b>${f[1] ? `<span>${esc(f[1])}</span>` : ""}</li>`).join("\n")}
+            </ul>`;
+}
+
+/* Le bloc d'information : une barre de pastilles, et rien d'autre tant
+   qu'on n'a rien choisi. Chaque section n'existe que comme volet — son
+   titre vit DANS le volet, avec la croix qui le referme.
+
+   Sans script, la classe `js` n'est pas posée et tous les volets sont
+   ouverts : la page reste entièrement lisible, chaque volet portant son
+   titre, et les pastilles redeviennent de simples ancres. */
+function infoBlock(p) {
+  const sections = infoSections(p);
+  if (!sections.length) return "";
+
+  const chips = sections
+    .map((s) => `          <a class="info-chip" href="#info-${s.id}">${esc(s.title)}</a>`)
+    .join("\n");
+
+  const list = sections
+    .map(
+      (s, i) => `        <section class="info-sec" id="info-${s.id}" aria-labelledby="info-${s.id}-t">
+          <div class="info-panel" id="info-${s.id}-p">
+            <div class="info-inner">
+              <div class="info-body">
+                <div class="info-bar">
+                  <span class="info-num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
+                  <h3 class="info-t" id="info-${s.id}-t">${esc(s.title)}</h3>
+                  <span class="info-sub">${esc(s.sub)}</span>
+                  <button class="info-close" type="button" aria-label="Cerrar ${esc(s.title)}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                  </button>
+                </div>
+            ${s.body}
+              </div>
+            </div>
+          </div>
+        </section>`
+    )
+    .join("\n");
+
+  return `
+    <!-- ===== Information détaillée — une barre de pastilles commande des
+         volets. Rien n'est déplié tant qu'on n'a rien choisi : la page
+         reste courte et tout tient à un geste. ===== -->
+    <section class="pdp-info" id="info" aria-labelledby="info-t">
+      <div class="container">
+        <div class="section-head rv">
+          <div>
+            <span class="eyebrow">${esc(p.short)}</span>
+            <h2 id="info-t">Todo lo que necesitas saber</h2>
+          </div>
+        </div>
+        <nav class="info-nav rv" aria-label="Secciones del producto">
+${chips}
+        </nav>
+        <div class="info-list rv">
+${list}
+        </div>
+      </div>
+    </section>
+`;
 }
 
 function page(p) {
@@ -461,7 +999,7 @@ ${galleryThumbs(p)}
               ${p.badge ? `<span class="pdp-badge">${esc(p.badge)}</span>` : ""}
             </div>
             <h1 id="pdp-t">${esc(p.name)}</h1>
-            <p class="pdp-lede">${esc(p.tagline)}</p>
+            <p class="pdp-lede">${esc(p.tagline)}</p>${factsRow(p)}
 
             <div class="pdp-price price-num">
               <b id="pdp-price">${money(p.price)}</b>
@@ -480,20 +1018,8 @@ ${colorRail(p)}${sizeRow(p)}
               <li>${CHECK}Producto original con garantía oficial</li>
               <li>${CHECK}Sin suscripción — sin cargos recurrentes</li>
             </ul>
+            <a class="pdp-more" href="#info-specs">Ver la ficha técnica completa</a>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== Résumé court : ce que c'est, en une phrase et trois points ===== -->
-    <section class="pdp-brief" aria-labelledby="brief-t">
-      <div class="container">
-        <div class="brief-card rv">
-          <h2 id="brief-t">${esc(briefTitle(p))}</h2>
-          <p>${esc(p.story ? p.story.text : p.tagline)}</p>
-          <ul class="brief-points">
-${p.highlights.slice(0, 3).map((h) => `            <li>${CHECK}${esc(h)}</li>`).join("\n")}
-          </ul>
         </div>
       </div>
     </section>
@@ -523,30 +1049,10 @@ ${p.highlights.slice(0, 3).map((h) => `            <li>${CHECK}${esc(h)}</li>`).
         </div>
       </div>
     </section>
-
+${infoBlock(p)}
     <!-- ===== Bannière produit ===== -->
 ${band(p)}
 ${story(p)}
-    <!-- ===== Fiche technique ===== -->
-    <section aria-labelledby="specs-t">
-      <div class="container">
-        <div class="section-head rv">
-          <div>
-            <span class="eyebrow">Ficha técnica</span>
-            <h2 id="specs-t">Todo lo que necesitas saber</h2>
-          </div>
-        </div>
-        <ul class="pdp-list rv">
-${p.highlights.map((h) => `          <li>${CHECK}${esc(h)}</li>`).join("\n")}
-        </ul>
-        <div class="spec-table rv">
-          <dl>
-${p.specs.map(([k, v]) => `            <dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("\n")}
-          </dl>
-        </div>
-      </div>
-    </section>
-
     <!-- ===== Le reste du catalogue ===== -->
     <section class="compare" aria-labelledby="otros-t">
       <div class="container">

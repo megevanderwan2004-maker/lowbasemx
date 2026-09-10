@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md
 
-> Last updated: 2026-09-05 (new `/nosotros` page — a pinned scroll hero ported from a 21st.dev React/GSAP/Swiper component to vanilla JS; nav and footer gain a fourth link)
+> Last updated: 2026-09-06 (all ten product pages restructured: a key-facts row in the buy column, and a chip bar that unfolds one section at a time, placed after the bundle and replacing the old brief + spec sections; no yellow left on any product page)
 > Purpose: Give a future Claude Code session (or human contributor) everything needed to continue this project without prior conversation context.
 
 ---
@@ -139,6 +139,8 @@ npm run build
 ```
 
 **Run it after any change to `catalog.js`, or to the nav/footer/band/boot templates inside `gen-products.js`.** Forgetting leaves the ten product pages stale, and nothing warns you.
+
+- **Product page section blocks.** Added 2026-09-06 in `gen-products.js`. Every product page now carries a key-facts row (`.pdp-facts`, values pulled from `specs`) and a `.pdp-info` block — a chip bar that unfolds one section at a time, placed *after* the bundle. Sections are composed from `catalog.js` alone (`tagline`/`story`, `highlights`, `specs`, `colors`, `sizes`): Resumen, an options section when the product has colours or sizes, Ficha técnica, and a FAQ built from the page's own guarantees. `PDP_INFO`, a table keyed by `handle`, overrides that for hand-written pages; it holds a single entry today (`cirqa`, seven sections) whose content also draws on the official Garmin product announcement in the repo (`assets/cirqa/documentos/83713503-….pdf`, 2026-07-21) — nothing that PDF marks confidential (SKU, UPC, MSRP, packaging, master carton) reaches the page. The old `.pdp-brief` and standalone "Ficha técnica" sections are gone; so are their CSS rules.
 
 - **Google Fonts**: Outfit (display) + DM Sans (body) — web-safe stand-ins for the brand fonts Codec Pro and Canva Sans.
 - **Images**: mostly local under `deploy/media/`; CIRQA photography still comes from the Shopify CDN.
@@ -503,7 +505,7 @@ That is exactly three cards plus two gutters, so the closed track and the open p
 
 **Motion tokens** live on `.goals-stage`: `--goals-gap: clamp(10px,1.6vw,18px)` and `--goals-ease: cubic-bezier(.22,1,.36,1)`. The return is deliberately shorter than the outbound trip — 160 + 260 ms against 280 + 400 ms.
 
-## 9. `app.js` — 21 modules
+## 9. `app.js` — 22 modules
 
 Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not decorative: `.rv` elements start at `opacity: 0`, so before the wrapper existed one uncaught error could leave **the entire page invisible**. The reveal module also has a 4-second failsafe.
 
@@ -523,6 +525,7 @@ Every module runs inside `module(name, fn)`, a try/catch wrapper. This is not de
 | `past-hero` | Toggles `body.past-hero`. **No longer an IntersectionObserver**: with the sheet scroll the hero is sticky and never leaves the viewport, so it can't be observed. The marker is now the top edge of `#contenido` (which begins exactly where the hero ends), read by position comparison — a root shrunk to a line does not notify reliably, and a sentinel small enough to be precise gets skipped by a fast fling. No new loop: Lenis already runs one and publishes its position; without Lenis (reduced motion) a passive `scroll` listener takes over. `sync()` reads no layout — the threshold is measured separately, on load and on resize. |
 | `dock-height` | Measures `--dock-h` and `--nav-h` |
 | `selection` | Product page colour/size radiogroups |
+| `pdp-info` | **New 2026-09-06.** The chip bar that unfolds one product-info section at a time, on all ten product pages. One open panel at a time — that is what keeps the page short and what makes the active chip self-evident, since it only ever designates the open panel. The sections have no headers of their own: each title lives *inside* its panel, next to the close cross. The HTML ships **all panels open**; the `js` class written in the `<head>` closes them before first paint, so without script the page stays fully readable and the chips fall back to plain anchors. This module is also what sets `aria-expanded` and `aria-controls`, so a chip never advertises a disclosure that does not exist. The panel animates `grid-template-rows` from `0fr` to `1fr` — no measured height, nothing to recompute when the viewport, the fonts or an image inside changes. A closed panel goes `visibility:hidden` after the animation, otherwise its links stay in the tab order. Re-alignment is immediate: the bar sits *above* the panels, so collapsing one and expanding another never moves it; the page only scrolls when the bar has slipped under the floating nav or fallen too low. The chosen chip is scrolled into the bar — on a phone it could otherwise stay half off-screen, and it is the only marker of what is open. The module listens for `a[href^="#info-"]` clicks in the **capture** phase, which puts it ahead of `smooth-scroll`. |
 | `checkout` | Shopify redirect or mailto fallback |
 | `read-more` | Below 720px, clamps long paragraphs to 3 lines with a `Ver más` toggle |
 | `carousel` | Arrows of every floating track; the step is measured from the real gap between the first two items. Also **hides the arrows** — and the `.head-aside` that only held them — when the track already fits |

@@ -50,7 +50,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   }
 }
 </script>
-<link rel="stylesheet" href="/styles.css?v=53b84971">
+<link rel="stylesheet" href="/styles.css?v=c9d34f06">
 <!-- ===== Écran d'ouverture — décidé AVANT la première peinture.
      Le script est en ligne et synchrone à dessein : posé dans app.js, qui
      est en defer, la page aurait le temps de se peindre une fois avant
@@ -203,6 +203,11 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             </div>
             <h1 id="pdp-t">Promix Non-GMO Creatine</h1>
             <p class="pdp-lede">Creatina monohidratada micronizada, en sticks de 5 g.</p>
+            <ul class="pdp-facts">
+              <li><b>30 sticks individuales × 5 g</b><span>Formato</span></li>
+              <li><b>5 g por stick</b><span>Creatina</span></li>
+              <li><b>Sin sabor</b><span>Sabor</span></li>
+            </ul>
 
             <div class="pdp-price price-num">
               <b id="pdp-price">$659</b>
@@ -221,22 +226,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Producto original con garantía oficial</li>
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Sin suscripción — sin cargos recurrentes</li>
             </ul>
+            <a class="pdp-more" href="#info-specs">Ver la ficha técnica completa</a>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== Résumé court : ce que c'est, en une phrase et trois points ===== -->
-    <section class="pdp-brief" aria-labelledby="brief-t">
-      <div class="container">
-        <div class="brief-card rv">
-          <h2 id="brief-t">¿Qué es y para qué sirve?</h2>
-          <p>Un solo ingrediente, molido lo bastante fino para desaparecer en el agua. Un stick por sesión, sin sabor que tapar ni aditivos que explicar.*</p>
-          <ul class="brief-points">
-            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Creatina monohidratada micronizada, sin endulzar y sin sabor</li>
-            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Apoya de forma segura el aumento de tamaño, fuerza y potencia muscular*</li>
-            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Esencial en los programas de entrenamiento de fuerza y potencia</li>
-          </ul>
         </div>
       </div>
     </section>
@@ -263,6 +254,113 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
           </div>
           <button class="btn btn-ink btn-lg bundle-cta" type="button" id="bundle-add">Añadir bundle al carrito</button>
           <p class="bundle-fine">El 10% se aplica en el checkout de Shopify con el código BUNDLE10. Envío gratis a todo México.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Information détaillée — une barre de pastilles commande des
+         volets. Rien n'est déplié tant qu'on n'a rien choisi : la page
+         reste courte et tout tient à un geste. ===== -->
+    <section class="pdp-info" id="info" aria-labelledby="info-t">
+      <div class="container">
+        <div class="section-head rv">
+          <div>
+            <span class="eyebrow">Non-GMO Creatine</span>
+            <h2 id="info-t">Todo lo que necesitas saber</h2>
+          </div>
+        </div>
+        <nav class="info-nav rv" aria-label="Secciones del producto">
+          <a class="info-chip" href="#info-resumen">Resumen</a>
+          <a class="info-chip" href="#info-specs">Ficha técnica</a>
+          <a class="info-chip" href="#info-faq">Preguntas frecuentes</a>
+        </nav>
+        <div class="info-list rv">
+        <section class="info-sec" id="info-resumen" aria-labelledby="info-resumen-t">
+          <div class="info-panel" id="info-resumen-p">
+            <div class="info-inner">
+              <div class="info-body">
+                <div class="info-bar">
+                  <span class="info-num" aria-hidden="true">01</span>
+                  <h3 class="info-t" id="info-resumen-t">Resumen</h3>
+                  <span class="info-sub">Qué es y para qué sirve</span>
+                  <button class="info-close" type="button" aria-label="Cerrar Resumen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                  </button>
+                </div>
+            <div class="info-split">
+            <div class="info-copy">
+              <p class="info-lede">Un solo ingrediente, molido lo bastante fino para desaparecer en el agua. Un stick por sesión, sin sabor que tapar ni aditivos que explicar.*</p>
+              <ul class="pdp-list">
+              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Creatina monohidratada micronizada, sin endulzar y sin sabor</li>
+              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Apoya de forma segura el aumento de tamaño, fuerza y potencia muscular*</li>
+              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Esencial en los programas de entrenamiento de fuerza y potencia</li>
+              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Fácil de digerir y de mezclar</li>
+            </ul>
+            </div>
+            <figure class="info-fig square">
+              <img loading="lazy" src="/media/productos/promix-creatina/promix-creatine-sticks.png" alt="Promix Non-GMO Creatine" width="900" height="900">
+            </figure>
+          </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="info-sec" id="info-specs" aria-labelledby="info-specs-t">
+          <div class="info-panel" id="info-specs-p">
+            <div class="info-inner">
+              <div class="info-body">
+                <div class="info-bar">
+                  <span class="info-num" aria-hidden="true">02</span>
+                  <h3 class="info-t" id="info-specs-t">Ficha técnica</h3>
+                  <span class="info-sub">Todos los detalles</span>
+                  <button class="info-close" type="button" aria-label="Cerrar Ficha técnica">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                  </button>
+                </div>
+            <div class="spec-table">
+            <dl>
+              <dt>Marca</dt><dd>Promix Nutrition</dd>
+              <dt>Formato</dt><dd>30 sticks individuales × 5 g</dd>
+              <dt>Creatina</dt><dd>5 g por stick</dd>
+              <dt>Sabor</dt><dd>Sin sabor</dd>
+              <dt>Certificaciones</dt><dd>Non-GMO Project Verified, vegano, keto y paleo</dd>
+              <dt>Envío</dt><dd>Gratis a todo México</dd>
+            </dl>
+          </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="info-sec" id="info-faq" aria-labelledby="info-faq-t">
+          <div class="info-panel" id="info-faq-p">
+            <div class="info-inner">
+              <div class="info-body">
+                <div class="info-bar">
+                  <span class="info-num" aria-hidden="true">03</span>
+                  <h3 class="info-t" id="info-faq-t">Preguntas frecuentes</h3>
+                  <span class="info-sub">Antes de comprar</span>
+                  <button class="info-close" type="button" aria-label="Cerrar Preguntas frecuentes">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                  </button>
+                </div>
+            <div class="faq-list info-faq">
+            <details>
+              <summary>¿Cómo son el envío y la garantía?</summary>
+              <div class="a">Envío gratis a todo México y producto original con garantía oficial. El pago es seguro, con tarjeta, vía Shopify Checkout.</div>
+            </details>
+            <details>
+              <summary>¿Hay suscripción o cargos recurrentes?</summary>
+              <div class="a">No. Se paga una sola vez: sin suscripción y sin cargos recurrentes.</div>
+            </details>
+            <details>
+              <summary>¿Cómo hago un cambio o una devolución?</summary>
+              <div class="a">Escríbenos a <a href="mailto:lowlabsmx@gmail.com">lowlabsmx@gmail.com</a> con tu número de pedido y te acompañamos.</div>
+            </details>
+          </div>
+              </div>
+            </div>
+          </div>
+        </section>
         </div>
       </div>
     </section>
@@ -296,34 +394,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <p class="rv">Un solo ingrediente, molido lo bastante fino para desaparecer en el agua. Un stick por sesión, sin sabor que tapar ni aditivos que explicar.*</p>
             <a class="btn btn-ink rv" href="#comprar">Comprar — $659 MXN</a>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== Fiche technique ===== -->
-    <section aria-labelledby="specs-t">
-      <div class="container">
-        <div class="section-head rv">
-          <div>
-            <span class="eyebrow">Ficha técnica</span>
-            <h2 id="specs-t">Todo lo que necesitas saber</h2>
-          </div>
-        </div>
-        <ul class="pdp-list rv">
-          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Creatina monohidratada micronizada, sin endulzar y sin sabor</li>
-          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Apoya de forma segura el aumento de tamaño, fuerza y potencia muscular*</li>
-          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Esencial en los programas de entrenamiento de fuerza y potencia</li>
-          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Fácil de digerir y de mezclar</li>
-        </ul>
-        <div class="spec-table rv">
-          <dl>
-            <dt>Marca</dt><dd>Promix Nutrition</dd>
-            <dt>Formato</dt><dd>30 sticks individuales × 5 g</dd>
-            <dt>Creatina</dt><dd>5 g por stick</dd>
-            <dt>Sabor</dt><dd>Sin sabor</dd>
-            <dt>Certificaciones</dt><dd>Non-GMO Project Verified, vegano, keto y paleo</dd>
-            <dt>Envío</dt><dd>Gratis a todo México</dd>
-          </dl>
         </div>
       </div>
     </section>
@@ -399,6 +469,6 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 <script src="/lenis.min.js?v=daec1872" defer></script>
 <script src="/catalog.js?v=34170873" defer></script>
 <script src="/cart.js?v=f3d8c0c3" defer></script>
-<script src="/app.js?v=6080ee3e" defer></script>
+<script src="/app.js?v=5493cb0b" defer></script>
 </body>
 </html>

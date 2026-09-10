@@ -184,7 +184,8 @@ html.lenis{scroll-behavior:auto}
    gardent leur geste natif : `contain` empêche le rebond de se propager
    à la page. La même liste est reprise dans app.js pour laisser passer
    la molette horizontale. */
-.cards,.goals,.gal-stage,.gal-thumbs,.rail-track{overscroll-behavior-x:contain}
+.cards,.goals,.gal-stage,.gal-thumbs,.rail-track,.pdp-facts,.info-nav,
+.cat-grid[data-exclude]{overscroll-behavior-x:contain}
 .price-num{font-variant-numeric:tabular-nums}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 /* Porte-filtres SVG : jamais display:none — un filtre référencé depuis un
@@ -239,16 +240,9 @@ a:focus-visible,button:focus-visible,summary:focus-visible,
   }
 }
 
-/* Le dock repose sur le hero, dont il ne doit pas rééchantillonner le
-   fond en permanence : au-dessus du hero il garde une teinte pleine, et
-   ne reprend le flou qu'une fois le hero dépassé.
-   La nav, elle, garde son flou — c'est ce qui la rend transparente sur
-   l'image (voir .nav-pill). */
-body:not(.past-hero) .dock-shell{
-  -webkit-backdrop-filter:none;
-  backdrop-filter:none;
-  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.82));
-}
+/* Le dock garde son flou partout, hero compris : la barre est demandée
+   transparente, et une teinte pleine au-dessus du hero l'aurait rendue
+   opaque sur exactement l'écran où on la remarque le plus. */
 
 @media (prefers-reduced-transparency:reduce){
   .blurred{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
@@ -571,28 +565,23 @@ body:not(.past-hero) .nav-pill{
 .nav-start{grid-column:1;justify-self:start;display:flex;align-items:center;min-width:0;max-width:100%}
 .nav-end{grid-column:3;justify-self:end;display:flex;align-items:center;gap:10px}
 
-/* Sous 1024px le logo centré ne laisse plus de place aux liens : la pilule
-   passe sur deux rangs, logo et action en haut, navigation en dessous —
-   toutes les entrées restent lisibles au lieu d'être rognées. */
-@media(max-width:1023px){
-  .nav-pill{
-    grid-template-columns:1fr auto 1fr;
-    gap:4px 8px;padding:8px 10px;border-radius:var(--radius-lg);
-  }
-  .nav-start{grid-row:2;grid-column:1 / -1;justify-self:stretch}
-  /* Le logo couvre toute la rangée et s'y centre : avec trois colonnes,
-     le bouton « Comprar » élargit la troisième au-delà de sa part et
-     décalait le logo vers la gauche. Le bouton est posé par-dessus, dans
-     la même rangée. */
-  .logo{
-    grid-row:1;grid-column:1 / -1;justify-self:center;
-    font-size:1.2rem;padding:0;
-  }
-  .nav-end{grid-row:1;grid-column:3;justify-self:end}
-  /* Centrée : à trois entrées la rangée tient sur la largeur de la
-     pilule, plus besoin de la caler à gauche pour éviter le rognage. */
-  .nav-links{width:100%;justify-content:center}
+/* La pilule tient sur deux rangs à TOUTES les largeurs : logo et actions
+   en haut, navigation centrée en dessous. C'était la mise en page des
+   petits écrans ; elle est devenue celle du site. */
+.nav-pill{
+  grid-template-columns:1fr auto 1fr;
+  gap:4px 8px;padding:8px 10px;border-radius:var(--radius-lg);
 }
+.nav-start{grid-row:2;grid-column:1 / -1;justify-self:stretch}
+/* Le logo couvre toute la rangée et s'y centre : avec trois colonnes, une
+   action élargit la troisième au-delà de sa part et décale le logo vers
+   la gauche. Les icônes sont posées par-dessus, dans la même rangée. */
+.logo{
+  grid-row:1;grid-column:1 / -1;justify-self:center;
+  font-size:1.2rem;padding:0;
+}
+.nav-end{grid-row:1;grid-column:3;justify-self:end}
+.nav-links{width:100%;justify-content:center}
 
 /* =========================================================================
    Hero — vidéo automuette en boucle
@@ -1169,6 +1158,29 @@ footer a{color:var(--ink)}
 .foot-title{font-size:.95rem;margin-bottom:12px;color:var(--ink);font-family:var(--font-display)}
 .legal{border-top:1px solid rgba(23,25,27,.12);padding-top:24px;font-size:.78rem;color:var(--teal-700);line-height:1.7}
 @media(min-width:768px){.foot-grid{grid-template-columns:2fr 1fr 1fr}}
+/* Sur téléphone le pied faisait presque un écran à lui seul : dix liens
+   produit empilés, chacun sur sa cible de 44px, plus une mention légale
+   au grand interligne. Rien n'est retiré — le référencement tient à ces
+   liens — mais la colonne « Tienda » passe sur deux rangées, ce qui
+   divise sa hauteur par deux sans toucher aux cibles tactiles, et les
+   réserves se resserrent. */
+@media(max-width:719px){
+  /* La réserve du bas garde le dock au-dessus du pied ; elle n'a pas
+     besoin de deux fois sa hauteur pour ça. */
+  footer{padding-top:32px;padding-bottom:calc(20px + var(--dock-h) + 16px + env(safe-area-inset-bottom,0px))}
+  .foot-grid{gap:20px;margin-bottom:22px}
+  .foot-logo{font-size:1.2rem}
+  .foot-logo span{font-size:.68rem;letter-spacing:.1em;margin-top:4px}
+  .foot-grid>div:first-child>p{margin-top:10px!important;font-size:.85rem;line-height:1.55}
+  .foot-title{font-size:.88rem;margin-bottom:4px}
+  /* Le titre garde sa rangée, les liens se répartissent en deux colonnes. */
+  .foot-grid>div{display:grid;grid-template-columns:1fr 1fr;column-gap:14px;align-content:start}
+  .foot-grid>div:first-child{grid-template-columns:1fr}
+  .foot-grid>div>.foot-title{grid-column:1 / -1}
+  .foot-grid p a{min-height:38px;font-size:.82rem;line-height:1.35}
+  .legal{padding-top:14px;font-size:.68rem;line-height:1.45}
+  .legal p+p{margin-top:6px!important}
+}
 
 /* =========================================================================
    Dock d'achat permanent
@@ -1182,8 +1194,19 @@ footer a{color:var(--ink)}
   pointer-events:auto;display:flex;align-items:center;gap:clamp(10px,2vw,20px);
   width:min(680px,100%);padding:8px 8px 8px 20px;border-radius:var(--radius-pill);
 }
-.dock-shell{position:relative;background:var(--lg-fill);box-shadow:var(--lg-depth)}
+/* Transparent, comme la pilule de nav : c'est le flou qui porte la
+   surface, pas une plaque blanche. Le contraste du texte est repris par
+   son halo (voir `.dock-info`), exactement comme pour `.nav-links a`. */
+.dock-shell{
+  position:relative;
+  background:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.26) 100%);
+  box-shadow:0 10px 30px rgba(23,25,27,.10),inset 0 0 0 1px rgba(255,255,255,.3);
+}
+.dock-shell::after{opacity:.4}
+/* Le halo remplace le fond : sur une surface aussi translucide, c'est lui
+   qui tient le contraste du texte quoi qu'il y ait derrière. */
 .dock-info{display:grid;gap:1px;min-width:0;line-height:1.3}
+.dock-info b,.dock-info span{text-shadow:0 0 12px rgba(255,255,255,.9),0 0 3px rgba(255,255,255,.95)}
 .dock-info b{font-family:var(--font-display);font-size:1.05rem;font-weight:600;color:var(--ink);letter-spacing:-.02em}
 .dock-info span{font-size:.8rem;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dock-shell .btn{margin-left:auto;flex:none}
@@ -2222,6 +2245,25 @@ html.booting .boot.done{opacity:0;pointer-events:none}
 /* Les quatre produits restants tiennent sur une rangée sous la fiche
    produit : auto-fill s'arrêterait avant et laisserait un orphelin. */
 @media(min-width:1120px){.cat-grid[data-exclude]{grid-template-columns:repeat(4,1fr)}}
+/* Sur téléphone, la grille du bas de fiche devient une piste, comme les
+   rayons de la boutique : même encoche, même débord jusqu'aux bords de
+   l'écran, même accroche. `[data-exclude]` ne vise que les fiches produit
+   — les rayons et la boutique gardent leur grille. */
+@media(max-width:719px){
+  .cat-grid[data-exclude]{
+    --cards-inset:clamp(14px,3vw,44px);
+    display:flex;grid-template-columns:none;gap:14px;
+    margin-inline:calc(-1 * var(--cards-inset));
+    padding:4px var(--cards-inset) 6px;
+    overflow-x:auto;scroll-snap-type:x mandatory;
+    scroll-padding-left:var(--cards-inset);
+    scrollbar-width:none;-ms-overflow-style:none;
+  }
+  .cat-grid[data-exclude]::-webkit-scrollbar{display:none}
+  /* Une carte et demie à l'écran : la seconde qui dépasse est ce qui dit
+     que la piste se fait glisser. */
+  .cat-grid[data-exclude]>*{flex:0 0 min(62vw,240px);scroll-snap-align:start}
+}
 /* Même parti que la carte qui flotte : le gris porte la carte entière, du
    visuel au prix. La surface blanche et son ombre partent avec — deux
    familles de cartes sur la même page ne peuvent pas avoir deux fonds. */
@@ -2655,17 +2697,9 @@ html.booting .boot.done{opacity:0;pointer-events:none}
   padding:6px 12px;border-radius:var(--radius-pill);background:var(--surface-sand);
 }
 
-/* Résumé court : ce que c'est, juste après l'achat. */
-.pdp-brief{padding-top:clamp(18px,2.4vw,28px);padding-bottom:0}
-.brief-card{
-  background:var(--surface-sand);border-radius:var(--radius-lg);
-  padding:clamp(20px,4vw,38px);display:grid;gap:12px;
-}
-.brief-card h2{font-size:clamp(1.25rem,3.4vw,1.8rem)}
-.brief-card p{color:var(--ink-soft);font-size:1rem;line-height:1.6;max-width:62ch}
-.brief-points{list-style:none;display:grid;gap:9px;margin-top:2px}
-.brief-points li{display:flex;gap:10px;align-items:flex-start;font-size:.93rem;color:var(--ink-soft);line-height:1.5}
-.brief-points svg{flex:none;margin-top:3px}
+/* `.pdp-brief` / `.brief-card` ont disparu le 06/09/2026 : le résumé court
+   est devenu la section « Resumen » du bloc d'information, sur les dix
+   fiches. Plus aucune page ne portait ces classes. */
 .pdp-pairs{padding-top:clamp(18px,2.4vw,30px)}
 /* Sur une carte de complément, la raison d'être passe avant le prix. */
 .fcard-why{
@@ -2787,6 +2821,209 @@ html.booting .boot.done{opacity:0;pointer-events:none}
 @media(max-width:639px){.spec-table dt{border-bottom:none}}
 .spec-table dl>:nth-last-child(-n+2){border-bottom:none}
 
+/* =========================================================================
+   Fiches produit — repères d'achat et information dépliable
+
+   Deux ajouts, sur les dix fiches :
+   · `.pdp-facts` — la rangée de repères, sous l'accroche et avant le prix.
+   · `.pdp-info`  — une barre de pastilles, et rien d'autre tant qu'on n'a
+     rien choisi. Une pastille déplie sa section, une autre replie la
+     précédente, la croix referme. Les sections n'ont pas d'en-tête à elles :
+     leur titre vit DANS le volet, sinon la page redevenait la liste de sept
+     lignes qu'on voulait justement replier.
+
+   Le volet n'a ni bibliothèque ni hauteur calculée en script : c'est la
+   GRILLE qui s'anime, de `0fr` à `1fr`. Le contenu garde donc sa hauteur
+   naturelle — rien à remesurer quand la fenêtre change de largeur, quand
+   les polices arrivent, ou quand une image se charge dedans.
+
+   Sans script, `.js` n'est pas posée sur la racine et tous les volets sont
+   ouverts, chacun portant son titre : la fiche reste entièrement lisible et
+   les pastilles redeviennent de simples ancres. `.js` étant écrite dans le
+   <head>, avant la première peinture, rien ne s'ouvre puis se referme à
+   l'écran.
+   ========================================================================= */
+.pdp-facts{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin-top:-2px}
+.pdp-facts li{
+  display:flex;align-items:baseline;gap:6px;flex:none;
+  padding:6px 12px;border-radius:var(--radius-pill);
+  background:var(--surface-teal);line-height:1.3;
+}
+.pdp-facts b{
+  font-family:var(--font-display);font-weight:600;font-size:.82rem;
+  letter-spacing:-.01em;color:var(--ink);
+}
+.pdp-facts span{font-size:.74rem;color:var(--teal-700)}
+/* Sur téléphone la rangée se fait glisser : repliée sur deux lignes elle
+   repousserait le bouton d'achat sous la ligne de flottaison — ce que
+   toute cette colonne est faite pour éviter. */
+@media(max-width:979px){
+  .pdp-facts{
+    flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;
+    scrollbar-width:none;-ms-overflow-style:none;
+  }
+  .pdp-facts::-webkit-scrollbar{display:none}
+}
+/* Le raccourci vers la fiche technique : discret, sous les garanties. */
+.pdp-more{
+  justify-self:start;font-size:.82rem;color:var(--teal-700);text-decoration:none;
+  border-bottom:1px solid var(--border);padding-bottom:1px;
+  transition:color .2s ease-out,border-color .2s ease-out;
+}
+.pdp-more:hover{color:var(--ink);border-color:var(--border-strong)}
+
+.pdp-info{padding-top:clamp(18px,2.4vw,30px)}
+/* La barre se fait glisser tant qu'elle ne tient pas, et se replie en deux
+   rangs dès qu'il y a la place. */
+.info-nav{
+  display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.info-nav::-webkit-scrollbar{display:none}
+@media(min-width:1080px){.info-nav{flex-wrap:wrap;overflow:visible}}
+.info-chip{
+  flex:0 0 auto;display:inline-flex;align-items:center;
+  padding:9px 16px;border-radius:var(--radius-pill);white-space:nowrap;
+  font-family:var(--font-display);font-weight:600;font-size:.82rem;
+  letter-spacing:-.01em;line-height:1.2;
+  color:var(--teal-700);text-decoration:none;background:var(--surface);
+  box-shadow:inset 0 0 0 1px var(--border);
+  transition:color .2s ease-out,background .22s ease-out,
+             box-shadow .2s ease-out,transform .2s ease-out;
+}
+.info-chip:hover{color:var(--ink);transform:translateY(-1px);box-shadow:inset 0 0 0 1px var(--border-strong)}
+.info-chip.on,.info-chip.on:hover{background:var(--ink);color:#fff;box-shadow:none}
+
+/* Aucune gouttière : un volet replié fait zéro pixel, et six gouttières
+   entre six riens laissaient une colonne de vide sous la barre. C'est donc
+   le volet ouvert qui porte sa propre marge. Sans script, où tout est
+   ouvert, les volets se séparent de nouveau. */
+.info-list{display:grid;margin-top:clamp(12px,1.8vw,18px)}
+.info-sec+.info-sec{margin-top:8px}
+.js .info-sec+.info-sec{margin-top:0}
+.info-sec{background:var(--surface-teal);border-radius:var(--radius-md);overflow:hidden;padding:0}
+
+.info-panel{display:grid;grid-template-rows:1fr}
+.js .info-panel{grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(.22,.61,.36,1)}
+.js .info-sec.open .info-panel{grid-template-rows:1fr}
+/* `min-height:0` autant que `overflow:hidden` : sans lui, un enfant de
+   grille refuse de descendre sous sa hauteur mini et le volet ne se
+   referme jamais complètement. */
+.info-inner{overflow:hidden;min-height:0}
+/* Un volet replié fait zéro pixel de haut — mais ses liens restaient dans
+   l'ordre de tabulation et dans l'arbre d'accessibilité. La visibilité les
+   en retire ; son changement est retardé du temps du repli pour ne pas
+   escamoter le contenu au milieu de l'animation. */
+.js .info-inner{visibility:hidden;transition:visibility 0s linear .34s}
+.js .info-sec.open .info-inner{visibility:visible;transition:visibility 0s}
+.js .info-body{opacity:0;transition:opacity .2s ease-out}
+.js .info-sec.open .info-body{opacity:1;transition:opacity .3s ease-out .08s}
+.rm .info-panel,.rm .info-body,.rm .info-inner{transition:none}
+.info-body{
+  padding:clamp(16px,2.4vw,22px) clamp(16px,2.4vw,24px) clamp(20px,2.8vw,26px);
+  display:grid;gap:clamp(16px,2.2vw,22px);
+}
+
+/* L'en-tête du volet : le titre de la section, et la croix qui la referme. */
+.info-bar{
+  display:flex;align-items:center;gap:clamp(10px,1.6vw,16px);
+  padding-bottom:clamp(10px,1.4vw,14px);
+  border-bottom:1px solid var(--border);
+}
+.info-num{
+  font-family:var(--font-display);font-size:.68rem;font-weight:600;
+  letter-spacing:.12em;color:var(--teal-700);flex:none;
+}
+.info-t{
+  font-family:var(--font-display);font-weight:600;letter-spacing:-.015em;
+  font-size:clamp(1.02rem,2.4vw,1.18rem);line-height:1.25;margin:0;
+}
+/* Le sous-titre est un confort de balayage, pas une information : sous
+   760px il volerait sa ligne au titre. */
+.info-sub{font-size:.8rem;color:var(--teal-700);line-height:1.35;margin-left:auto;text-align:right}
+@media(max-width:759px){.info-sub{display:none}}
+.info-close{
+  flex:none;margin-left:auto;width:34px;height:34px;padding:8px;
+  display:grid;place-items:center;cursor:pointer;border:0;
+  border-radius:50%;color:var(--teal-700);background:var(--surface);
+  box-shadow:inset 0 0 0 1px var(--border);
+  transition:color .2s ease-out,box-shadow .2s ease-out,transform .2s ease-out;
+}
+@media(min-width:760px){.info-close{margin-left:0}}
+.info-close:hover{color:var(--ink);box-shadow:inset 0 0 0 1px var(--border-strong);transform:rotate(90deg)}
+.info-close svg{width:100%;height:100%;display:block}
+/* Sans script il n'y a rien à refermer : les volets sont tous ouverts. */
+html:not(.js) .info-close{display:none}
+
+/* Le texte d'abord, le visuel ensuite : sur téléphone la colonne se replie
+   dans l'ordre du HTML, et on lit avant de regarder. */
+.info-split{display:grid;gap:clamp(16px,2.4vw,28px);align-items:start}
+@media(min-width:820px){.info-split{grid-template-columns:minmax(0,1fr) minmax(0,300px)}}
+.info-copy{display:grid;gap:clamp(16px,2.2vw,22px);min-width:0}
+.info-lede{color:var(--ink-soft);font-size:1rem;line-height:1.6;max-width:62ch}
+.info-block{display:grid;gap:10px;min-width:0}
+.info-block h4{
+  font-family:var(--font-display);font-weight:600;font-size:.95rem;
+  letter-spacing:-.01em;color:var(--ink);
+}
+.info-block p{color:var(--ink-soft);font-size:.92rem;line-height:1.6;max-width:62ch}
+.info-fine{font-size:.82rem;color:var(--teal-700);line-height:1.55}
+/* Onze fonctions d'entraînement à la file font un pavé que personne ne
+   lit : en pastilles, l'œil les prend d'un coup. */
+.info-tags{list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.info-tags li{
+  padding:6px 12px;border-radius:var(--radius-pill);
+  background:var(--surface);box-shadow:inset 0 0 0 1px var(--border);
+  font-size:.8rem;color:var(--ink-soft);line-height:1.35;
+}
+/* Coloris et tailles : la pastille de couleur, le nom, la note du
+   catalogue. Une seule liste sert aux deux — la pastille est facultative. */
+.info-opts{list-style:none;display:grid;gap:8px}
+.info-opts li{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;font-size:.9rem}
+.info-opts i{
+  flex:none;width:13px;height:13px;border-radius:50%;align-self:center;
+  box-shadow:inset 0 0 0 1px rgba(23,25,27,.14);
+}
+.info-opts b{font-family:var(--font-display);font-weight:600;color:var(--ink)}
+.info-opts span{color:var(--teal-700);font-size:.85rem;line-height:1.45}
+.info-fig{
+  margin:0;border-radius:var(--radius-md);overflow:hidden;
+  background:var(--tile);align-self:start;
+}
+.info-fig img{width:100%;height:auto;display:block}
+/* Les visuels de galerie sont cadrés carré partout ailleurs sur le site :
+   la boîte est réservée avant le chargement, le volet ne saute pas. */
+.info-fig.square{aspect-ratio:1}
+.info-fig.square img{height:100%;object-fit:cover}
+/* Une capture de téléphone est deux fois plus haute que large : à pleine
+   colonne elle écraserait le texte qu'elle illustre. */
+.info-fig.tall{max-width:250px;margin-inline:auto}
+@media(max-width:819px){.info-fig{max-width:300px;margin-inline:auto}}
+.info-stats li{padding:16px 18px}
+.info-stats b{font-size:1.02rem}
+.info-stats span{font-size:.82rem}
+/* La FAQ réutilise le composant du site ; elle n'a plus à se centrer, le
+   volet borne déjà sa mesure. */
+.info-faq{max-width:none;margin:0}
+.info-faq details{background:var(--surface);box-shadow:inset 0 0 0 1px var(--border)}
+.info-faq details:last-child{margin-bottom:0}
+.info-faq .a a{color:var(--ink)}
+
+/* ---- Aucun jaune sur les fiches produit ----
+   Le sable reste la teinte du site — home, rayons, chapitres. Sur les dix
+   fiches produit (les seules pages à porter `data-product`) il cède la
+   place au gris neutre déjà employé partout ailleurs : badge, carte de
+   bundle, colonne d'en-têtes de la fiche technique, colonne mise en avant
+   du tableau comparatif. */
+body[data-product] .pdp-badge,
+body[data-product] .bundle-card,
+body[data-product] .spec-table dt,
+body[data-product] .reco-chip:hover{background:var(--surface-teal)}
+body[data-product] .col-hl{background:var(--tile)}
+/* Le tiret « non » passe de 4,2:1 à 6,3:1 sur la colonne mise en avant. */
+body[data-product] td.no{color:var(--teal-700)}
+/* La coche est un SVG en ligne : elle se centre comme un glyphe. */
+body[data-product] td.yes svg{display:inline-block;vertical-align:middle}
 /* Fil d'ariane */
 .crumbs{
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;

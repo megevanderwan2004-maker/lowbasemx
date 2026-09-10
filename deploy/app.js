@@ -131,7 +131,7 @@
        d'autre — quand le geste est franchement horizontal ; le navigateur
        fait alors défiler la piste lui-même.
        Le tactile, lui, n'est jamais intercepté : Lenis ne le touche pas. */
-    var TRACKS = ".cards,.goals,.gal-stage,.gal-thumbs,.rail-track";
+    var TRACKS = ".cards,.goals,.gal-stage,.gal-thumbs,.rail-track,.pdp-facts,.info-nav,.cat-grid";
     document.addEventListener("wheel", function(e){
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
       if (!e.target || !e.target.closest || !e.target.closest(TRACKS)) return;
@@ -1948,6 +1948,140 @@
     }, false);
 
     galMark(0);
+  });
+
+  /* =====================================================================
+     Fiche produit — information dépliable
+
+     Une barre de pastilles, et rien d'autre tant qu'on n'a rien choisi.
+     Choisir une pastille déplie sa section, en choisir une autre replie la
+     précédente, la croix referme. UN SEUL volet ouvert à la fois : c'est
+     ce qui garde la page courte — la raison d'être du bloc — et ce qui
+     rend la pastille active évidente, puisqu'elle ne fait que désigner le
+     volet ouvert. Rien à observer au défilement.
+
+     Le HTML arrive tous volets OUVERTS, chacun portant son titre : sans
+     script, la fiche reste entièrement lisible (voir `.info-panel` dans
+     styles.css, où c'est la classe `js` — posée dans le <head> — qui les
+     referme avant la première peinture). Ce module n'ajoute que le geste,
+     et c'est lui qui déclare l'état d'ouverture aux technologies
+     d'assistance : sans lui, une pastille annoncerait un pliage qui
+     n'existe pas.
+
+     La barre est AU-DESSUS des volets : replier l'un et déplier l'autre ne
+     la déplace pas. Le recalage se fait donc tout de suite, sans attendre
+     la fin de l'animation.
+     ===================================================================== */
+  module("pdp-info", function(){
+    var wrap = document.querySelector(".pdp-info");
+    if (!wrap) return;
+
+    var bar = wrap.querySelector(".info-nav");
+    var secs = wrap.querySelectorAll(".info-sec");
+    var chips = wrap.querySelectorAll(".info-chip");
+    if (!bar || !secs.length || !chips.length) return;
+
+    function isOpen(sec){ return sec.className.indexOf("open") > -1; }
+
+    function secFor(a){
+      var href = a.getAttribute("href") || "";
+      if (href.charAt(0) !== "#") return null;
+      var el = document.getElementById(href.slice(1));
+      return el && el.className.indexOf("info-sec") > -1 ? el : null;
+    }
+
+    function paint(){
+      each(chips, function(chip){
+        var sec = secFor(chip);
+        if (!sec) return;
+        var panel = sec.querySelector(".info-panel");
+        if (panel && panel.id) chip.setAttribute("aria-controls", panel.id);
+        var on = isOpen(sec);
+        flag(chip, "on", on);
+        chip.setAttribute("aria-expanded", on ? "true" : "false");
+      });
+    }
+
+    /* `null` referme tout : c'est la croix, et la pastille sur laquelle on
+       réappuie. */
+    function openOnly(sec){
+      each(secs, function(s){ flag(s, "open", s === sec); });
+      paint();
+    }
+
+    /* La barre doit rester à l'écran, au-dessus du volet qu'elle vient
+       d'ouvrir. On ne déplace la page que si elle est passée sous la nav
+       flottante ou si elle est tombée trop bas dans la fenêtre — recaler
+       quelqu'un qui a la barre sous les yeux est plus désagréable
+       qu'utile. */
+    function align(){
+      /* La même mesure que les ancres du site : `[id]` porte déjà un
+         `scroll-margin-top` qui dégage la nav flottante. */
+      var margin = parseFloat(window.getComputedStyle(wrap).scrollMarginTop) || 0;
+      var top = bar.getBoundingClientRect().top;
+      if (top >= margin && top < window.innerHeight * 0.45) return;
+      scrollToY(top + window.pageYOffset - margin, false);
+    }
+
+    /* La pastille choisie doit se voir. Sur téléphone la barre se fait
+       glisser, et celle qu'on vient de prendre pouvait rester à moitié
+       hors champ — c'est la seule marque de ce qui est ouvert. On ne
+       déplace que la barre, jamais la page. */
+    function reveal(chip){
+      var b = bar.getBoundingClientRect(), c = chip.getBoundingClientRect(), pad = 14;
+      var dx = 0;
+      if (c.left < b.left + pad) dx = c.left - b.left - pad;
+      else if (c.right > b.right - pad) dx = c.right - b.right + pad;
+      if (!dx) return;
+      var x = bar.scrollLeft + dx;
+      try { bar.scrollTo({ left: x, behavior: reduceMotion ? "auto" : "smooth" }); }
+      catch(e){ bar.scrollLeft = x; }
+    }
+
+    function choose(sec, chip){
+      openOnly(isOpen(sec) ? null : sec);
+      if (chip) reveal(chip);
+      align();
+    }
+
+    /* Toutes les adresses qui désignent un volet passent par ici : les
+       pastilles, mais aussi le raccourci « Ver la ficha técnica » de la
+       nacelle. En capture, donc AVANT le module d'ancrage, qui sinon ferait
+       glisser la page vers un volet encore replié. */
+    document.addEventListener("click", function(e){
+      var t = e.target;
+      if (!t || !t.closest) return;
+
+      var close = t.closest(".info-close");
+      if (close && wrap.contains(close)){
+        e.preventDefault();
+        openOnly(null);
+        return;
+      }
+
+      var a = t.closest('a[href^="#info-"]');
+      if (!a) return;
+      var sec = secFor(a);
+      if (!sec) return;
+      e.preventDefault();
+      e.stopPropagation();
+      choose(sec, a.className.indexOf("info-chip") > -1 ? a : null);
+      if (history.replaceState) history.replaceState(null, "", a.getAttribute("href"));
+    }, true);
+
+    /* Une adresse partagée doit OUVRIR son volet, pas seulement l'amener à
+       l'écran refermé. Sinon on ouvre sur la seule barre, comme demandé. */
+    var hash = window.location.hash;
+    var target = null;
+    if (hash && hash.length > 1){
+      var el = document.getElementById(hash.slice(1));
+      if (el && el.className.indexOf("info-sec") > -1) target = el;
+    }
+    openOnly(target);
+    if (target){
+      each(chips, function(chip){ if (secFor(chip) === target) reveal(chip); });
+      align();
+    }
   });
 
   /* =====================================================================
