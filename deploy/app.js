@@ -17,8 +17,11 @@
   var PRODUCT = CATALOG.byHandle(document.body.getAttribute("data-product") || "");
 
   var state = {
-    color: PRODUCT && PRODUCT.colors ? PRODUCT.colors[0].name : null,
-    size:  PRODUCT && PRODUCT.sizes  ? PRODUCT.sizes[0].name  : null
+    color:    PRODUCT && PRODUCT.colors    ? PRODUCT.colors[0].name    : null,
+    size:     PRODUCT && PRODUCT.sizes     ? PRODUCT.sizes[0].name     : null,
+    /* Où porter la bande. Elle commande la liste des coloris : le poignet
+       en a trois, le brassard n'existe qu'en noir. */
+    position: PRODUCT && PRODUCT.positions ? PRODUCT.positions[0].name : null
   };
   var reduceMotion = document.documentElement.className.indexOf("rm") > -1;
   var hasIO = "IntersectionObserver" in window;
@@ -1705,6 +1708,27 @@
   var swapTimer = null;
   var pendingSrc = null;
 
+  /* Le nom affiché d'un coloris. `name` est la clé de variante Shopify —
+     « Brazalete Negro » — et `label` le mot court qu'on montre une fois la
+     position déjà choisie au-dessus. */
+  function colorLabel(name){
+    if (!PRODUCT || !PRODUCT.colors) return name;
+    for (var i = 0; i < PRODUCT.colors.length; i++){
+      if (PRODUCT.colors[i].name === name) return PRODUCT.colors[i].label || name;
+    }
+    return name;
+  }
+
+  /* Le premier coloris d'une position — celui sur lequel on retombe quand
+     on change de position et que le coloris courant n'y existe pas. */
+  function firstColorAt(position){
+    if (!PRODUCT || !PRODUCT.colors) return null;
+    for (var i = 0; i < PRODUCT.colors.length; i++){
+      if (PRODUCT.colors[i].position === position) return PRODUCT.colors[i].name;
+    }
+    return null;
+  }
+
   function imageFor(color){
     if (!PRODUCT) return null;
     if (!PRODUCT.colors) return PRODUCT.image;
@@ -1716,14 +1740,48 @@
 
   function variantLabel(){
     var bits = [];
-    if (state.color) bits.push(state.color);
+    if (state.position) bits.push(state.position);
+    if (state.color) bits.push(colorLabel(state.color));
     if (state.size) bits.push((PRODUCT && PRODUCT.sizeLabel ? PRODUCT.sizeLabel : "Talla") + " " + state.size);
     bits.push("Envío gratis");
     return bits.join(" · ");
   }
 
   function syncSelection(){
+    /* Le coloris courant doit exister à la position courante : sans ce
+       recalage, passer au brassard laisserait « Gris Lima » choisi et la
+       variante Shopify résolue serait celle du poignet. */
+    if (state.position && PRODUCT && PRODUCT.colors){
+      var ok = false;
+      each(PRODUCT.colors, function(c){
+        if (c.name === state.color && c.position === state.position) ok = true;
+      });
+      if (!ok) state.color = firstColorAt(state.position) || state.color;
+    }
+
+    each(document.querySelectorAll(".pos-btn"), function(b){
+      var on = b.getAttribute("data-position") === state.position;
+      b.className = on
+        ? (b.className.replace(/\s*active/g, "") + " active")
+        : b.className.replace(/\s*active/g, "");
+      b.setAttribute("aria-checked", on ? "true" : "false");
+      b.tabIndex = on ? 0 : -1;
+    });
+
     each(document.querySelectorAll(".rail-item"), function(b){
+      /* Une pastille d'une autre position sort de la rangée : elle n'est
+         plus affichée, plus tabulable, plus annoncée — et elle perd sa
+         coche, sinon celle du coloris qu'on vient de quitter resterait
+         allumée à côté de la nouvelle. */
+      var pos = b.getAttribute("data-position");
+      if (state.position && pos && pos !== state.position){
+        b.hidden = true;
+        b.className = b.className.replace(/\s*active/g, "");
+        b.setAttribute("aria-checked", "false");
+        b.tabIndex = -1;
+        return;
+      }
+      b.hidden = false;
       var on = b.getAttribute("data-color") === state.color;
       b.className = on
         ? (b.className.replace(/\s*active/g, "") + " active")
@@ -1743,7 +1801,10 @@
     /* La valeur choisie s'écrit à côté de son intitulé : une pastille
        entourée ne dit pas son nom. */
     each(document.querySelectorAll("[data-opt]"), function(el){
-      var v = el.getAttribute("data-opt") === "color" ? state.color : state.size;
+      var k = el.getAttribute("data-opt");
+      var v = k === "color" ? colorLabel(state.color)
+            : k === "position" ? state.position
+            : state.size;
       if (v) el.textContent = v;
     });
 
@@ -2105,7 +2166,11 @@
       }
       return p.colors[0].image;
     }
-    return p.packshot || p.image;
+    /* `card` d'abord, comme partout ailleurs sur le site : c'est le seul
+       champ qui commande ce que montrent les carrousels, les grilles et les
+       pastilles de complément. Le bundle s'en écartait, et montrait un
+       visuel que le produit n'avait nulle part ailleurs. */
+    return p.card || p.packshot || p.image;
   }
 
   function bundleMedia(p, color){
@@ -2151,13 +2216,22 @@
       return i === 0 && state.color ? state.color : p.colors[0].name;
     });
 
+    /* Le prix d'un article du bundle dépend de l'option choisie : depuis
+       que le brassard vaut 1 249 au lieu de 1 099, `p.price` affichait un
+       montant que le panier ne facturait pas. `priceOf` lit l'option avant
+       de retomber sur le prix de la fiche, comme la nacelle. */
+    function lignePrix(p, i){
+      var pr = CATALOG.priceOf ? CATALOG.priceOf(p, colors[i], i === 0 ? state.size : null) : null;
+      return pr ? pr.price : p.price;
+    }
+
     function itemHtml(p, i){
       return (i ? '<span class="bundle-plus" aria-hidden="true">+</span>' : "") +
         '<div class="bundle-item on" data-i="' + i + '">' +
           bundleMedia(p, colors[i]) +
           (i === 0 ? '<span class="bundle-this">Este producto</span>' : "") +
           '<a class="bundle-name" href="' + esc(CATALOG.url(p.handle)) + '">' + esc(p.short) + '</a>' +
-          '<span class="bundle-price price-num">' + CATALOG.money(p.price) + '</span>' +
+          '<span class="bundle-price price-num">' + CATALOG.money(lignePrix(p, i)) + '</span>' +
           bundleSwatches(p, colors[i], i) +
           (i === 0
             ? '<span class="bundle-fixed" aria-hidden="true">' +
@@ -2177,7 +2251,7 @@
 
     function totals(){
       var full = 0;
-      each(items, function(p, i){ if (picked[i]) full += p.price; });
+      each(items, function(p, i){ if (picked[i]) full += lignePrix(p, i); });
       var off = picked.filter(Boolean).length > 1 ? Math.round(full * (window.LOWCART ? LOWCART.BUNDLE_OFF : 0.1)) : 0;
       return { full: full, off: off, net: full - off };
     }
@@ -2264,7 +2338,20 @@
         if (changed) revealGallery();
       }, false);
     });
-    each(document.querySelectorAll(".size-btn"), function(b){
+    each(document.querySelectorAll(".pos-btn"), function(b){
+      b.addEventListener("click", function(){
+        var next = b.getAttribute("data-position");
+        var changed = next !== state.position;
+        state.position = next;
+        /* `syncSelection` recale le coloris si celui qui est choisi
+           n'existe pas à cette position. */
+        syncSelection();
+        if (changed) revealGallery();
+      }, false);
+    });
+    /* `[data-size]` et non `.size-btn` : les boutons de position partagent
+       la classe pour en partager l'allure, pas le rôle. */
+    each(document.querySelectorAll(".size-btn[data-size]"), function(b){
       b.addEventListener("click", function(){
         var next = b.getAttribute("data-size");
         var changed = next !== state.size;

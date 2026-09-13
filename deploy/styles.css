@@ -1028,6 +1028,10 @@ section{padding:clamp(22px,3.2vw,40px) 0}
 .rail-item:hover{transform:translateY(-1px)}
 .rail-item:hover,.rail-item.active{background:linear-gradient(180deg,var(--glass-light-hi-a),var(--glass-light-hi-b))}
 .rail-item.active{box-shadow:var(--glass-edge),var(--glass-drop),inset 0 0 0 2px var(--ink)}
+/* `display:flex` de `.rail-item` bat le `display:none` que le navigateur
+   attache à `[hidden]` : sans cette règle, une pastille masquée par le
+   script resterait à l'écran. */
+.rail-item[hidden]{display:none}
 .rail-thumb{
   width:52px;height:52px;border-radius:50%;flex:none;overflow:hidden;
   background:var(--surface-teal);box-shadow:0 3px 10px rgba(23,25,27,.16);
@@ -1289,20 +1293,22 @@ footer a{color:var(--ink)}
 @supports not (height:100svh){
   .hero-full{height:calc(100vh - var(--topbar-h) - var(--gutter))}
 }
-/* Desktop : photo depuis le 03/09/2026, en remplacement de la boucle vidéo
-   du 22/08. Elle est posée en FOND et non dans une balise `img` : un
-   `<img>` en `display:none` est tout de même téléchargé, un fond CSS ne
-   l'est pas. Le téléphone, qui a sa propre boucle, ne paie donc rien.
+/* Desktop : boucle vidéo depuis le 13/09/2026, en remplacement de la photo
+   du 03/09. Elle occupe exactement la boîte que la photo occupait.
 
-   `cover` sur un 3/2 dans un cadre plus large que haut ne rogne que
-   quelques pour-cent en haut et en bas. Le cadrage est remonté à 42% :
-   les deux têtes sont dans le premier quart de l'image et c'est ce qu'il
-   ne faut pas perdre, tandis que le bas — le sol, sombre — peut être
-   entamé sans dommage. C'est d'ailleurs lui qui porte le contraste du
-   wordmark et des deux actions, calées en bas du cadre. */
-.hero-shot-desktop{
+   Le fond `#111214` sous la vidéo n'est pas décoratif : il tient la boîte
+   pendant le temps que met la première image à arriver, et la première
+   image de cette boucle est une salle sombre — le raccord ne se voit pas.
+
+   `cover` rogne le haut et le bas d'une source en 1,46/1 posée dans un
+   cadre plein écran. Le cadrage est remonté à 40% : le sujet est dans le
+   premier tiers et c'est ce qu'il ne faut pas perdre, tandis que le bas
+   peut être entamé — c'est lui qui porte le contraste du wordmark et des
+   deux actions, calées en bas du cadre. */
+.hero-loop-desktop{
   position:absolute;inset:0;z-index:1;
-  background:#111214 url("/media/landing/hero/hero-desktop.jpg") 50% 42%/cover no-repeat;
+  width:100%;height:100%;object-fit:cover;object-position:50% 40%;
+  display:block;background:#111214;
 }
 /* Mobile : la boucle vidéo remplace l'image. Elle reste hors du DOM
    visible au-dessus de 760px — display:none suffit, l'observateur de
@@ -1330,7 +1336,7 @@ footer a{color:var(--ink)}
     aspect-ratio:auto;max-height:none;min-height:0;border-radius:0;
     margin-inline:calc(-1 * var(--gutter));
   }
-  .hero-shot-desktop{display:none}
+  .hero-loop-desktop{display:none}
   .hero-loop{
     display:block;position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;object-position:center;z-index:1;
@@ -1382,6 +1388,19 @@ body.has-dark-top #contenido{position:relative;z-index:1;background:var(--surfac
 .hero-full::before{
   content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
   background:linear-gradient(180deg,rgba(12,13,14,0) 56%,rgba(12,13,14,.46) 100%);
+}
+/* La boucle desktop traverse des plans clairs autant que des plans sombres,
+   et le wordmark est blanc dans tous les cas. Une flaque très douce, centrée
+   sur lui, lui garantit un fond quel que soit le plan — elle ne se voit pas
+   sur les plans déjà sombres, où elle n'ajoute presque rien, et ne se
+   remarque que là où elle sert. Le bandeau du bas, lui, ne bouge pas.
+   Desktop seulement : la boucle mobile porte son propre wordmark incrusté. */
+@media(min-width:760px){
+  .hero-full::before{
+    background:
+      radial-gradient(56% 36% at 50% 46%, rgba(12,13,14,.32) 0%, rgba(12,13,14,0) 100%),
+      linear-gradient(180deg,rgba(12,13,14,0) 56%,rgba(12,13,14,.46) 100%);
+  }
 }
 .hero-full::after{
   content:"";position:absolute;inset:0;z-index:3;pointer-events:none;

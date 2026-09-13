@@ -122,21 +122,41 @@ function thumbSrc(src) {
 
 function colorRail(p) {
   if (!p.colors) return "";
+  const label = p.colorLabel || "Color";
   return `
             <div class="opt">
               <!-- La valeur choisie est écrite en toutes lettres : sur une
                    rangée de pastilles, l'anneau seul ne suffit pas à dire
                    laquelle est prise. app.js la tient à jour. -->
-              <p class="opt-head"><span>Color</span><b data-opt="color">${esc(p.colors[0].name)}</b></p>
-            <div class="rail-track" role="radiogroup" aria-label="Color de la banda">
+              <p class="opt-head"><span>${esc(label)}</span><b data-opt="color">${esc(p.colors[0].name)}</b></p>
+            <div class="rail-track" role="radiogroup" aria-label="${esc(label)}">
 ${p.colors
   .map(
-    (c, i) => `              <button class="rail-item glass-light${i === 0 ? " active" : ""}" type="button" role="radio" aria-checked="${i === 0}" data-color="${esc(c.name)}">
+    (c, i) => `              <button class="rail-item glass-light${i === 0 ? " active" : ""}" type="button" role="radio" aria-checked="${i === 0}" data-color="${esc(c.name)}"${c.position ? ` data-position="${esc(c.position)}"` : ""}>
                 <span class="rail-thumb"><img loading="lazy" src="${thumbSrc(c.image)}" alt="" width="80" height="80"></span>
-                <span class="rail-txt"><b>${esc(c.name)}</b><span>${esc(c.note)}</span></span>
+                <span class="rail-txt"><b>${esc(c.label || c.name)}</b><span>${esc(c.note)}</span></span>
                 <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                 <span class="rail-dot" style="background:${c.dot}" aria-hidden="true"></span>
               </button>`
+  )
+  .join("\n")}
+            </div>
+            </div>`;
+}
+
+/* Où porter la bande. Même gabarit que les tailles — deux boutons, un
+   intitulé, la valeur choisie écrite à côté — parce que c'est le même
+   geste : un choix parmi deux, sans visuel à comparer. La position
+   commande la liste des coloris, elle passe donc AVANT eux. */
+function positionRow(p) {
+  if (!p.positions) return "";
+  return `
+            <div class="opt">
+              <p class="opt-head"><span>Posición</span><b data-opt="position">${esc(p.positions[0].name)}</b></p>
+            <div class="rail-sizes" role="radiogroup" aria-label="Posición">
+${p.positions
+  .map(
+    (o, i) => `              <button class="size-btn pos-btn glass-light${i === 0 ? " active" : ""}" type="button" role="radio" aria-checked="${i === 0}" data-position="${esc(o.name)}"><b>${esc(o.name)}</b><small>${esc(o.note)}</small></button>`
   )
   .join("\n")}
             </div>
@@ -464,8 +484,11 @@ ${items
 function optionsSection(p) {
   if (!p.colors && !p.sizes) return null;
   const sizeLabel = p.sizeLabel === "Formato" ? "Formatos" : "Tallas";
-  const title = p.colors && p.sizes ? `Colores y ${sizeLabel.toLowerCase()}`
-    : p.colors ? "Colores" : sizeLabel;
+  /* Même intitulé que la nacelle : « Colores » par défaut, celui que la
+     fiche déclare sinon. */
+  const colorLabel = p.colorLabel ? p.colorLabel + "s" : "Colores";
+  const title = p.colors && p.sizes ? `${colorLabel} y ${sizeLabel.toLowerCase()}`
+    : p.colors ? colorLabel : sizeLabel;
   /* Un seul intitulé quand il n'y a qu'une liste : le volet porte déjà
      « Colores » dans sa barre de titre, le répéter juste en dessous ne
      dit rien de plus. */
@@ -473,7 +496,7 @@ function optionsSection(p) {
   const blocks = [];
   if (p.colors) {
     blocks.push(`<div class="info-block">${both ? `
-            <h4>Colores</h4>` : ""}
+            <h4>${esc(colorLabel)}</h4>` : ""}
             ${optionList(p.colors, true)}
           </div>`);
   }
@@ -1007,7 +1030,7 @@ ${galleryThumbs(p)}
               <span>MXN · Envío gratis</span>
               ${p.compareAt ? `<span class="sr-only">Precio anterior: ${money(p.compareAt)} pesos. Precio actual: ${money(p.price)} pesos mexicanos.</span>` : ""}
             </div>
-${colorRail(p)}${sizeRow(p)}
+${positionRow(p)}${colorRail(p)}${sizeRow(p)}
             <div class="pdp-cta">
               <button class="btn btn-ink btn-block btn-lg" id="checkout-btn" type="button" data-label="Añadir al carrito">${esc(buyLabel)}</button>
               <p class="pdp-note">${hasShopify ? "Pago seguro con tarjeta vía Shopify Checkout" : "Disponible bajo pedido — te contactamos para confirmar tu compra"}</p>

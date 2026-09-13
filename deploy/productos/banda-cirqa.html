@@ -50,7 +50,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   }
 }
 </script>
-<link rel="stylesheet" href="/styles.css?v=c9d34f06">
+<link rel="stylesheet" href="/styles.css?v=629b4b8d">
 <!-- ===== Écran d'ouverture — décidé AVANT la première peinture.
      Le script est en ligne et synchrone à dessein : posé dans app.js, qui
      est en defer, la page aurait le temps de se peindre une fois avant
@@ -179,6 +179,9 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               <figure class="gal-frame contain" data-color="Azul Francés">
                 <img loading="lazy" src="/media/productos/banda-cirqa/banda-azul-frances.jpg" alt="Banda CIRQA™ de repuesto — Azul Francés" width="900" height="900">
               </figure>
+              <figure class="gal-frame contain" data-color="Brazalete Negro">
+                <img loading="lazy" src="/media/productos/banda-cirqa/banda-brazo-negra.jpg" alt="Banda CIRQA™ de repuesto — Brazalete Negro" width="900" height="900">
+              </figure>
             </div>
             <div class="gal-dots" id="gal-dots" aria-hidden="true"></div>
             <div class="gal-thumbs" role="tablist" aria-label="Vistas del producto">
@@ -190,6 +193,9 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               </button>
               <button class="gal-thumb contain" type="button" role="tab" aria-selected="false" data-i="2" data-color="Azul Francés">
                 <img loading="lazy" src="/media/productos/banda-cirqa/banda-azul-frances.jpg" alt="Banda CIRQA™ de repuesto — Azul Francés" width="120" height="120">
+              </button>
+              <button class="gal-thumb contain" type="button" role="tab" aria-selected="false" data-i="3" data-color="Brazalete Negro">
+                <img loading="lazy" src="/media/productos/banda-cirqa/banda-brazo-negra.jpg" alt="Banda CIRQA™ de repuesto — Brazalete Negro" width="120" height="120">
               </button>
             </div>
           </div>
@@ -205,9 +211,9 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <p class="pdp-lede">Cambia el color sin cambiar de banda.</p>
             <ul class="pdp-facts">
               <li><b>CIRQA™ Smart Band</b><span>Compatibilidad</span></li>
+              <li><b>Muñeca o brazo superior</b><span>Posición</span></li>
               <li><b>S–M (120–200 mm) · L–XL (145–240 mm)</b><span>Tallas</span></li>
               <li><b>Tejido elástico, cierre de gancho</b><span>Material</span></li>
-              <li><b>Gris Lima, Oliva Oscuro, Azul Francés</b><span>Colores</span></li>
             </ul>
 
             <div class="pdp-price price-num">
@@ -218,36 +224,49 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             </div>
 
             <div class="opt">
+              <p class="opt-head"><span>Posición</span><b data-opt="position">Muñeca</b></p>
+            <div class="rail-sizes" role="radiogroup" aria-label="Posición">
+              <button class="size-btn pos-btn glass-light active" type="button" role="radio" aria-checked="true" data-position="Muñeca"><b>Muñeca</b><small>la banda clásica</small></button>
+              <button class="size-btn pos-btn glass-light" type="button" role="radio" aria-checked="false" data-position="Brazo superior"><b>Brazo superior</b><small>brazalete, solo en negro</small></button>
+            </div>
+            </div>
+            <div class="opt">
               <!-- La valeur choisie est écrite en toutes lettres : sur une
                    rangée de pastilles, l'anneau seul ne suffit pas à dire
                    laquelle est prise. app.js la tient à jour. -->
               <p class="opt-head"><span>Color</span><b data-opt="color">Gris Lima</b></p>
-            <div class="rail-track" role="radiogroup" aria-label="Color de la banda">
-              <button class="rail-item glass-light active" type="button" role="radio" aria-checked="true" data-color="Gris Lima">
+            <div class="rail-track" role="radiogroup" aria-label="Color">
+              <button class="rail-item glass-light active" type="button" role="radio" aria-checked="true" data-color="Gris Lima" data-position="Muñeca">
                 <span class="rail-thumb"><img loading="lazy" src="/media/productos/banda-cirqa/banda-gris-lima.jpg" alt="" width="80" height="80"></span>
                 <span class="rail-txt"><b>Gris Lima</b><span>Gris cálido con remate lima</span></span>
                 <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                 <span class="rail-dot" style="background:#a8a98d" aria-hidden="true"></span>
               </button>
-              <button class="rail-item glass-light" type="button" role="radio" aria-checked="false" data-color="Oliva Oscuro">
+              <button class="rail-item glass-light" type="button" role="radio" aria-checked="false" data-color="Oliva Oscuro" data-position="Muñeca">
                 <span class="rail-thumb"><img loading="lazy" src="/media/productos/banda-cirqa/banda-oliva-oscuro.jpg" alt="" width="80" height="80"></span>
                 <span class="rail-txt"><b>Oliva Oscuro</b><span>Verde profundo, casi militar</span></span>
                 <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                 <span class="rail-dot" style="background:#4f5232" aria-hidden="true"></span>
               </button>
-              <button class="rail-item glass-light" type="button" role="radio" aria-checked="false" data-color="Azul Francés">
+              <button class="rail-item glass-light" type="button" role="radio" aria-checked="false" data-color="Azul Francés" data-position="Muñeca">
                 <span class="rail-thumb"><img loading="lazy" src="/media/productos/banda-cirqa/banda-azul-frances.jpg" alt="" width="80" height="80"></span>
                 <span class="rail-txt"><b>Azul Francés</b><span>Azul claro y luminoso</span></span>
                 <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                 <span class="rail-dot" style="background:#8e9cc4" aria-hidden="true"></span>
+              </button>
+              <button class="rail-item glass-light" type="button" role="radio" aria-checked="false" data-color="Brazalete Negro" data-position="Brazo superior">
+                <span class="rail-thumb"><img loading="lazy" src="/media/productos/banda-cirqa/banda-brazo-negra.jpg" alt="" width="80" height="80"></span>
+                <span class="rail-txt"><b>Negra</b><span>Tejido negro, para el brazo superior</span></span>
+                <svg class="rail-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                <span class="rail-dot" style="background:#2b2b2e" aria-hidden="true"></span>
               </button>
             </div>
             </div>
             <div class="opt">
               <p class="opt-head"><span>Talla</span><b data-opt="size">S–M</b></p>
             <div class="rail-sizes" role="radiogroup" aria-label="Talla">
-              <button class="size-btn glass-light active" type="button" role="radio" aria-checked="true" data-size="S–M"><b>S–M</b><small>muñeca 120–200 mm</small></button>
-              <button class="size-btn glass-light" type="button" role="radio" aria-checked="false" data-size="L–XL"><b>L–XL</b><small>muñeca 145–240 mm</small></button>
+              <button class="size-btn glass-light active" type="button" role="radio" aria-checked="true" data-size="S–M"><b>S–M</b><small>contorno 120–200 mm</small></button>
+              <button class="size-btn glass-light" type="button" role="radio" aria-checked="false" data-size="L–XL"><b>L–XL</b><small>contorno 145–240 mm</small></button>
             </div>
             </div>
             <div class="pdp-cta">
@@ -328,7 +347,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               <ul class="pdp-list">
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Compatible con todas las Garmin CIRQA™ Smart Band</li>
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>El mismo tejido elástico y el mismo cierre que la banda original</li>
-              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Dos tallas, para muñecas de 120 a 240 mm</li>
+              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>También en versión brazalete, para llevarla en el brazo superior</li>
+              <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Dos tallas, de 120 a 240 mm de contorno</li>
               <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a6165" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Accesorio oficial Garmin</li>
             </ul>
             </div>
@@ -356,13 +376,14 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
               <li><i style="background:#a8a98d" aria-hidden="true"></i><b>Gris Lima</b><span>Gris cálido con remate lima</span></li>
               <li><i style="background:#4f5232" aria-hidden="true"></i><b>Oliva Oscuro</b><span>Verde profundo, casi militar</span></li>
               <li><i style="background:#8e9cc4" aria-hidden="true"></i><b>Azul Francés</b><span>Azul claro y luminoso</span></li>
+              <li><i style="background:#2b2b2e" aria-hidden="true"></i><b>Brazalete Negro</b><span>Tejido negro, para el brazo superior</span></li>
             </ul>
           </div>
           <div class="info-block">
             <h4>Tallas</h4>
             <ul class="info-opts">
-              <li><b>S–M</b><span>muñeca 120–200 mm</span></li>
-              <li><b>L–XL</b><span>muñeca 145–240 mm</span></li>
+              <li><b>S–M</b><span>contorno 120–200 mm</span></li>
+              <li><b>L–XL</b><span>contorno 145–240 mm</span></li>
             </ul>
           </div>
               </div>
@@ -385,9 +406,10 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <dl>
               <dt>Marca</dt><dd>Garmin</dd>
               <dt>Compatibilidad</dt><dd>CIRQA™ Smart Band</dd>
+              <dt>Posición</dt><dd>Muñeca o brazo superior</dd>
               <dt>Tallas</dt><dd>S–M (120–200 mm) · L–XL (145–240 mm)</dd>
               <dt>Material</dt><dd>Tejido elástico, cierre de gancho</dd>
-              <dt>Colores</dt><dd>Gris Lima, Oliva Oscuro, Azul Francés</dd>
+              <dt>Colores</dt><dd>Muñeca: Gris Lima, Oliva Oscuro, Azul Francés · Brazalete: Negro</dd>
               <dt>Envío</dt><dd>Gratis a todo México</dd>
             </dl>
           </div>
@@ -410,11 +432,11 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
             <div class="faq-list info-faq">
             <details>
               <summary>¿Qué talla elijo?</summary>
-              <div class="a"><b>S–M</b> — muñeca 120–200 mm · <b>L–XL</b> — muñeca 145–240 mm.</div>
+              <div class="a"><b>S–M</b> — contorno 120–200 mm · <b>L–XL</b> — contorno 145–240 mm.</div>
             </details>
             <details>
               <summary>¿En qué colores viene?</summary>
-              <div class="a">En 3: Gris Lima, Oliva Oscuro, Azul Francés. El color se elige arriba, antes de añadir al carrito.</div>
+              <div class="a">En 4: Gris Lima, Oliva Oscuro, Azul Francés, Brazalete Negro. El color se elige arriba, antes de añadir al carrito.</div>
             </details>
             <details>
               <summary>¿Cómo son el envío y la garantía?</summary>
@@ -539,8 +561,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
 <!-- Défilement fluide : une seule instance, démarrée par app.js. -->
 <script src="/lenis.min.js?v=daec1872" defer></script>
-<script src="/catalog.js?v=34170873" defer></script>
+<script src="/catalog.js?v=e3aadc52" defer></script>
 <script src="/cart.js?v=f3d8c0c3" defer></script>
-<script src="/app.js?v=5493cb0b" defer></script>
+<script src="/app.js?v=2cadc7e0" defer></script>
 </body>
 </html>

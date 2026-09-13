@@ -391,7 +391,8 @@
            le générateur retombe sur celle de la fiche (`s.image || p.image`
            dans gen-products.js), c'est-à-dire le packshot détouré. Le
            format reste donc achetable et illustré, sans ses deux photos. */
-        { name: "28 dosis",  note: "un mes",      price: 1599 }
+        { name: "28 dosis",  note: "un mes",      price: 1599,
+          image: "/media/productos/absorption-sleep/sleep-28-dosis.jpg" }
       ],
       shotFit: "contain",
       name: "The Absorption Company Sleep",
@@ -401,17 +402,16 @@
       price: 499,
       badge: "Nuevo",
       category: "Suplementos",
-      /* Visuel principal : le sachet de 28 doses, c'est-à-dire la 3e vue de
-         la fiche, détourée. Avant le 22/08/2026 c'était l'étui de 7 sticks
-         (`absorption-sleep.png`) — un PNG dont 76 % de la surface était un
-         rectangle blanc opaque, ce qui donnait au `drop-shadow` de la carte
-         l'ombre d'une boîte au lieu de celle du produit.
-         Attention : les trois formats gardent LEURS visuels dans `sizes`,
-         et c'est encore « 7 sticks » qui est sélectionné par défaut. */
-      image: "/media/productos/absorption-sleep/sleep-packshot.png",
-
-      hero: "/media/productos/absorption-sleep/sleep-packshot.png",
-      packshot: "/media/productos/absorption-sleep/sleep-packshot.png",
+      /* Visuel principal : l'étui de 7 sticks, redevenu la référence le
+         13/09/2026. Il avait cédé la place au sachet de 28 doses le
+         22/08 parce que son PNG — 76 % de rectangle blanc opaque — donnait
+         au `drop-shadow` des cartes l'ombre d'une boîte. Ce `drop-shadow`
+         n'existe plus : les cartes ont changé de gabarit depuis, et la
+         seule règle qui l'emploie encore vise l'icône du panier.
+         Le format 28 dosis, lui, garde SA photo dans `sizes`. */
+      image: "/media/productos/absorption-sleep/absorption-sleep.png",
+      hero: "/media/productos/absorption-sleep/absorption-sleep.png",
+      packshot: "/media/productos/absorption-sleep/absorption-sleep.png",
       highlights: [
         "Sin melatonina — descanso sin dependencia ni niebla matinal",
         "Azafrán liposomal Capsoil® y aceite de pasiflora Capsoil® para reducir el estrés",
@@ -569,12 +569,13 @@
       /* Mots-clés de recherche — jamais affichés. Espagnol ET anglais :
          le catalogue est en es-MX mais les noms de molécules et les
          termes produit circulent en anglais. */
-      keywords: ["banda","band","correa","strap","repuesto","recambio","cirqa","brazalete","garmin"],
+      keywords: ["banda","band","correa","strap","repuesto","recambio","cirqa","brazalete","brazo","biceps","brassard","armband","garmin"],
       pairs: ["cirqa", "absorption-sleep", "promix-creatina"],
       shopify: { handle: "banda-cirqa-repuesto", variants: {
-        "Gris Lima":    { "S–M": "64326134333817", "L–XL": "64326134366585" },
-        "Oliva Oscuro": { "S–M": "64326134399353", "L–XL": "64326134432121" },
-        "Azul Francés": { "S–M": "64326134464889", "L–XL": "64326134497657" }
+        "Gris Lima":       { "S–M": "64326134333817", "L–XL": "64326134366585" },
+        "Oliva Oscuro":    { "S–M": "64326134399353", "L–XL": "64326134432121" },
+        "Azul Francés":    { "S–M": "64326134464889", "L–XL": "64326134497657" },
+        "Brazalete Negro": { "S–M": "64558229160313", "L–XL": "64558229193081" }
       }},
       name: "Banda CIRQA™ de repuesto",
       short: "Banda de repuesto",
@@ -582,6 +583,15 @@
       tagline: "Cambia el color sin cambiar de banda.",
       price: 1099,
       category: "Accesorios",
+      /* Deux endroits où la porter, et ils n'offrent pas les mêmes
+         coloris : le poignet en a trois, le brassard n'existe qu'en noir.
+         La position est donc sa PROPRE option, comme chez Garmin, et
+         chaque coloris déclare celle à laquelle il appartient —
+         `selection` n'affiche que ceux de la position choisie. */
+      positions: [
+        { name: "Muñeca",         note: "la banda clásica" },
+        { name: "Brazo superior", note: "brazalete, solo en negro" }
+      ],
       image: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
       hero: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
       /* Détourée : le rendu brut est un JPEG sur fond blanc, donc opaque de
@@ -595,29 +605,45 @@
       card: "/media/productos/banda-cirqa/card.png",
       shotFit: "contain",
       colors: [
-        { name: "Gris Lima",    dot: "#a8a98d", image: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
+        { name: "Gris Lima",    position: "Muñeca", dot: "#a8a98d", image: "/media/productos/banda-cirqa/banda-gris-lima.jpg",
           note: "Gris cálido con remate lima" },
-        { name: "Oliva Oscuro", dot: "#4f5232", image: "/media/productos/banda-cirqa/banda-oliva-oscuro.jpg",
+        { name: "Oliva Oscuro", position: "Muñeca", dot: "#4f5232", image: "/media/productos/banda-cirqa/banda-oliva-oscuro.jpg",
           note: "Verde profundo, casi militar" },
-        { name: "Azul Francés", dot: "#8e9cc4", image: "/media/productos/banda-cirqa/banda-azul-frances.jpg",
-          note: "Azul claro y luminoso" }
+        { name: "Azul Francés", position: "Muñeca", dot: "#8e9cc4", image: "/media/productos/banda-cirqa/banda-azul-frances.jpg",
+          note: "Azul claro y luminoso" },
+        /* Le brassard : même produit Shopify, quatrième valeur de l'option
+           de couleur, et son propre prix — `priceOf` lit `price` sur
+           l'option choisie avant de retomber sur celui de la fiche.
+           `name` est la CLÉ de variante Shopify, et elle dit « brazalete »
+           pour que le panier et la commande soient sans ambiguïté ;
+           `label` est ce que la pastille affiche, la position étant déjà
+           choisie juste au-dessus. */
+        { name: "Brazalete Negro", label: "Negra", position: "Brazo superior",
+          dot: "#2b2b2e", price: 1249,
+          image: "/media/productos/banda-cirqa/banda-brazo-negra.jpg",
+          note: "Tejido negro, para el brazo superior" }
       ],
+      /* Les tailles servent les deux positions : on donne le contorno que
+         la bande couvre, sans nommer le poignet — Garmin ne publie pas de
+         plage pour le bras. */
       sizes: [
-        { name: "S–M",  note: "muñeca 120–200 mm" },
-        { name: "L–XL", note: "muñeca 145–240 mm" }
+        { name: "S–M",  note: "contorno 120–200 mm" },
+        { name: "L–XL", note: "contorno 145–240 mm" }
       ],
       highlights: [
         "Compatible con todas las Garmin CIRQA™ Smart Band",
         "El mismo tejido elástico y el mismo cierre que la banda original",
-        "Dos tallas, para muñecas de 120 a 240 mm",
+        "También en versión brazalete, para llevarla en el brazo superior",
+        "Dos tallas, de 120 a 240 mm de contorno",
         "Accesorio oficial Garmin"
       ],
       specs: [
         ["Marca", "Garmin"],
         ["Compatibilidad", "CIRQA™ Smart Band"],
+        ["Posición", "Muñeca o brazo superior"],
         ["Tallas", "S–M (120–200 mm) · L–XL (145–240 mm)"],
         ["Material", "Tejido elástico, cierre de gancho"],
-        ["Colores", "Gris Lima, Oliva Oscuro, Azul Francés"],
+        ["Colores", "Muñeca: Gris Lima, Oliva Oscuro, Azul Francés · Brazalete: Negro"],
         ["Envío", "Gratis a todo México"]
       ],
       story: {

@@ -19,12 +19,15 @@
 <link rel="preconnect" href="https://cdn.shopify.com">
 <!-- Typographie verrouillée : Outfit (titres) + DM Sans (texte courant). Aucune autre famille sur le site. -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<!-- Le hero desktop est une photo depuis le 03/09/2026 : c'est `hero-desktop.jpg`
-     qu'il faut précharger, pas `poster-hero-desktop.jpg` — l'affiche de
+<!-- Le hero desktop est redevenu une boucle vidéo le 13/09/2026. Plus rien à
+     précharger de ce côté : la balise `video` est en `preload="metadata"`,
+     elle va chercher ce qu'il lui faut toute seule et peint sa première
+     image sans qu'on ait à servir une affiche. Le téléphone, lui, garde sa
+     propre boucle — voir plus bas.
+     (Ancien commentaire, conservé pour la boucle mobile : l'affiche de
      l'ancienne boucle vidéo, orpheline, que ce lien ciblait encore. Sans ce
      correctif le vrai visuel n'était découvert qu'à la lecture de la CSS,
      et 43 ko partaient sur un fichier que plus personne n'affiche. -->
-<link rel="preload" as="image" href="/media/landing/hero/hero-desktop.jpg" media="(min-width: 760px)" fetchpriority="high">
 <link rel="preload" as="image" href="/media/landing/hero/poster-hero-mobile.jpg" media="(max-width: 759px)" fetchpriority="high">
 <script>
 document.documentElement.className += " js";
@@ -41,7 +44,7 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
   "currenciesAccepted": "MXN"
 }
 </script>
-<link rel="stylesheet" href="/styles.css?v=c9d34f06">
+<link rel="stylesheet" href="/styles.css?v=629b4b8d">
 <!-- ===== Écran d'ouverture — décidé AVANT la première peinture.
      Le script est en ligne et synchrone à dessein : posé dans app.js, qui
      est en `defer`, la page aurait le temps de se peindre une fois avant
@@ -142,15 +145,28 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
   <!-- ===== Hero pleine largeur ===== -->
   <header class="hero-full" id="hero">
-    <!-- Desktop : photo depuis le 03/09/2026, en remplacement de la boucle
-         vidéo du 22/08. Le visuel est posé en FOND CSS et non dans une
-         balise `img` : un `<img>` en `display:none` est tout de même
-         téléchargé par le navigateur, et le téléphone paierait 285 ko pour
-         un visuel qu'il n'affiche jamais. Un fond CSS sur un élément
-         `display:none`, lui, n'est jamais demandé. C'est exactement le
-         mécanisme que les affiches des deux boucles utilisaient déjà.
+    <!-- Desktop : boucle vidéo depuis le 13/09/2026, en remplacement de la
+         photo du 03/09.
+
+         `preload="metadata"` et non `none` : c'est ce qui fait peindre la
+         PREMIÈRE IMAGE sans qu'on ait à servir une affiche à côté. Elle
+         tient donc lieu d'affiche — y compris en mouvement réduit, où
+         `section-loops` met la boucle en pause et laisse cette image. Le
+         téléphone ne paie que les quelques kilo-octets de l'en-tête du
+         fichier, jamais la boucle : elle est en `display:none` sous 760px
+         et `section-loops` ne croise alors jamais l'élément.
+
+         Ni `autoplay` ni `poster`, pour la même raison que la boucle
+         mobile : les deux déclenchent le téléchargement complet même sur
+         un élément masqué. C'est `section-loops` qui lance la lecture
+         quand la boucle entre dans le cadre.
+
          Décoratif : le `h1` hors écran plus bas porte le sens. -->
-    <div class="hero-shot-desktop" aria-hidden="true"></div>
+    <video class="hero-loop-desktop" muted loop playsinline webkit-playsinline preload="metadata"
+           disablepictureinpicture disableremoteplayback
+           width="1048" height="718" aria-hidden="true" tabindex="-1" data-autoloop>
+      <source src="/media/landing/hero/hero-desktop.mp4" type="video/mp4">
+    </video>
     <!-- Mobile : boucle vidéo à la place de l'image. Ni `autoplay` ni
          `poster` ici — les deux déclenchent le téléchargement même quand
          l'élément est en display:none. C'est `section-loops` qui lance la
@@ -487,8 +503,8 @@ try{ if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.docume
 
 <!-- Défilement fluide : une seule instance, démarrée par app.js. -->
 <script src="/lenis.min.js?v=daec1872" defer></script>
-<script src="/catalog.js?v=34170873" defer></script>
+<script src="/catalog.js?v=e3aadc52" defer></script>
 <script src="/cart.js?v=f3d8c0c3" defer></script>
-<script src="/app.js?v=5493cb0b" defer></script>
+<script src="/app.js?v=2cadc7e0" defer></script>
 </body>
 </html>
